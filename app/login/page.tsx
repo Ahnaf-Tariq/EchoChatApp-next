@@ -1,18 +1,48 @@
 "use client";
-import React, { useState } from "react";
-import { signInWithPopup } from "firebase/auth";
+import { useEffect, useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth, provider } from "../firebase/config";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
-  const [currentState, setCurrentState] = useState("Sign In");
+  const [currentState, setCurrentState] = useState<string>("Sign In");
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (curuser) => {
+      if (curuser) {
+        router.push("/chat");
+      }
+    });
+  }, []);
 
   const googleLogin = async () => {
     try {
       const res = await signInWithPopup(auth, provider);
       console.log(res.user);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSignIn = async () => {
+    try {
+      if (currentState === "Sign In") {
+        const res = await signInWithEmailAndPassword(auth, email, password);
+        console.log(res.user);
+      } else {
+        const res = await createUserWithEmailAndPassword(auth, email, password);
+        console.log(res.user);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -62,7 +92,7 @@ const Login = () => {
             />
           </div>
           <button
-            // onClick={signIn}
+            onClick={handleSignIn}
             className="w-full font-semibold bg-[#14b8a6] text-white rounded-lg py-1 mt-2 cursor-pointer"
           >
             {currentState}

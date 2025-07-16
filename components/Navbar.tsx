@@ -2,14 +2,17 @@
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../app/firebase/config";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
+  const router = useRouter()
 
   const logOut = async () => {
     try {
       await signOut(auth);
       console.log("user logged out");
+      router.replace('/')
     } catch (error) {
       console.log(error);
     }
