@@ -1,8 +1,22 @@
 "use client";
 import React, { useState } from "react";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../firebase/config";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Sign In");
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const googleLogin = async () => {
+    try {
+      const res = await signInWithPopup(auth, provider);
+      console.log(res.user);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="flex justify-center mt-20 items-center px-2">
       <div className="bg-white shadow-md p-6 rounded-xl w-96">
@@ -17,6 +31,8 @@ const Login = () => {
               <label htmlFor="name">Name</label>
               <input
                 className="border border-gray-400 rounded-md px-1"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 type="text"
                 placeholder="Full Name..."
                 id="name"
@@ -27,6 +43,8 @@ const Login = () => {
             <label htmlFor="email">Email</label>
             <input
               className="border border-gray-400 rounded-md px-1"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               type="email"
               placeholder="Email..."
               id="email"
@@ -36,6 +54,8 @@ const Login = () => {
             <label htmlFor="password">Password</label>
             <input
               className="border border-gray-400 rounded-md px-1"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               type="password"
               placeholder="Password..."
               id="password"
@@ -54,7 +74,7 @@ const Login = () => {
             <hr className="flex-grow border-t border-gray-300" />
           </div>
           <button
-            // onClick={googleLogin}
+            onClick={googleLogin}
             className="w-full border border-[#14b8a6] text-xl rounded-lg cursor-pointer flex justify-center"
           >
             {/* Google logo */}
