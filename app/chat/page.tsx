@@ -1,9 +1,19 @@
-'use client'
+"use client";
 import Navbar from "@/components/Navbar";
-import React from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import React, { useEffect } from "react";
+import { auth } from "../firebase/config";
+import { useRouter } from "next/navigation";
 
 const Chat = () => {
-  
+  const router = useRouter()
+  useEffect(() => {
+    onAuthStateChanged(auth, (curuser) => {
+      if(!curuser){
+        router.replace('/')
+      }
+    });
+  }, []);
   return (
     <div>
       <Navbar />
