@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState<string>("Sign In");
-  const [name, setName] = useState<string>("");
+  const [name, setName] = useState<File>();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [user, setUser] = useState<any>(null);
@@ -50,23 +50,30 @@ const Login = () => {
   return (
     <div className="flex justify-center mt-20 items-center px-2">
       <div className="bg-white shadow-md p-6 rounded-xl w-96">
-        <div className="flex justify-between">
+        <div className="flex justify-center">
           <h1 className="font-semibold text-xl">{currentState}</h1>
-          <button className="text-xl">X</button>
         </div>
         <hr className="text-gray-400 my-4" />
         <div className="flex flex-col gap-3">
           {currentState === "Sign Up" && (
             <div className="flex flex-col gap-1">
-              <label htmlFor="name">Name</label>
               <input
                 className="border border-gray-400 rounded-md px-1"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                type="text"
+                // value={name}
+                hidden
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setName(e.target.files[0]);
+                  }
+                }}
+                type="file"
                 placeholder="Full Name..."
                 id="name"
               />
+              <label htmlFor="name">
+                Photo
+                <img className="size-10" src={name ? URL.createObjectURL(name) :"/assests/file.svg"} alt="" />
+              </label>
             </div>
           )}
           <div className="flex flex-col gap-1">

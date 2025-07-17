@@ -11,7 +11,7 @@ const Navbar = () => {
   const logOut = async () => {
     try {
       await signOut(auth);
-      console.log("user logged out");
+      console.log("user logged out",user);
       router.replace('/')
     } catch (error) {
       console.log(error);

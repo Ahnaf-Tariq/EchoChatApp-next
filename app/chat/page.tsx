@@ -6,11 +6,11 @@ import { auth } from "../firebase/config";
 import { useRouter } from "next/navigation";
 
 const Chat = () => {
-  const router = useRouter()
+  const router = useRouter();
   useEffect(() => {
     onAuthStateChanged(auth, (curuser) => {
-      if(!curuser){
-        router.replace('/')
+      if (!curuser) {
+        router.replace("/");
       }
     });
   }, []);
