@@ -9,6 +9,7 @@ import {
 import { auth, provider } from "../firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const { image, setImage } = useContext(AppContext);
@@ -24,7 +25,6 @@ const Login = () => {
         router.push("/chat");
       }
     });
-
     localStorage.setItem("image", image);
   }, []);
 
@@ -52,8 +52,9 @@ const Login = () => {
         const res = await createUserWithEmailAndPassword(auth, email, password);
         console.log(res.user);
       }
-    } catch (error) {
+    } catch (error:any) {
       console.log(error);
+      toast.error(error.code);
     }
   };
   return (
