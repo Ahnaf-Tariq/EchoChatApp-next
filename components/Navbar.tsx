@@ -1,10 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../app/firebase/config";
 import { useRouter } from "next/navigation";
+import { AppContext } from "@/context/Context";
 
 const Navbar = () => {
+  const {image} = useContext(AppContext)
   const [user, setUser] = useState<any>(null);
   const router = useRouter()
 
@@ -30,11 +32,11 @@ const Navbar = () => {
         <h1 className="text-white text-2xl sm:text-3xl font-semibold">
           Chat App
         </h1>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-3 items-center">
           {user && (
             <img
-              className="size-12 rounded-full cursor-pointer"
-              src={user.photoURL}
+              className="size-14 rounded-full cursor-pointer"
+              src={image ? URL.createObjectURL(image) : user.photoURL}
               alt="user Profile"
             />
           )}

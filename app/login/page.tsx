@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -8,10 +8,11 @@ import {
 } from "firebase/auth";
 import { auth, provider } from "../firebase/config";
 import { useRouter } from "next/navigation";
+import { AppContext } from "@/context/Context";
 
 const Login = () => {
+  const { image, setImage } = useContext(AppContext);
   const [currentState, setCurrentState] = useState<string>("Sign In");
-  const [name, setName] = useState<File>();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [user, setUser] = useState<any>(null);
@@ -23,7 +24,15 @@ const Login = () => {
         router.push("/chat");
       }
     });
+
+    localStorage.setItem("image", image);
   }, []);
+
+  const handleImageChange = (e: any) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
 
   const googleLogin = async () => {
     try {
@@ -61,18 +70,18 @@ const Login = () => {
                 className="border border-gray-400 rounded-md px-1"
                 // value={name}
                 hidden
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setName(e.target.files[0]);
-                  }
-                }}
+                onChange={handleImageChange}
                 type="file"
                 placeholder="Full Name..."
                 id="name"
               />
-              <label htmlFor="name">
+              <label className="text-gray-400 font-bold" htmlFor="name">
+                <img
+                  className="size-10 mb-1"
+                  src={image ? URL.createObjectURL(image) : "/assests/file.svg"}
+                  alt=""
+                />
                 Photo
-                <img className="size-10" src={name ? URL.createObjectURL(name) :"/assests/file.svg"} alt="" />
               </label>
             </div>
           )}
