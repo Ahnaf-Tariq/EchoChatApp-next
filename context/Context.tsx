@@ -48,7 +48,7 @@ export const Context = ({ children }: any) => {
         }
         setChatData(tempData.sort((a, b) => b.updatedAt - a.updatedAt));
 
-        return () =>  snap();
+        return () => snap();
       });
     }
   }, [userData]);
