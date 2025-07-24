@@ -6,17 +6,19 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import { auth, provider } from "../firebase/config";
+import { auth, db, provider } from "../firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
 import { toast } from "react-toastify";
+import { doc, setDoc } from "firebase/firestore";
 
 const Login = () => {
   const { image, setImage } = useContext(AppContext);
   const [currentState, setCurrentState] = useState<string>("Sign In");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [user, setUser] = useState<any>(null);
+  const [name, setName] = useState<any>(null);
+  // const [u,sU] = useState<any>(null)
   const router = useRouter();
 
   useEffect(() => {
@@ -24,6 +26,7 @@ const Login = () => {
       if (curuser) {
         router.push("/chat");
       }
+      // LoadUserData(curuser?.uid);
     });
     localStorage.setItem("image", image);
   }, []);
@@ -50,9 +53,21 @@ const Login = () => {
         console.log(res.user);
       } else {
         const res = await createUserWithEmailAndPassword(auth, email, password);
-        console.log(res.user);
+        const user = res.user;
+        console.log(user);
+
+        await setDoc(doc(db, "users", user.uid), {
+          id: user.uid,
+          email,
+          username: name.toLowerCase(),
+          lastSeen: Date.now(),
+        });
+
+        await setDoc(doc(db, "chats", user.uid), {
+          chatData: [],
+        });
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.log(error);
       toast.error(error.code);
     }
@@ -66,25 +81,39 @@ const Login = () => {
         <hr className="text-gray-400 my-4" />
         <div className="flex flex-col gap-3">
           {currentState === "Sign Up" && (
-            <div className="flex flex-col gap-1">
-              <input
-                className="border border-gray-400 rounded-md px-1"
-                // value={name}
-                hidden
-                onChange={handleImageChange}
-                type="file"
-                placeholder="Full Name..."
-                id="name"
-              />
-              <label className="text-gray-400 font-bold" htmlFor="name">
-                <img
-                  className="size-10 mb-1"
-                  src={image ? URL.createObjectURL(image) : "/assests/file.svg"}
-                  alt=""
+            <>
+              <div className="flex flex-col gap-1">
+                <input
+                  className="border border-gray-400 rounded-md px-1"
+                  // value={name}
+                  hidden
+                  onChange={handleImageChange}
+                  type="file"
+                  id="photo"
                 />
-                Photo
-              </label>
-            </div>
+                <label className="text-gray-400 font-bold" htmlFor="photo">
+                  <img
+                    className="size-10 mb-1"
+                    src={
+                      image ? URL.createObjectURL(image) : "/assests/file.svg"
+                    }
+                    alt=""
+                  />
+                  Photo
+                </label>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label htmlFor="name">Email</label>
+                <input
+                  className="border border-gray-400 rounded-md px-1"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  type="text"
+                  placeholder="Name..."
+                  id="name"
+                />
+              </div>
+            </>
           )}
           <div className="flex flex-col gap-1">
             <label htmlFor="email">Email</label>
