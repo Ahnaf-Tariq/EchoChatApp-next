@@ -9,19 +9,19 @@ import { HiDotsVertical } from "react-icons/hi";
 import { FaSearch } from "react-icons/fa";
 import { BsExclamationCircle } from "react-icons/bs";
 import { IoSend } from "react-icons/io5";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 
 interface User {
-  id:string;
-  username:string;
-  email:string;
+  id: string;
+  username: string;
+  email: string;
   lastSeen: number;
 }
 
 const Chat = () => {
   const { LoadUserData } = useContext(AppContext);
   const router = useRouter();
-  const [usersList,setUsersList] = useState<User[]>([])
+  const [usersList, setUsersList] = useState<User[]>([]);
 
   useEffect(() => {
     onAuthStateChanged(auth, (curuser) => {
@@ -75,6 +75,24 @@ const Chat = () => {
     },
   ];
 
+  const msgLists = [
+    {
+      text: "lorem ipsum dolor tos ami kos Hala Madrid!",
+      time: "9:39 PM",
+      type: "Sender",
+    },
+    {
+      text: "lorem ipsum dolor tos ami kos Visca Barca!",
+      time: "4:40 PM",
+      type: "Reciever",
+    },
+    {
+      text: "lorem ipsum dolor tos ami kos Forza Inter!",
+      time: "8:14 AM",
+      type: "Sender",
+    }
+  ];
+
   useEffect(() => {
     const fetch = async () => {
       const userRef = collection(db, "users");
@@ -83,7 +101,7 @@ const Chat = () => {
       const users: User[] = snap.docs.map((doc) => doc.data() as User);
 
       console.log(users);
-      setUsersList(users)
+      setUsersList(users);
     };
     fetch();
   }, []);
@@ -116,7 +134,7 @@ const Chat = () => {
                 }`}
               >
                 <img
-                  src='https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg'
+                  src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg"
                   alt="avatar"
                   className="size-10 rounded-full"
                 />
@@ -141,6 +159,14 @@ const Chat = () => {
               <p className="bg-yellow-400 rounded-full w-3 h-3"></p>
             </div>
             <BsExclamationCircle className="size-6 cursor-pointer" />
+          </div>
+          <div  className="max-h-[450px] overflow-y-scroll scrollbar-hide">
+            {msgLists.map((msg,ind) => (
+              <div key={ind} className={`bg-[#0f766e] p-2 m-2 w-80 rounded-lg flex flex-col ${msg.type === 'Sender' ? 'ml-auto rounded-br-none' : 'mr-auto rounded-bl-none'}`}>
+                <h1>{msg.text}</h1>
+                <p className="flex self-end text-sm text-gray-200">{msg.time}</p>
+              </div>
+            ))}
           </div>
           {/* input msg */}
           <div className="absolute bottom-0 w-full flex items-center gap-2 bg-[#0f766e] p-4">
