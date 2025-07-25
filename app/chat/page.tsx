@@ -22,6 +22,8 @@ const Chat = () => {
   const { LoadUserData } = useContext(AppContext);
   const router = useRouter();
   const [usersList, setUsersList] = useState<User[]>([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [originalUsersList, setOriginalUsersList] = useState<User[]>([]);
 
   useEffect(() => {
     onAuthStateChanged(auth, (curuser) => {
@@ -90,7 +92,7 @@ const Chat = () => {
       text: "lorem ipsum dolor tos ami kos Forza Inter!",
       time: "8:14 AM",
       type: "Sender",
-    }
+    },
   ];
 
   useEffect(() => {
@@ -102,9 +104,21 @@ const Chat = () => {
 
       console.log(users);
       setUsersList(users);
+      setOriginalUsersList(users);
     };
     fetch();
   }, []);
+
+  const change = (e: any) => {
+    const value = e.target.value
+    setSearchInput(value);
+
+    const filtered = originalUsersList.filter((item) =>
+      item.username.toLowerCase().includes(value.toLowerCase())
+    );
+
+    setUsersList(filtered)
+  };
   return (
     <div>
       <Navbar />
@@ -121,6 +135,8 @@ const Chat = () => {
             <FaSearch className="text-white text-sm" />
             <input
               type="text"
+              onChange={change}
+              value={searchInput}
               placeholder="Search here.."
               className="bg-transparent text-white placeholder-white outline-none w-full"
             />
@@ -160,11 +176,20 @@ const Chat = () => {
             </div>
             <BsExclamationCircle className="size-6 cursor-pointer" />
           </div>
-          <div  className="max-h-[450px] overflow-y-scroll scrollbar-hide">
-            {msgLists.map((msg,ind) => (
-              <div key={ind} className={`bg-[#0f766e] p-2 m-2 w-80 rounded-lg flex flex-col ${msg.type === 'Sender' ? 'ml-auto rounded-br-none' : 'mr-auto rounded-bl-none'}`}>
+          <div className="max-h-[450px] overflow-y-scroll scrollbar-hide">
+            {msgLists.map((msg, ind) => (
+              <div
+                key={ind}
+                className={`bg-[#0f766e] p-2 m-2 w-80 rounded-lg flex flex-col ${
+                  msg.type === "Sender"
+                    ? "ml-auto rounded-br-none"
+                    : "mr-auto rounded-bl-none"
+                }`}
+              >
                 <h1>{msg.text}</h1>
-                <p className="flex self-end text-sm text-gray-200">{msg.time}</p>
+                <p className="flex self-end text-sm text-gray-200">
+                  {msg.time}
+                </p>
               </div>
             ))}
           </div>
