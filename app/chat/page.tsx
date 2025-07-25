@@ -9,7 +9,16 @@ import { HiDotsVertical } from "react-icons/hi";
 import { FaSearch } from "react-icons/fa";
 import { BsExclamationCircle } from "react-icons/bs";
 import { IoSend } from "react-icons/io5";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  arrayUnion,
+  onSnapshot,
+} from "firebase/firestore";
 
 interface User {
   id: string;
@@ -18,12 +27,22 @@ interface User {
   lastSeen: number;
 }
 
+interface Message {
+  senderId: string;
+  receiverId: string;
+  text: string;
+  timestamp: number;
+}
+
 const Chat = () => {
   const { LoadUserData } = useContext(AppContext);
   const router = useRouter();
   const [usersList, setUsersList] = useState<User[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [originalUsersList, setOriginalUsersList] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [inputMessage, setInputMessage] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     onAuthStateChanged(auth, (curuser) => {
@@ -33,49 +52,6 @@ const Chat = () => {
       LoadUserData(curuser?.uid);
     });
   }, []);
-
-  const usersLists = [
-    {
-      name: "Richard Sanford",
-      message: "Hello, How are you?",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-    },
-    {
-      name: "Cristiano Ronaldo",
-      message: "Hello, How are you?",
-      avatar: "https://randomuser.me/api/portraits/men/2.jpg",
-    },
-    {
-      name: "Lionel Messi",
-      message: "Hello, How are you?",
-      avatar: "https://randomuser.me/api/portraits/men/3.jpg",
-    },
-    {
-      name: "Neymar Jr",
-      message: "Hello, How are you?",
-      avatar: "https://randomuser.me/api/portraits/men/4.jpg",
-    },
-    {
-      name: "Kylian Mbappe",
-      message: "Hello, How are you?",
-      avatar: "https://randomuser.me/api/portraits/men/5.jpg",
-    },
-    {
-      name: "Ronaldinho",
-      message: "Hello, How are you?",
-      avatar: "https://randomuser.me/api/portraits/men/6.jpg",
-    },
-    {
-      name: "Fede Valverde",
-      message: "Hello, How are you?",
-      avatar: "https://randomuser.me/api/portraits/men/7.jpg",
-    },
-    {
-      name: "Thierry Henry",
-      message: "Hello, How are you?",
-      avatar: "https://randomuser.me/api/portraits/men/8.jpg",
-    },
-  ];
 
   const msgLists = [
     {
@@ -96,28 +72,89 @@ const Chat = () => {
   ];
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchUsers = async () => {
       const userRef = collection(db, "users");
       const snap = await getDocs(userRef);
 
-      const users: User[] = snap.docs.map((doc) => doc.data() as User);
+      const users: User[] = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as User[];
 
       console.log(users);
       setUsersList(users);
       setOriginalUsersList(users);
     };
-    fetch();
+    fetchUsers();
   }, []);
 
+  // Send message function
+  const sendMessage = async () => {
+    if (!selectedUser || !auth.currentUser || !inputMessage.trim()) return;
+
+    const currentUserId = auth.currentUser.uid;
+    const receiverId = selectedUser.id;
+    const chatId =
+      currentUserId < receiverId
+        ? `${currentUserId}_${receiverId}`
+        : `${receiverId}_${currentUserId}`;
+
+    const chatRef = doc(db, "chats", chatId);
+    const chatSnap = await getDoc(chatRef);
+
+    const newMsg: Message = {
+      senderId: currentUserId,
+      receiverId,
+      text: inputMessage,
+      timestamp: Date.now(),
+    };
+
+    if (chatSnap.exists()) {
+      await updateDoc(chatRef, {
+        chatData: arrayUnion(newMsg),
+      });
+    } else {
+      await setDoc(chatRef, {
+        chatData: [newMsg],
+      });
+    }
+
+    setInputMessage("");
+  };
+
+  // Real-time messages
+  useEffect(() => {
+    if (!selectedUser || !auth.currentUser) return;
+
+    const currentUserId = auth.currentUser.uid;
+    const receiverId = selectedUser.id;
+    const chatId =
+      currentUserId < receiverId
+        ? `${currentUserId}_${receiverId}`
+        : `${receiverId}_${currentUserId}`;
+
+    const chatRef = doc(db, "chats", chatId);
+
+    const unsub = onSnapshot(chatRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setMessages(docSnap.data().chatData || []);
+      } else {
+        setMessages([]);
+      }
+    });
+
+    return () => unsub();
+  }, [selectedUser]);
+
   const change = (e: any) => {
-    const value = e.target.value
+    const value = e.target.value;
     setSearchInput(value);
 
     const filtered = originalUsersList.filter((item) =>
       item.username.toLowerCase().includes(value.toLowerCase())
     );
 
-    setUsersList(filtered)
+    setUsersList(filtered);
   };
   return (
     <div>
@@ -144,9 +181,10 @@ const Chat = () => {
           <div className="max-h-[450px] overflow-y-scroll scrollbar-hide">
             {usersList.map((users, index) => (
               <div
+                onClick={() => setSelectedUser(users)}
                 key={index}
                 className={`flex items-center gap-3 px-4 py-3 hover:bg-[#1A4FA3] cursor-pointer ${
-                  index === 0 ? "bg-[#1A4FA3]" : ""
+                  selectedUser?.id === users.id ? "bg-[#1A4FA3]" : ""
                 }`}
               >
                 <img
@@ -168,39 +206,43 @@ const Chat = () => {
             <div className="flex items-center gap-3">
               <img
                 className="size-8 rounded-full"
-                src="https://randomuser.me/api/portraits/men/1.jpg"
+                src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg"
                 alt=""
               />
-              <h1 className="text-lg font-semibold">Richard Stanford</h1>
+              <h1 className="text-lg font-semibold capitalize">{selectedUser?.username}</h1>
               <p className="bg-yellow-400 rounded-full w-3 h-3"></p>
             </div>
             <BsExclamationCircle className="size-6 cursor-pointer" />
           </div>
           <div className="max-h-[450px] overflow-y-scroll scrollbar-hide">
-            {msgLists.map((msg, ind) => (
+            {messages.map((msg, ind) => (
               <div
                 key={ind}
-                className={`bg-[#0f766e] p-2 m-2 w-80 rounded-lg flex flex-col ${
-                  msg.type === "Sender"
+                className={`bg-[#0f766e] p-2 m-2 w-80 rounded-lg flex ${
+                  msg.senderId === auth.currentUser?.uid
                     ? "ml-auto rounded-br-none"
-                    : "mr-auto rounded-bl-none"
+                    : "rounded-bl-none"
                 }`}
               >
-                <h1>{msg.text}</h1>
-                <p className="flex self-end text-sm text-gray-200">
-                  {msg.time}
-                </p>
+                <div>
+                  <h1>{msg.text}</h1>
+                  <p className="flex justify-end text-sm text-gray-200">
+                    {new Date(msg.timestamp).toLocaleTimeString()}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
           {/* input msg */}
           <div className="absolute bottom-0 w-full flex items-center gap-2 bg-[#0f766e] p-4">
             <input
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
               type="text"
               placeholder="Search here.."
               className="text-white placeholder-white outline-none w-full"
             />
-            <p className="cursor-pointer">
+            <p onClick={sendMessage} className="cursor-pointer">
               <IoSend className="size-6" />
             </p>
           </div>
