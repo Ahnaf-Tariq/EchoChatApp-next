@@ -62,10 +62,6 @@ const Login = () => {
           username: name.toLowerCase(),
           lastSeen: Date.now(),
         });
-
-        await setDoc(doc(db, "chats", user.uid), {
-          chatData: [],
-        });
       }
     } catch (error: any) {
       console.log(error);
@@ -111,6 +107,7 @@ const Login = () => {
                   type="text"
                   placeholder="Name..."
                   id="name"
+                  required
                 />
               </div>
             </>
@@ -124,6 +121,7 @@ const Login = () => {
               type="email"
               placeholder="Email..."
               id="email"
+              required
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -135,6 +133,7 @@ const Login = () => {
               type="password"
               placeholder="Password..."
               id="password"
+              required
             />
           </div>
           <button

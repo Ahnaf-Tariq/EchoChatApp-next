@@ -179,25 +179,27 @@ const Chat = () => {
             />
           </div>
           <div className="max-h-[450px] overflow-y-scroll scrollbar-hide">
-            {usersList.map((users, index) => (
-              <div
-                onClick={() => setSelectedUser(users)}
-                key={index}
-                className={`flex items-center gap-3 px-4 py-3 hover:bg-[#1A4FA3] cursor-pointer ${
-                  selectedUser?.id === users.id ? "bg-[#1A4FA3]" : ""
-                }`}
-              >
-                <img
-                  src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg"
-                  alt="avatar"
-                  className="size-10 rounded-full"
-                />
-                <div>
-                  <p className="font-semibold">{users.username}</p>
-                  <p className="text-sm text-gray-300">{users.email}</p>
+            {usersList
+              .filter((user) => user.id !== auth.currentUser?.uid)
+              .map((user, index) => (
+                <div
+                  onClick={() => setSelectedUser(user)}
+                  key={index}
+                  className={`flex items-center gap-3 px-4 py-3 hover:bg-[#1A4FA3] cursor-pointer ${
+                    selectedUser?.id === user.id ? "bg-[#1A4FA3]" : ""
+                  }`}
+                >
+                  <img
+                    src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg"
+                    alt="avatar"
+                    className="size-10 rounded-full"
+                  />
+                  <div>
+                    <p className="font-semibold">{user.username}</p>
+                    <p className="text-sm text-gray-300">{user.email}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
         {/* chat display */}
@@ -209,7 +211,9 @@ const Chat = () => {
                 src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg"
                 alt=""
               />
-              <h1 className="text-lg font-semibold capitalize">{selectedUser?.username}</h1>
+              <h1 className="text-lg font-semibold capitalize">
+                {selectedUser?.username}
+              </h1>
               <p className="bg-yellow-400 rounded-full w-3 h-3"></p>
             </div>
             <BsExclamationCircle className="size-6 cursor-pointer" />
@@ -236,8 +240,8 @@ const Chat = () => {
           {/* input msg */}
           <div className="absolute bottom-0 w-full flex items-center gap-2 bg-[#0f766e] p-4">
             <input
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
               type="text"
               placeholder="Search here.."
               className="text-white placeholder-white outline-none w-full"
