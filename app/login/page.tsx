@@ -18,7 +18,6 @@ const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<any>(null);
-  // const [u,sU] = useState<any>(null)
   const router = useRouter();
 
   useEffect(() => {

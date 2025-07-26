@@ -19,12 +19,13 @@ import {
   arrayUnion,
   onSnapshot,
 } from "firebase/firestore";
+import { formatDistanceToNow } from "date-fns";
 
 interface User {
   id: string;
   username: string;
   email: string;
-  lastSeen: number;
+  lastSeen: number | string;
 }
 
 interface Message {
@@ -141,7 +142,7 @@ const Chat = () => {
   return (
     <div>
       <Navbar />
-      <div className="max-w-6xl mx-auto my-10 grid grid-cols-[1fr_2fr] h-[600px]">
+      <div className="max-w-6xl mx-auto my-10 grid grid-cols-[1fr_2fr] h-[600px] px-2">
         {/* left side users */}
         <div className="bg-[#14b8a6] text-white border-r-2 border-gray-100">
           <div className="flex justify-between items-center p-6 gap-2">
@@ -194,11 +195,21 @@ const Chat = () => {
                 src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg"
                 alt=""
               />
-              <h1 className="text-lg font-semibold capitalize">
-                {selectedUser?.username
-                  ? selectedUser?.username
-                  : "Select User"}
-              </h1>
+              <div>
+                <h1 className="text-lg font-semibold capitalize">
+                  {selectedUser?.username
+                    ? selectedUser?.username
+                    : "Select User"}
+                </h1>
+                <p className="text-xs">
+                  Last Seen:{" "}
+                  {selectedUser?.lastSeen
+                    ? formatDistanceToNow(new Date(selectedUser.lastSeen), {
+                        addSuffix: true,
+                      })
+                    : "N/A"}
+                </p>
+              </div>
               {/* <p className="bg-yellow-400 rounded-full w-3 h-3"></p> */}
             </div>
             <BsExclamationCircle className="size-6 cursor-pointer" />
@@ -218,7 +229,7 @@ const Chat = () => {
                 >
                   <h1>{msg.text}</h1>
                   <p
-                    className={`flex ${
+                    className={`${
                       msg.receiverId === selectedUser?.id
                         ? "self-end"
                         : "self-start"
