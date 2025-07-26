@@ -2,7 +2,7 @@
 import { auth, db } from "@/app/firebase/config";
 import { AppContext } from "@/context/Context";
 import { collection, getDocs } from "firebase/firestore";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
 
