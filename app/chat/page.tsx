@@ -53,7 +53,6 @@ const Chat = () => {
     });
   }, []);
 
-
   useEffect(() => {
     const fetchUsers = async () => {
       const userRef = collection(db, "users");
@@ -143,7 +142,7 @@ const Chat = () => {
     <div>
       <Navbar />
       <div className="max-w-6xl mx-auto my-10 grid grid-cols-[1fr_2fr] h-[600px]">
-        {/* users */}
+        {/* left side users */}
         <div className="bg-[#14b8a6] text-white border-r-2 border-gray-100">
           <div className="flex justify-between items-center p-6 gap-2">
             <h1 className="text-2xl font-semibold">ChatApp</h1>
@@ -161,6 +160,7 @@ const Chat = () => {
               className="bg-transparent text-white placeholder-white outline-none w-full"
             />
           </div>
+          {/* users list */}
           <div className="max-h-[450px] overflow-y-scroll scrollbar-hide">
             {usersList
               .filter((user) => user.id !== auth.currentUser?.uid)
@@ -185,7 +185,7 @@ const Chat = () => {
               ))}
           </div>
         </div>
-        {/* chat display */}
+        {/* right side chat display */}
         <div className="bg-[#14b8a6] text-white relative">
           <div className="flex justify-between items-center p-4 border-b-2 border-gray-300 mx-2">
             <div className="flex items-center gap-3">
@@ -195,29 +195,46 @@ const Chat = () => {
                 alt=""
               />
               <h1 className="text-lg font-semibold capitalize">
-                {selectedUser?.username}
+                {selectedUser?.username
+                  ? selectedUser?.username
+                  : "Select User"}
               </h1>
               {/* <p className="bg-yellow-400 rounded-full w-3 h-3"></p> */}
             </div>
             <BsExclamationCircle className="size-6 cursor-pointer" />
           </div>
-          <div className="max-h-[450px] overflow-y-scroll scrollbar-hide">
-            {messages.map((msg, ind) => (
-              <div
-                key={ind}
-                className={`bg-[#0f766e] p-2 m-2 w-44 rounded-lg flex flex-col gap-1 ${
-                  msg.senderId === auth.currentUser?.uid
-                    ? "ml-auto rounded-br-none"
-                    : "rounded-bl-none"
-                }`}
-              >
+          {/* chats msgs */}
+
+          {selectedUser ? (
+            <div className="max-h-[450px] overflow-y-scroll scrollbar-hide">
+              {messages.map((msg, ind) => (
+                <div
+                  key={ind}
+                  className={`bg-[#0f766e] p-2 m-2 w-44 rounded-lg flex flex-col gap-1 ${
+                    msg.senderId === auth.currentUser?.uid
+                      ? "ml-auto rounded-br-none"
+                      : "rounded-bl-none"
+                  }`}
+                >
                   <h1>{msg.text}</h1>
-                  <p className="flex self-end text-sm text-gray-200">
+                  <p
+                    className={`flex ${
+                      msg.receiverId === selectedUser?.id
+                        ? "self-end"
+                        : "self-start"
+                    } text-sm text-gray-200`}
+                  >
                     {new Date(msg.timestamp).toLocaleTimeString()}
                   </p>
-              </div>
-            ))}
-          </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col justify-center items-center mt-32">
+              <h1 className="text-2xl">No User Selected</h1>
+              <p className="text-xl">Please select any user to chat!</p>
+            </div>
+          )}
           {/* input msg */}
           <div className="absolute bottom-0 w-full flex items-center gap-2 bg-[#0f766e] p-4">
             <input
