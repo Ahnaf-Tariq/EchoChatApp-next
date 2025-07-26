@@ -53,23 +53,6 @@ const Chat = () => {
     });
   }, []);
 
-  const msgLists = [
-    {
-      text: "lorem ipsum dolor tos ami kos Hala Madrid!",
-      time: "9:39 PM",
-      type: "Sender",
-    },
-    {
-      text: "lorem ipsum dolor tos ami kos Visca Barca!",
-      time: "4:40 PM",
-      type: "Reciever",
-    },
-    {
-      text: "lorem ipsum dolor tos ami kos Forza Inter!",
-      time: "8:14 AM",
-      type: "Sender",
-    },
-  ];
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -214,7 +197,7 @@ const Chat = () => {
               <h1 className="text-lg font-semibold capitalize">
                 {selectedUser?.username}
               </h1>
-              <p className="bg-yellow-400 rounded-full w-3 h-3"></p>
+              {/* <p className="bg-yellow-400 rounded-full w-3 h-3"></p> */}
             </div>
             <BsExclamationCircle className="size-6 cursor-pointer" />
           </div>
@@ -222,18 +205,16 @@ const Chat = () => {
             {messages.map((msg, ind) => (
               <div
                 key={ind}
-                className={`bg-[#0f766e] p-2 m-2 w-80 rounded-lg flex ${
+                className={`bg-[#0f766e] p-2 m-2 w-44 rounded-lg flex flex-col gap-1 ${
                   msg.senderId === auth.currentUser?.uid
                     ? "ml-auto rounded-br-none"
                     : "rounded-bl-none"
                 }`}
               >
-                <div>
                   <h1>{msg.text}</h1>
-                  <p className="flex justify-end text-sm text-gray-200">
+                  <p className="flex self-end text-sm text-gray-200">
                     {new Date(msg.timestamp).toLocaleTimeString()}
                   </p>
-                </div>
               </div>
             ))}
           </div>

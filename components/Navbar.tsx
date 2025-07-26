@@ -35,14 +35,14 @@ const Navbar = () => {
         <div className="flex gap-3 items-center">
           {user && (
             <img
-              className="size-14 rounded-full cursor-pointer"
-              src={image ? URL.createObjectURL(image) : user.photoURL}
+              className="size-12 rounded-full cursor-pointer"
+              src={image ? URL.createObjectURL(image) : user.photoURL ? user.photoURL : 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg'}
               alt="user Profile"
             />
           )}
           <button
             onClick={logOut}
-            className="text-white bg-[#0f766e] rounded-xl px-2 sm:px-4 py-1 sm:py-2 cursor-pointer"
+            className="text-white font-semibold bg-[#0f766e] rounded-xl px-2 sm:px-4 py-1 sm:py-2 cursor-pointer"
           >
             Logout
           </button>

@@ -25,8 +25,7 @@ const Login = () => {
     onAuthStateChanged(auth, (curuser) => {
       if (curuser) {
         router.push("/chat");
-      }
-      // LoadUserData(curuser?.uid);
+      } 
     });
     localStorage.setItem("image", image);
   }, []);
@@ -49,19 +48,28 @@ const Login = () => {
   const handleSignIn = async () => {
     try {
       if (currentState === "Sign In") {
+        if (!email || !password) {
+          toast.error("Please fill all fields");
+          return;
+        }
         const res = await signInWithEmailAndPassword(auth, email, password);
         console.log(res.user);
       } else {
-        const res = await createUserWithEmailAndPassword(auth, email, password);
-        const user = res.user;
-        console.log(user);
+        if (!name || !email || !password) {
+          toast.error("Please fill all fields");
+          return;
+        } else {
+          const res = await createUserWithEmailAndPassword(auth,email,password);
+          const user = res.user;
+          console.log(user);
 
-        await setDoc(doc(db, "users", user.uid), {
-          id: user.uid,
-          email,
-          username: name.toLowerCase(),
-          lastSeen: Date.now(),
-        });
+          await setDoc(doc(db, "users", user.uid), {
+            id: user.uid,
+            email,
+            username: name.toLowerCase(),
+            lastSeen: Date.now(),
+          });
+        }
       }
     } catch (error: any) {
       console.log(error);
