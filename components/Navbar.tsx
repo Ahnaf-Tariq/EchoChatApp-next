@@ -6,15 +6,15 @@ import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
 
 const Navbar = () => {
-  const {image} = useContext(AppContext)
+  const { image } = useContext(AppContext);
   const [user, setUser] = useState<any>(null);
-  const router = useRouter()
+  const router = useRouter();
 
   const logOut = async () => {
     try {
       await signOut(auth);
-      console.log("user logged out",user);
-      router.replace('/')
+      console.log("user logged out", user);
+      router.replace("/");
     } catch (error) {
       console.log(error);
     }
@@ -23,7 +23,7 @@ const Navbar = () => {
   useEffect(() => {
     const getUser = onAuthStateChanged(auth, (curuser) => setUser(curuser));
 
-    return () => getUser()
+    return () => getUser();
   }, []);
 
   return (
@@ -36,7 +36,13 @@ const Navbar = () => {
           {user && (
             <img
               className="size-12 rounded-full cursor-pointer"
-              src={image ? URL.createObjectURL(image) : user.photoURL ? user.photoURL : 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg'}
+              src={
+                image
+                  ? URL.createObjectURL(image)
+                  : user.photoURL
+                  ? user.photoURL
+                  : "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg"
+              }
               alt="user Profile"
             />
           )}

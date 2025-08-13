@@ -27,6 +27,7 @@ const Chat = () => {
       <div className="max-w-6xl mx-auto my-10 grid grid-cols-[1fr_2fr] h-[600px] px-2">
         {/* left side users */}
         <LeftSideChat />
+
         {/* right side chat display */}
         <RightSideChat />
       </div>

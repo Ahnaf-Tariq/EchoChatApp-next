@@ -24,7 +24,7 @@ const Login = () => {
     onAuthStateChanged(auth, (curuser) => {
       if (curuser) {
         router.push("/chat");
-      } 
+      }
     });
     localStorage.setItem("image", image);
   }, []);
