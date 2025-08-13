@@ -26,7 +26,7 @@ const Login = () => {
         router.push("/chat");
       }
     });
-    localStorage.setItem("image", image);
+    // localStorage.setItem("image", image);
   }, []);
 
   const handleImageChange = (e: any) => {
@@ -58,7 +58,11 @@ const Login = () => {
           toast.error("Please fill all fields");
           return;
         } else {
-          const res = await createUserWithEmailAndPassword(auth,email,password);
+          const res = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
           const user = res.user;
           console.log(user);
 
@@ -106,7 +110,7 @@ const Login = () => {
                 </label>
               </div>
               <div className="flex flex-col gap-1">
-                <label htmlFor="name">Email</label>
+                <label htmlFor="name">Name</label>
                 <input
                   className="border border-gray-400 rounded-md px-1"
                   value={name}
@@ -149,12 +153,13 @@ const Login = () => {
           >
             {currentState}
           </button>
-          {/* </div> */}
+
           <div className="flex items-center my-1">
             <hr className="flex-grow border-t border-gray-300" />
             <span className="mx-2 text-gray-700">Or</span>
             <hr className="flex-grow border-t border-gray-300" />
           </div>
+
           <button
             onClick={googleLogin}
             className="w-full border border-[#14b8a6] text-xl rounded-lg cursor-pointer flex justify-center"
@@ -168,22 +173,22 @@ const Login = () => {
           </button>
         </div>
         {currentState === "Sign In" ? (
-          <p
-            className="mt-4 text-lg"
-            onClick={() => setCurrentState("Sign Up")}
-          >
+          <p className="mt-4 text-lg">
             or dont have an account{" "}
-            <span className="text-[#14b8a6] text-base font-semibold cursor-pointer">
+            <span
+              onClick={() => setCurrentState("Sign Up")}
+              className="text-[#14b8a6] text-base font-semibold cursor-pointer"
+            >
               Sign Up
             </span>
           </p>
         ) : (
-          <p
-            className="mt-4 text-lg"
-            onClick={() => setCurrentState("Sign In")}
-          >
+          <p className="mt-4 text-lg">
             back to{" "}
-            <span className="text-[#14b8a6] text-base font-semibold cursor-pointer">
+            <span
+              onClick={() => setCurrentState("Sign In")}
+              className="text-[#14b8a6] text-base font-semibold cursor-pointer"
+            >
               Sign In
             </span>
           </p>

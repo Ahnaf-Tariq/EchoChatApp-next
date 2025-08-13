@@ -1,7 +1,7 @@
 "use client";
 import Navbar from "@/components/Navbar";
 import { onAuthStateChanged } from "firebase/auth";
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { auth } from "../firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
@@ -24,7 +24,7 @@ const Chat = () => {
   return (
     <div>
       <Navbar />
-      <div className="max-w-6xl mx-auto my-10 grid grid-cols-[1fr_2fr] h-[600px] px-2">
+      <div className="max-w-6xl mx-auto my-10 grid grid-cols-[1fr_2fr] h-[600px] px-4">
         {/* left side users */}
         <LeftSideChat />
 

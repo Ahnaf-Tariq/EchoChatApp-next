@@ -33,7 +33,7 @@ export const Context = ({ children }: any) => {
             lastSeen: Date.now(),
           });
         }
-      }, 60000); // after every 1 minute
+      }, 60000); // update user's last seen after every 1 minute
     } catch (error) {
       console.log(error);
     }

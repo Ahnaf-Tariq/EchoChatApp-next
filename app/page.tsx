@@ -3,7 +3,7 @@ import Login from "./login/page";
 
 export default function Home() {
   return (
-    <div>
+    <div className="bg-gray-200 h-screen">
       <Navbar />
       <Login />
     </div>
