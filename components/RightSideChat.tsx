@@ -84,6 +84,7 @@ const RightSideChat = () => {
 
   return (
     <div className="bg-[#14b8a6] text-white relative">
+      {/* user info */}
       <div className="flex justify-between items-center p-4 border-b-2 border-gray-300 mx-2">
         <div className="flex items-center gap-3">
           <img
@@ -108,8 +109,8 @@ const RightSideChat = () => {
         </div>
         <BsExclamationCircle className="size-6 cursor-pointer" />
       </div>
+      
       {/* chats msgs */}
-
       {selectedUser ? (
         <div className="max-h-[450px] overflow-y-scroll scrollbar-hide">
           {messages.map((msg, ind) => (
@@ -140,6 +141,7 @@ const RightSideChat = () => {
           <p className="text-xl">Please select any user to chat!</p>
         </div>
       )}
+      
       {/* input msg */}
       <div className="absolute bottom-0 w-full flex items-center gap-2 bg-[#0f766e] p-4">
         <input

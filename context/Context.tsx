@@ -1,7 +1,7 @@
 "use client";
 import { auth, db } from "@/app/firebase/config";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { createContext, useState } from "react";
+import { createContext, useRef, useState } from "react";
 
 export const AppContext = createContext<any>(null);
 
@@ -15,6 +15,7 @@ interface User {
 export const Context = ({ children }: any) => {
   const [image, setImage] = useState<File>();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const loginInputRef = useRef(null)
 
   const LoadUserData = async (uid: string) => {
     try {
@@ -45,6 +46,7 @@ export const Context = ({ children }: any) => {
     LoadUserData,
     selectedUser,
     setSelectedUser,
+    loginInputRef
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
