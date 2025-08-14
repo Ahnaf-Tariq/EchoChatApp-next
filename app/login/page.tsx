@@ -89,7 +89,10 @@ const Login = () => {
           <h1 className="font-bold text-2xl">{currentState}</h1>
         </div>
         <hr className="text-gray-400 my-4" />
+
+        {/* input fields */}
         <div className="flex flex-col gap-3">
+          {/* photo & name field */}
           {currentState === "Sign Up" && (
             <>
               <div className="">
@@ -99,14 +102,19 @@ const Login = () => {
                   type="file"
                   id="photo"
                 />
-                <label className="flex flex-col items-center gap-2 cursor-pointer" htmlFor="photo">
+                <label
+                  className="flex flex-col items-center gap-2 cursor-pointer"
+                  htmlFor="photo"
+                >
                   <img
                     className="size-16 rounded-full border-2 border-gray-300 object-cover hover:scale-105 transition-transform"
                     src={
-                      image ? URL.createObjectURL(image) : "/assests/avatar.webp"
+                      image
+                        ? URL.createObjectURL(image)
+                        : "/assests/avatar.webp"
                     }
                     alt=""
-                  /> 
+                  />
                   <span className="text-sm text-gray-500">Upload Photo</span>
                 </label>
               </div>
@@ -139,6 +147,8 @@ const Login = () => {
               </div>
             </>
           )}
+
+          {/* email field */}
           <div className="flex flex-col gap-1 relative">
             <input
               type="email"
@@ -167,6 +177,7 @@ const Login = () => {
               Email
             </label>
           </div>
+          {/* password field */}
           <div className="flex flex-col gap-1 relative">
             <input
               type="text"
@@ -194,6 +205,8 @@ const Login = () => {
               Password
             </label>
           </div>
+
+          {/* button sign in */}
           <button
             onClick={handleSignIn}
             className="w-full font-semibold bg-[#14b8a6] text-white rounded-lg py-1 mt-2 cursor-pointer"
@@ -207,19 +220,23 @@ const Login = () => {
             <hr className="flex-grow border-t border-gray-300" />
           </div>
 
+          {/* Google logo button */}
           <button
             onClick={googleLogin}
             className="w-full flex justify-center items-center gap-2 border border-[#14b8a6] rounded-lg py-2 hover:bg-gray-50 transition cursor-pointer"
           >
-            {/* Google logo */}
             <img
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOHI2JLXYQ0StQ1vzNLvULyckAUF1uIUnoxg&s"
               className="size-5"
               alt=""
             />
-            <span className="text-sm font-medium text-gray-700">Continue with Google</span>
+            <span className="text-sm font-medium text-gray-700">
+              Continue with Google
+            </span>
           </button>
         </div>
+
+        {/* logic last */}
         {currentState === "Sign In" ? (
           <p className="mt-4 text-sm">
             Don't have an account?{" "}
