@@ -4,15 +4,18 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../app/firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
+import { MdOutlineLogin } from "react-icons/md";
+import { BiLogOut } from "react-icons/bi";
 
 const Navbar = () => {
-  const { image, loginInputRef } = useContext(AppContext);
+  const { image, loginInputRef, setSelectedUser } = useContext(AppContext);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
   const logOut = async () => {
     try {
       await signOut(auth);
+      setSelectedUser(null);
       console.log("user logged out", user);
       router.replace("/");
     } catch (error) {
@@ -27,42 +30,59 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="bg-teal-500 shadow-md">
-      <div className="flex justify-between items-center max-w-7xl mx-auto p-4">
-        <h1 className="text-white text-2xl sm:text-3xl font-bold tracking-wide">
-          Chat App
+    <nav className="bg-white shadow-sm border-b border-gray-200">
+      <div className="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
+        {/* Logo/Brand */}
+        <h1 className="text-gray-800 text-xl sm:text-2xl font-bold tracking-tight">
+          ChatApp
         </h1>
-        <div className="flex gap-4 items-center">
+
+        {/* User Section */}
+        <div className="flex items-center gap-4">
           {user && (
-            <img
-              className="size-12 rounded-full cursor-pointer border-2 border-white shadow-sm hover:scale-105 transition-transform duration-200"
-              src={
-                image
-                  ? URL.createObjectURL(image)
-                  : user.photoURL ||
-                    "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg"
-              }
-              alt="user Profile"
-            />
+            <div className="flex items-center gap-3">
+              {/* User Info */}
+              <div className="hidden sm:block">
+                <p className="text-xs text-gray-500">{user.email}</p>
+              </div>
+
+              {/* Profile Picture */}
+              <div className="relative">
+                <img
+                  className="w-10 h-10 rounded-full ring-2 ring-gray-100 hover:ring-blue-200 transition-all duration-200 cursor-pointer"
+                  src={
+                    image
+                      ? URL.createObjectURL(image)
+                      : user.photoURL ||
+                        "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg"
+                  }
+                  alt="Profile"
+                />
+              </div>
+            </div>
           )}
+
+          {/* Login || logout Buttons */}
           {user ? (
             <button
               onClick={logOut}
-              className="text-white font-medium bg-teal-700 hover:bg-teal-800 rounded-lg px-4 py-2 shadow cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg transition-all duration-200 hover:shadow-sm focus:outline-none cursor-pointer"
             >
-              Logout
+              <BiLogOut className="text-lg sm:text-base" />
+              <span className="hidden sm:inline">Logout</span>
             </button>
           ) : (
-            <p
+            <button
               onClick={() => loginInputRef.current.focus()}
-              className="text-white text-sm sm:text-base font-semibold cursor-pointer underline hover:text-gray-200"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-all duration-200 hover:shadow-sm cursor-pointer"
             >
-              Click here to Login
-            </p>
+              <MdOutlineLogin className="text-lg sm:text-base" />
+              <span className="hidden sm:inline">Sign In</span>
+            </button>
           )}
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
 

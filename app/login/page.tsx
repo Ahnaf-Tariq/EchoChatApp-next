@@ -209,7 +209,7 @@ const Login = () => {
           {/* button sign in */}
           <button
             onClick={handleSignIn}
-            className="w-full font-semibold bg-[#14b8a6] text-white rounded-lg py-1 mt-2 cursor-pointer"
+            className="w-full font-semibold bg-blue-500 hover:bg-blue-600 hover:shadow-md text-white rounded-lg py-1 mt-2 cursor-pointer"
           >
             {currentState}
           </button>
@@ -242,7 +242,7 @@ const Login = () => {
             Don't have an account?{" "}
             <span
               onClick={() => setCurrentState("Sign Up")}
-              className="text-[#14b8a6] font-semibold hover:underline cursor-pointer"
+              className="text-blue-500 font-semibold hover:underline cursor-pointer"
             >
               Sign Up
             </span>
@@ -252,7 +252,7 @@ const Login = () => {
             Already have an account?{" "}
             <span
               onClick={() => setCurrentState("Sign In")}
-              className="text-[#14b8a6] hover:underline font-semibold cursor-pointer"
+              className="text-blue-500 hover:underline font-semibold cursor-pointer"
             >
               Sign In
             </span>

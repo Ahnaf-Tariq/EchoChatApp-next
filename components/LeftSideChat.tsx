@@ -46,7 +46,6 @@ const LeftSideChat = () => {
 
     setUsersList(filtered);
   };
-  // LeftSideChat.tsx
   return (
     <div className="bg-white text-black border-r border-gray-200 flex flex-col">
       {/* Header */}
@@ -81,11 +80,13 @@ const LeftSideChat = () => {
                   : "hover:bg-gray-100"
               }`}
             >
-              <img
-                src="/assests/avatar.webp"
-                alt="avatar"
-                className="size-10 rounded-full border border-gray-300"
-              />
+              <div className="hidden sm:block">
+                <img
+                  src="/assests/avatar.webp"
+                  alt="avatar"
+                  className="size-10 rounded-full border border-gray-300"
+                />
+              </div>
               <div>
                 <p className="font-semibold">{user.username}</p>
                 <p className="text-sm text-gray-500">{user.email}</p>

@@ -24,7 +24,7 @@ const Chat = () => {
   return (
     <div className="bg-gray-50 h-screen">
       <Navbar />
-      <div className="max-w-6xl mx-auto my-10 grid grid-cols-[1fr_2fr] h-[600px] shadow-md">
+      <div className="max-w-6xl mx-auto my-10 grid grid-cols-[1fr_2fr] h-[600px] px-4 shadow-md">
         {/* left side users */}
         <LeftSideChat />
 
