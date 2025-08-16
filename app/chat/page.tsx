@@ -9,7 +9,7 @@ import LeftSideChat from "@/components/LeftSideChat";
 import RightSideChat from "@/components/RightSideChat";
 
 const Chat = () => {
-  const { LoadUserData } = useContext(AppContext);
+  const { LoadUserData,selectedUser } = useContext(AppContext);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,12 +25,16 @@ const Chat = () => {
   return (
     <div className="bg-gray-50 h-screen">
       <Navbar />
-      <div className="max-w-6xl mx-auto my-10 grid grid-cols-[1fr_2fr] h-[600px] shadow-md">
+      <div className="max-w-6xl mx-auto my-4 grid grid-cols-1 sm:grid-cols-[1fr_2fr] h-[600px] shadow-md">
         {/* left side users */}
-        <LeftSideChat />
+        <div className={`${selectedUser ? 'hidden sm:block' : 'block'}`}>
+          <LeftSideChat />
+        </div>
 
         {/* right side chat display */}
-        <RightSideChat />
+        <div className={`${selectedUser ? 'block' : 'hidden sm:block'}`}>
+          <RightSideChat />
+        </div>
       </div>
     </div>
   );

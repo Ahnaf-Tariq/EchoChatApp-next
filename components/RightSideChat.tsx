@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import { useContext, useEffect, useRef, useState } from "react";
 import { BsExclamationCircle } from "react-icons/bs";
-import { IoChatboxEllipsesOutline, IoSend } from "react-icons/io5";
+import { IoArrowBack, IoChatboxEllipsesOutline, IoSend } from "react-icons/io5";
 import { RiGalleryLine } from "react-icons/ri";
 
 interface Message {
@@ -26,7 +26,7 @@ interface Message {
 }
 
 const RightSideChat = () => {
-  const { selectedUser } = useContext(AppContext);
+  const { selectedUser, setSelectedUser } = useContext(AppContext);
   const [inputMessage, setInputMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -67,7 +67,6 @@ const RightSideChat = () => {
     return () => unsub();
   }, [selectedUser]);
 
-
   // send message function
   const sendMessage = async () => {
     if (!selectedUser || !auth.currentUser) return;
@@ -107,7 +106,6 @@ const RightSideChat = () => {
 
     setInputMessage("");
   };
-
 
   // image upload to cloudinary function
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,13 +170,19 @@ const RightSideChat = () => {
     }
   };
   return (
-    <div className="bg-gray-50 flex flex-col">
+    <div className="h-[600px] bg-gray-50 flex flex-col">
       {selectedUser ? (
         <>
           {/* Chat Header */}
           <div className="bg-white border-b border-gray-200 p-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
+                <button
+                  onClick={()=>setSelectedUser(null)}
+                  className="sm:hidden p-1 hover:bg-gray-100 rounded-full cursor-pointer"
+                >
+                  <IoArrowBack className="size-5 text-gray-600" />
+                </button>
                 <div className="hidden sm:block">
                   <img
                     className="size-10 rounded-full ring-2 ring-gray-100"
@@ -218,8 +222,10 @@ const RightSideChat = () => {
                 }`}
               >
                 <div
-                  className={`max-w-xs lg:max-w-md px-1 sm:px-4 py-1 sm:py-3 rounded-lg sm:rounded-2xl shadow-sm ${
-                    msg.senderId === auth.currentUser?.uid
+                  className={`max-w-xs lg:max-w-md px-2 sm:px-3 py-2 rounded-lg sm:rounded-2xl shadow-sm ${
+                    msg.type === "image"
+                      ? "bg-white p-0"
+                      : msg.senderId === auth.currentUser?.uid
                       ? "bg-blue-500 text-white rounded-br-sm"
                       : "bg-white text-gray-800 border border-gray-200 rounded-bl-sm"
                   }`}
@@ -231,12 +237,14 @@ const RightSideChat = () => {
                     <img
                       src={msg.imageUrl}
                       alt="chat image"
-                      className="rounded-lg object-cover"
+                      className="rounded-lg object-cover w-full max-w-[200px] sm:max-w-[250px] md:max-w-[300px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
                     />
                   )}
                   <p
                     className={`text-xs mt-1 ${
-                      msg.senderId === auth.currentUser?.uid
+                      msg.type === "image"
+                        ? "text-gray-400"
+                        : msg.senderId === auth.currentUser?.uid
                         ? "text-blue-100"
                         : "text-gray-500"
                     }`}
@@ -274,7 +282,7 @@ const RightSideChat = () => {
                 }`}
                 title="Upload Image"
               >
-                <RiGalleryLine className="size-3 sm:size-5" />
+                <RiGalleryLine className="size-5" />
               </button>
               <div className="flex-1 relative">
                 <input

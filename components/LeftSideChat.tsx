@@ -47,7 +47,7 @@ const LeftSideChat = () => {
     setUsersList(filtered);
   };
   return (
-    <div className="bg-white text-black border-r border-gray-200 flex flex-col">
+    <div className="h-[600px] bg-white text-black border-r border-gray-200 flex flex-col">
       {/* Header */}
       <div className="flex justify-between items-center gap-1 p-4 border-b border-gray-200">
         <h1 className="text-xl font-bold">ChatApp</h1>
@@ -74,13 +74,13 @@ const LeftSideChat = () => {
             <div
               onClick={() => setSelectedUser(user)}
               key={user.id}
-              className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+              className={`flex items-center gap-3 px-2 sm:px-4 py-2 sm:py-3 cursor-pointer transition-colors ${
                 selectedUser?.id === user.id
                   ? "bg-blue-100"
                   : "hover:bg-gray-100"
               }`}
             >
-              <div className="hidden sm:block">
+              <div className="">
                 <img
                   src="/assests/avatar.webp"
                   alt="avatar"
