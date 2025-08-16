@@ -4,6 +4,7 @@ import { AppContext } from "@/context/Context";
 import { uploadCloudinary } from "@/lib/cloudinary";
 import { formatDistanceToNow } from "date-fns";
 import {
+  arrayRemove,
   arrayUnion,
   doc,
   getDoc,
@@ -14,6 +15,7 @@ import {
 import { useContext, useEffect, useRef, useState } from "react";
 import { BsExclamationCircle } from "react-icons/bs";
 import { IoArrowBack, IoChatboxEllipsesOutline, IoSend } from "react-icons/io5";
+import { MdDelete } from "react-icons/md";
 import { RiGalleryLine } from "react-icons/ri";
 
 interface Message {
@@ -169,6 +171,31 @@ const RightSideChat = () => {
       sendMessage();
     }
   };
+
+  // deleting message function
+  const deleteMsg = async (timestamp: number) => {
+    try {
+      if (!selectedUser || !auth.currentUser) return;
+
+      const currentUserId = auth.currentUser.uid;
+      const receiverId = selectedUser.id;
+      const chatId =
+        currentUserId < receiverId
+          ? `${currentUserId}_${receiverId}`
+          : `${receiverId}_${currentUserId}`;
+
+      const chatRef = doc(db, "chats", chatId);
+
+      const msgToDelete = messages.find((msg) => msg.timestamp === timestamp);
+      if (!msgToDelete) return;
+
+      await updateDoc(chatRef, {
+        chatData: arrayRemove(msgToDelete),
+      });
+    } catch (error) {
+      console.error(`Error deleting message ${error}`);
+    }
+  };
   return (
     <div className="h-[600px] bg-gray-50 flex flex-col">
       {selectedUser ? (
@@ -177,8 +204,9 @@ const RightSideChat = () => {
           <div className="bg-white border-b border-gray-200 p-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
+                {/* back button */}
                 <button
-                  onClick={()=>setSelectedUser(null)}
+                  onClick={() => setSelectedUser(null)}
                   className="sm:hidden p-1 hover:bg-gray-100 rounded-full cursor-pointer"
                 >
                   <IoArrowBack className="size-5 text-gray-600" />
@@ -222,7 +250,7 @@ const RightSideChat = () => {
                 }`}
               >
                 <div
-                  className={`max-w-xs lg:max-w-md px-2 sm:px-3 py-2 rounded-lg sm:rounded-2xl shadow-sm ${
+                  className={`relative max-w-xs lg:max-w-md px-2 sm:px-3 py-2 rounded-lg sm:rounded-2xl shadow-sm ${
                     msg.type === "image"
                       ? "bg-white p-0"
                       : msg.senderId === auth.currentUser?.uid
@@ -251,6 +279,14 @@ const RightSideChat = () => {
                   >
                     {new Date(msg.timestamp).toLocaleTimeString()}
                   </p>
+                  {msg.senderId === auth.currentUser?.uid && (
+                    <button
+                      onClick={() => deleteMsg(msg.timestamp)}
+                      className="absolute -top-2 -right-2 p-1 rounded-full bg-red-500 text-white hover:bg-red-600 transition cursor-pointer"
+                    >
+                      <MdDelete size={16} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
