@@ -32,7 +32,18 @@ const RightSideChat = () => {
   const [uploading, setUploading] = useState(false);
   const msgSendInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chatScrollRef = useRef<HTMLInputElement>(null);
 
+  // scroll to bottom function
+  const scrollToBottom = () => {
+    chatScrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, selectedUser]);
+
+  // get all chats
   useEffect(() => {
     if (!selectedUser || !auth.currentUser) return;
 
@@ -56,6 +67,8 @@ const RightSideChat = () => {
     return () => unsub();
   }, [selectedUser]);
 
+
+  // send message function
   const sendMessage = async () => {
     if (!selectedUser || !auth.currentUser) return;
 
@@ -95,6 +108,8 @@ const RightSideChat = () => {
     setInputMessage("");
   };
 
+
+  // image upload to cloudinary function
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !auth.currentUser || !selectedUser) return;
@@ -149,6 +164,7 @@ const RightSideChat = () => {
     }
   };
 
+  // msg delivered on Enter key press
   const handleKeyPress = (e: any) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -230,6 +246,9 @@ const RightSideChat = () => {
                 </div>
               </div>
             ))}
+
+            {/* auto scroll to bottom */}
+            <div ref={chatScrollRef} />
           </div>
 
           {/* Message Input */}
