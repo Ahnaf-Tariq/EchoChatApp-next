@@ -83,10 +83,10 @@ const Login = () => {
     }
   };
   return (
-    <div className="flex justify-center mt-20 items-center px-2">
-      <div className="bg-white shadow-md p-6 rounded-xl w-96">
+    <div className="flex justify-center mt-16 sm:mt-20 items-center px-2">
+      <div className="bg-white shadow-md p-4 sm:p-6 rounded-xl w-96 max-w-full sm:w-96">
         <div className="flex justify-center">
-          <h1 className="font-bold text-2xl">{currentState}</h1>
+          <h1 className="font-bold text-xl sm:text-2xl">{currentState}</h1>
         </div>
         <hr className="text-gray-400 my-4" />
 
@@ -107,7 +107,7 @@ const Login = () => {
                   htmlFor="photo"
                 >
                   <img
-                    className="size-16 rounded-full border-2 border-gray-300 object-cover hover:scale-105 transition-transform"
+                    className="size-12 sm:size-16 rounded-full border-2 border-gray-300 object-cover hover:scale-105 transition-transform"
                     src={
                       image
                         ? URL.createObjectURL(image)
@@ -121,7 +121,7 @@ const Login = () => {
               <div className="flex flex-col gap-1 relative">
                 <input
                   type="text"
-                  className={`px-2 py-2 text-base border rounded-md outline-none transition-all duration-200 ease-in-out
+                  className={`px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out
               ${isNameFocused ? "border-blue-500" : "border-gray-400"}
             `}
                   value={name}
@@ -152,7 +152,7 @@ const Login = () => {
           <div className="flex flex-col gap-1 relative">
             <input
               type="email"
-              className={`px-2 py-2 text-base border rounded-md outline-none transition-all duration-200 ease-in-out
+              className={`px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out
               ${isEmailFocused ? "border-blue-500" : "border-gray-400"}
             `}
               value={email}
@@ -180,8 +180,8 @@ const Login = () => {
           {/* password field */}
           <div className="flex flex-col gap-1 relative">
             <input
-              type="text"
-              className={`px-2 py-2 text-base border rounded-md outline-none transition-all duration-200 ease-in-out
+              type="password"
+              className={`px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out
               ${isPasswordFocused ? "border-blue-500" : "border-gray-400"}
             `}
               value={password}
@@ -209,7 +209,7 @@ const Login = () => {
           {/* button sign in */}
           <button
             onClick={handleSignIn}
-            className="w-full font-semibold bg-blue-500 hover:bg-blue-600 hover:shadow-md text-white rounded-lg py-1 mt-2 cursor-pointer"
+            className="w-full font-semibold text-sm sm:text-base bg-blue-500 hover:bg-blue-600 hover:shadow-md text-white rounded-lg py-1 mt-2 cursor-pointer"
           >
             {currentState}
           </button>
@@ -223,14 +223,14 @@ const Login = () => {
           {/* Google logo button */}
           <button
             onClick={googleLogin}
-            className="w-full flex justify-center items-center gap-2 border border-[#14b8a6] rounded-lg py-2 hover:bg-gray-50 transition cursor-pointer"
+            className="w-full flex justify-center items-center gap-2 border border-[#14b8a6] rounded-lg py-1 sm:py-2 hover:bg-gray-50 transition cursor-pointer"
           >
             <img
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOHI2JLXYQ0StQ1vzNLvULyckAUF1uIUnoxg&s"
               className="size-5"
               alt=""
             />
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-gray-700 hidden sm:block">
               Continue with Google
             </span>
           </button>

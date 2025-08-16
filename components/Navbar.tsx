@@ -66,7 +66,7 @@ const Navbar = () => {
           {user ? (
             <button
               onClick={logOut}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg transition-all duration-200 hover:shadow-sm focus:outline-none cursor-pointer"
+              className="flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg transition-all duration-200 hover:shadow-sm focus:outline-none cursor-pointer"
             >
               <BiLogOut className="text-lg sm:text-base" />
               <span className="hidden sm:inline">Logout</span>
@@ -74,7 +74,7 @@ const Navbar = () => {
           ) : (
             <button
               onClick={() => loginInputRef.current.focus()}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-all duration-200 hover:shadow-sm cursor-pointer"
+              className="flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-all duration-200 hover:shadow-sm cursor-pointer"
             >
               <MdOutlineLogin className="text-lg sm:text-base" />
               <span className="hidden sm:inline">Sign In</span>

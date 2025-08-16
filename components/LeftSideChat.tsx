@@ -49,7 +49,7 @@ const LeftSideChat = () => {
   return (
     <div className="bg-white text-black border-r border-gray-200 flex flex-col">
       {/* Header */}
-      <div className="flex justify-between items-center p-4 border-b border-gray-200">
+      <div className="flex justify-between items-center gap-1 p-4 border-b border-gray-200">
         <h1 className="text-xl font-bold">ChatApp</h1>
         <HiDotsVertical className="cursor-pointer text-gray-500 hover:text-gray-700" />
       </div>
