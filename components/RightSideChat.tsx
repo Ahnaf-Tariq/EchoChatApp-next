@@ -16,7 +16,13 @@ import {
 import { useContext, useEffect, useRef, useState } from "react";
 import { BsExclamationCircle } from "react-icons/bs";
 import { IoArrowBack, IoChatboxEllipsesOutline, IoSend } from "react-icons/io5";
-import { MdDelete, MdKeyboardVoice, MdStop, MdPlayArrow, MdPause } from "react-icons/md";
+import {
+  MdDelete,
+  MdKeyboardVoice,
+  MdStop,
+  MdPlayArrow,
+  MdPause,
+} from "react-icons/md";
 import { RiGalleryLine } from "react-icons/ri";
 
 interface Message {
@@ -37,6 +43,7 @@ const RightSideChat = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [playingAudio, setPlayingAudio] = useState<string | null>(null);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   const msgSendInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatScrollRef = useRef<HTMLInputElement>(null);
@@ -79,25 +86,24 @@ const RightSideChat = () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
-      
+
       const chunks: Blob[] = [];
-      
+
       recorder.ondataavailable = (event) => {
         chunks.push(event.data);
       };
 
       recorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        const audioBlob = new Blob(chunks, { type: "audio/webm" });
         await sendVoiceMessage(audioBlob);
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       recorder.start();
       setMediaRecorder(recorder);
       setIsRecording(true);
-
     } catch (error) {
-      alert('Could not access microphone');
+      alert("Could not access microphone");
     }
   };
 
@@ -155,20 +161,41 @@ const RightSideChat = () => {
   };
 
   // Play/pause audio
-  const toggleAudio = (audioUrl: string) => {
+   const toggleAudio = (audioUrl: string) => {
     if (playingAudio === audioUrl) {
+      // Pause current audio
+      if (currentAudio) {
+        currentAudio.pause();
+        setCurrentAudio(null);
+      }
       setPlayingAudio(null);
     } else {
-      setPlayingAudio(audioUrl);
+      // Stop any currently playing audio
+      if (currentAudio) {
+        currentAudio.pause();
+        setCurrentAudio(null);
+      }
+      
+      // Play new audio
       const audio = new Audio(audioUrl);
-      audio.onended = () => setPlayingAudio(null);
+      audio.onended = () => {
+        setPlayingAudio(null);
+        setCurrentAudio(null);
+      };
       audio.play();
+      setPlayingAudio(audioUrl);
+      setCurrentAudio(audio);
     }
   };
 
   // send message function
   const sendMessage = async () => {
-    if (!selectedUser || !auth.currentUser || !inputMessage.trim()) return;
+    if (!selectedUser || !auth.currentUser) return;
+
+    if (!inputMessage.trim()) {
+      msgSendInputRef.current?.focus();
+      return null;
+    }
 
     const currentUserId = auth.currentUser.uid;
     const receiverId = selectedUser.id;
@@ -273,7 +300,7 @@ const RightSideChat = () => {
 
       const chatRef = doc(db, "chats", chatId);
       const msgToDelete = messages.find((msg) => msg.timestamp === timestamp);
-      
+
       if (msgToDelete) {
         await updateDoc(chatRef, {
           chatData: arrayRemove(msgToDelete),
@@ -349,7 +376,7 @@ const RightSideChat = () => {
                   {(msg.type === "text" || (!msg.type && msg.text)) && (
                     <p className="text-sm leading-relaxed">{msg.text}</p>
                   )}
-                  
+
                   {/* Image Message */}
                   {msg.type === "image" && msg.imageUrl && (
                     <img
@@ -358,45 +385,65 @@ const RightSideChat = () => {
                       className="rounded-lg object-cover w-full max-w-[200px] sm:max-w-[250px] md:max-w-[300px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
                     />
                   )}
-                  
+
                   {/* Voice Message */}
                   {msg.type === "audio" && msg.audioUrl && (
                     <div className="flex items-center gap-3 min-w-[150px]">
                       <button
                         onClick={() => toggleAudio(msg.audioUrl!)}
-                        className={`p-2 rounded-full ${
+                        className={`p-2 rounded-full cursor-pointer ${
                           msg.senderId === auth.currentUser?.uid
                             ? "bg-blue-600 hover:bg-blue-700"
                             : "bg-gray-200 hover:bg-gray-300"
                         } transition-colors`}
                       >
                         {playingAudio === msg.audioUrl ? (
-                          <MdPause className={`size-4 ${
-                            msg.senderId === auth.currentUser?.uid ? "text-white" : "text-gray-600"
-                          }`} />
+                          <MdPause
+                            className={`size-4 ${
+                              msg.senderId === auth.currentUser?.uid
+                                ? "text-white"
+                                : "text-gray-600"
+                            }`}
+                          />
                         ) : (
-                          <MdPlayArrow className={`size-4 ${
-                            msg.senderId === auth.currentUser?.uid ? "text-white" : "text-gray-600"
-                          }`} />
+                          <MdPlayArrow
+                            className={`size-4 ${
+                              msg.senderId === auth.currentUser?.uid
+                                ? "text-white"
+                                : "text-gray-600"
+                            }`}
+                          />
                         )}
                       </button>
                       <div className="flex-1">
-                        <div className={`h-1 rounded-full ${
-                          msg.senderId === auth.currentUser?.uid ? "bg-blue-300" : "bg-gray-300"
-                        }`}>
-                          <div className={`h-full w-2/3 rounded-full ${
-                            msg.senderId === auth.currentUser?.uid ? "bg-white" : "bg-blue-500"
-                          }`}></div>
+                        <div
+                          className={`h-1 rounded-full ${
+                            msg.senderId === auth.currentUser?.uid
+                              ? "bg-blue-300"
+                              : "bg-gray-300"
+                          }`}
+                        >
+                          <div
+                            className={`h-full w-2/3 rounded-full ${
+                              msg.senderId === auth.currentUser?.uid
+                                ? "bg-white"
+                                : "bg-blue-500"
+                            }`}
+                          ></div>
                         </div>
-                        <p className={`text-xs mt-1 ${
-                          msg.senderId === auth.currentUser?.uid ? "text-blue-100" : "text-gray-500"
-                        }`}>
+                        <p
+                          className={`text-xs mt-1 ${
+                            msg.senderId === auth.currentUser?.uid
+                              ? "text-blue-100"
+                              : "text-gray-500"
+                          }`}
+                        >
                           Voice message
                         </p>
                       </div>
                     </div>
                   )}
-                  
+
                   <p
                     className={`text-xs mt-1 ${
                       msg.type === "image"
@@ -408,7 +455,7 @@ const RightSideChat = () => {
                   >
                     {new Date(msg.timestamp).toLocaleTimeString()}
                   </p>
-                  
+
                   {msg.senderId === auth.currentUser?.uid && (
                     <button
                       onClick={() => deleteMsg(msg.timestamp)}
@@ -433,7 +480,7 @@ const RightSideChat = () => {
                 <span className="text-red-600 font-medium">Recording...</span>
               </div>
             )}
-            
+
             <div className="flex items-center gap-3">
               <input
                 type="file"
@@ -458,6 +505,7 @@ const RightSideChat = () => {
                 <RiGalleryLine className="size-5" />
               </button>
 
+              {/* input message */}
               <div className="flex-1 relative">
                 <input
                   value={inputMessage}
@@ -482,7 +530,7 @@ const RightSideChat = () => {
                     ? "text-gray-400 cursor-not-allowed"
                     : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
                 }`}
-                title={isRecording ? "Stop Recording" : "Voice Message"}
+                title={isRecording ? "Stop Recording" : "Start Voice Recording"}
               >
                 {isRecording ? (
                   <MdStop className="size-5" />
@@ -507,7 +555,7 @@ const RightSideChat = () => {
           </div>
         </>
       ) : (
-        /* No User Selected State */
+        // No User Selected State
         <div className="flex-1 flex flex-col justify-center items-center text-center p-8">
           <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4">
             <IoChatboxEllipsesOutline className="size-8" />
