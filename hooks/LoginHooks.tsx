@@ -40,22 +40,23 @@ export const useLogin = () => {
         if (!name || !email || !password) {
           toast.error("Please fill all fields");
           return;
-        } else {
-          const res = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
-          const user = res.user;
-          console.log(user);
-
-          await setDoc(doc(db, "users", user.uid), {
-            id: user.uid,
-            email,
-            username: name.toLowerCase(),
-            lastSeen: Date.now(),
-          });
         }
+
+        if (password.length < 6) {
+          toast.error("Password must be strong");
+          return;
+        }
+
+        const res = await createUserWithEmailAndPassword(auth, email, password);
+        const user = res.user;
+        console.log(user);
+
+        await setDoc(doc(db, "users", user.uid), {
+          id: user.uid,
+          email,
+          username: name.toLowerCase(),
+          lastSeen: Date.now(),
+        });
       }
     } catch (error: any) {
       console.log(error);

@@ -1,4 +1,5 @@
 import { auth } from "@/app/firebase/config";
+import { useChatMsgs } from "@/hooks/ChatMsgsHooks";
 import React from "react";
 import { MdDelete, MdPause, MdPlayArrow } from "react-icons/md";
 
@@ -15,6 +16,7 @@ interface Message {
 interface ChatsMsgsProps {
   msg: Message;
   playingAudio: string | null;
+  isPaused: boolean;
   toggleAudio: (url: string) => void;
   deleteMsg: (timestamp: number) => void;
 }
@@ -22,6 +24,7 @@ interface ChatsMsgsProps {
 const ChatsMsgs = ({
   msg,
   playingAudio,
+  isPaused,
   toggleAudio,
   deleteMsg,
 }: ChatsMsgsProps) => {
@@ -65,7 +68,7 @@ const ChatsMsgs = ({
                   : "bg-gray-200 hover:bg-gray-300"
               } transition-colors`}
             >
-              {playingAudio === msg.audioUrl ? (
+              {playingAudio === msg.audioUrl && !isPaused ? (
                 <MdPause
                   className={`size-4 ${
                     msg.senderId === auth.currentUser?.uid

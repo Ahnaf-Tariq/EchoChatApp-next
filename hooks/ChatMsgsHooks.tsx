@@ -33,6 +33,7 @@ export const useChatMsgs = () => {
     null
   );
   const [playingAudio, setPlayingAudio] = useState<string | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
     null
   );
@@ -45,7 +46,6 @@ export const useChatMsgs = () => {
     chatScrollRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // use effect
   useEffect(() => {
     scrollToBottom();
   }, [messages, selectedUser]);
@@ -155,15 +155,19 @@ export const useChatMsgs = () => {
 
   // Play/pause audio
   const toggleAudio = (audioUrl: string) => {
-    if (playingAudio === audioUrl) {
-      // Pause current audio
-      if (currentAudio) {
+    // If clicking on the same audio that's currently loaded
+    if (playingAudio === audioUrl && currentAudio) {
+      if (isPaused) {
+        // Resume the paused audio
+        currentAudio.play();
+        setIsPaused(false);
+      } else {
+        // Pause the playing audio
         currentAudio.pause();
-        setCurrentAudio(null);
+        setIsPaused(true);
       }
-      setPlayingAudio(null);
     } else {
-      // Stop any currently playing audio
+      // Stop any currently playing audio and start new one
       if (currentAudio) {
         currentAudio.pause();
         setCurrentAudio(null);
@@ -171,13 +175,25 @@ export const useChatMsgs = () => {
 
       // Play new audio
       const audio = new Audio(audioUrl);
+
       audio.onended = () => {
         setPlayingAudio(null);
         setCurrentAudio(null);
+        setIsPaused(false);
       };
+
+      audio.onpause = () => {
+        setIsPaused(true);
+      };
+
+      audio.onplay = () => {
+        setIsPaused(false);
+      };
+
       audio.play();
       setPlayingAudio(audioUrl);
       setCurrentAudio(audio);
+      setIsPaused(false);
     }
   };
 
@@ -303,6 +319,7 @@ export const useChatMsgs = () => {
     uploading,
     isRecording,
     playingAudio,
+    isPaused,
     msgSendInputRef,
     fileInputRef,
     chatScrollRef,

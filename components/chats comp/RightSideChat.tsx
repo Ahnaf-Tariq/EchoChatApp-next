@@ -18,6 +18,7 @@ const RightSideChat = () => {
     uploading,
     isRecording,
     playingAudio,
+    isPaused,
     msgSendInputRef,
     fileInputRef,
     chatScrollRef,
@@ -38,7 +39,7 @@ const RightSideChat = () => {
   };
 
   return (
-    <div className="h-[600px] bg-gray-50 flex flex-col">
+    <div className="h-[550px] bg-gray-50 flex flex-col">
       {selectedUser ? (
         <>
           {/* Chat Header */}
@@ -85,6 +86,7 @@ const RightSideChat = () => {
                 <ChatsMsgs
                   msg={msg}
                   playingAudio={playingAudio}
+                  isPaused={isPaused}
                   toggleAudio={toggleAudio}
                   deleteMsg={deleteMsg}
                 />
