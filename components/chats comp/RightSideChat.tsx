@@ -31,7 +31,7 @@ const RightSideChat = () => {
   } = useChatMsgs();
 
   // Enter key press
-  const handleKeyPress = (e: any) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -39,7 +39,7 @@ const RightSideChat = () => {
   };
 
   return (
-    <div className="h-[550px] bg-gray-50 flex flex-col">
+    <div className="h-[550px] sm:h-[550px] bg-gray-50 flex flex-col">
       {selectedUser ? (
         <>
           {/* Chat Header */}
@@ -135,7 +135,7 @@ const RightSideChat = () => {
                 <input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyPress}
                   ref={msgSendInputRef}
                   type="text"
                   placeholder="Type your message..."

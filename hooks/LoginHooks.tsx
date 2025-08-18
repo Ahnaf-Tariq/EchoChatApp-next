@@ -2,12 +2,10 @@
 import { useContext, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
 import { auth, db, provider } from "@/app/firebase/config";
-import { useRouter } from "next/navigation";
 import { doc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { AppContext } from "@/context/Context";
@@ -16,14 +14,14 @@ export const useLogin = () => {
   const { currentState } = useContext(AppContext);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [name, setName] = useState<any>(null);
+  const [name, setName] = useState<string>("");
 
   const googleLogin = async () => {
     try {
       const res = await signInWithPopup(auth, provider);
       console.log(res.user);
     } catch (error) {
-      console.log(error);
+      console.log("Error in logging: " + error);
     }
   };
 
@@ -59,7 +57,7 @@ export const useLogin = () => {
         });
       }
     } catch (error: any) {
-      console.log(error);
+      console.log("Error in logging: " + error);
       toast.error(error.code);
     }
   };

@@ -1,9 +1,7 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBmBrK2KDYM_vUGgv9QThRs_DYet1Syalw",
   authDomain: "chatapp-nextjs-e25a3.firebaseapp.com",

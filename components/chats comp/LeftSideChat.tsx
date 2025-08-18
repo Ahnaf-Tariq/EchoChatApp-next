@@ -47,7 +47,7 @@ const LeftSideChat = () => {
     setUsersList(filtered);
   };
   return (
-    <div className="h-[550px] bg-white text-black border-r border-gray-200 flex flex-col">
+    <div className="h-[500px] sm:h-[550px] bg-white text-black border-r border-gray-200 flex flex-col">
       {/* Header */}
       <div className="flex justify-between items-center gap-1 p-4 border-b border-gray-200">
         <h1 className="text-xl font-bold">ChatApp</h1>

@@ -47,9 +47,9 @@ const Navbar = () => {
               </div>
 
               {/* Profile Picture */}
-              <div className="relative">
+              <div className="">
                 <img
-                  className="w-10 h-10 rounded-full ring-2 ring-gray-100 hover:ring-blue-200 transition-all duration-200 cursor-pointer"
+                  className="w-10 h-10 rounded-full border-2 border-gray-100 cursor-pointer"
                   src={"/assests/avatar.webp"}
                   alt="Profile"
                 />

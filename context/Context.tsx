@@ -1,7 +1,7 @@
 "use client";
 import { auth, db } from "@/app/firebase/config";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { createContext, useRef, useState } from "react";
+import { createContext, ReactNode, useRef, useState } from "react";
 
 export const AppContext = createContext<any>(null);
 
@@ -12,7 +12,7 @@ interface User {
   lastSeen: number;
 }
 
-export const Context = ({ children }: any) => {
+export const Context = ({ children }: { children: ReactNode }) => {
   const [currentState, setCurrentState] = useState<string>("Sign In");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const loginInputRef = useRef(null);

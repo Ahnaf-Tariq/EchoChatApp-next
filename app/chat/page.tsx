@@ -26,7 +26,7 @@ const Chat = () => {
   return (
     <div className="bg-gray-50 h-screen">
       <Navbar />
-      <div className="max-w-6xl mx-auto my-6 grid grid-cols-1 sm:grid-cols-[1fr_2fr] h-[550px] shadow-md">
+      <div className="max-w-6xl mx-auto my-3 sm:my-6 grid grid-cols-1 sm:grid-cols-[1fr_2fr] h-[550px] sm:h-[550px] shadow-md">
         {/* left side users */}
         <div className={`${selectedUser ? "hidden sm:block" : "block"}`}>
           <LeftSideChat />

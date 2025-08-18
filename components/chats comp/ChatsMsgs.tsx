@@ -1,7 +1,12 @@
 import { auth } from "@/app/firebase/config";
-import { useChatMsgs } from "@/hooks/ChatMsgsHooks";
-import React from "react";
-import { MdDelete, MdPause, MdPlayArrow } from "react-icons/md";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  MdDelete,
+  MdPause,
+  MdPlayArrow,
+  MdMoreVert,
+  MdEdit,
+} from "react-icons/md";
 
 interface Message {
   senderId: string;
@@ -28,6 +33,21 @@ const ChatsMsgs = ({
   toggleAudio,
   deleteMsg,
 }: ChatsMsgsProps) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div
       className={`flex ${
@@ -35,7 +55,7 @@ const ChatsMsgs = ({
       }`}
     >
       <div
-        className={`relative max-w-xs lg:max-w-md px-2 sm:px-3 py-2 rounded-lg sm:rounded-2xl shadow-sm ${
+        className={`group relative max-w-xs lg:max-w-md px-2 sm:px-3 py-2 rounded-lg sm:rounded-2xl shadow-sm ${
           msg.type === "image"
             ? "bg-white p-0"
             : msg.senderId === auth.currentUser?.uid
@@ -45,7 +65,7 @@ const ChatsMsgs = ({
       >
         {/* Text Message */}
         {(msg.type === "text" || (!msg.type && msg.text)) && (
-          <p className="text-sm leading-relaxed">{msg.text}</p>
+          <>{<p className="text-sm leading-relaxed">{msg.text}</p>}</>
         )}
 
         {/* Image Message */}
@@ -115,6 +135,7 @@ const ChatsMsgs = ({
           </div>
         )}
 
+        {/* Timestamp */}
         <p
           className={`text-xs mt-1 ${
             msg.type === "image"
@@ -128,12 +149,35 @@ const ChatsMsgs = ({
         </p>
 
         {msg.senderId === auth.currentUser?.uid && (
-          <button
-            onClick={() => deleteMsg(msg.timestamp)}
-            className="absolute -top-2 -right-2 p-1 rounded-full bg-red-500 text-white hover:bg-red-600 transition cursor-pointer"
+          <div
+            className="absolute top-1/2 -translate-y-1/2 -left-8"
+            ref={menuRef}
           >
-            <MdDelete size={16} />
-          </button>
+            {/* Three dot button */}
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="opacity-0 group-hover:opacity-100 p-1 rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-all duration-200 cursor-pointer"
+            >
+              <MdMoreVert className="size-4" />
+            </button>
+
+            {/* Dropdown Menu */}
+            {showMenu && (
+              <div className="absolute left-0 top-6 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
+                {/* Delete btn */}
+                <button
+                  onClick={() => {
+                    deleteMsg(msg.timestamp);
+                    setShowMenu(false);
+                  }}
+                  className="w-full px-2 py-1 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer"
+                >
+                  <MdDelete className="size-4" />
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

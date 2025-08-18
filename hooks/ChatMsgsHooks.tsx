@@ -146,16 +146,14 @@ export const useChatMsgs = () => {
           });
         }
       }
+      setUploading(false);
     } catch (error) {
       console.error("Voice message error:", error);
-    } finally {
-      setUploading(false);
     }
   };
 
   // Play/pause audio
   const toggleAudio = (audioUrl: string) => {
-    // If clicking on the same audio that's currently loaded
     if (playingAudio === audioUrl && currentAudio) {
       if (isPaused) {
         // Resume the paused audio
@@ -167,7 +165,6 @@ export const useChatMsgs = () => {
         setIsPaused(true);
       }
     } else {
-      // Stop any currently playing audio and start new one
       if (currentAudio) {
         currentAudio.pause();
         setCurrentAudio(null);
