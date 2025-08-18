@@ -45,6 +45,7 @@ export const useChatMsgs = () => {
     chatScrollRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // use effect
   useEffect(() => {
     scrollToBottom();
   }, [messages, selectedUser]);
