@@ -8,7 +8,7 @@ import { MdOutlineLogin } from "react-icons/md";
 import { BiLogOut } from "react-icons/bi";
 
 const Navbar = () => {
-  const { image, loginInputRef, setSelectedUser } = useContext(AppContext);
+  const { loginInputRef, setSelectedUser } = useContext(AppContext);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
@@ -41,7 +41,7 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           {user && (
             <div className="flex items-center gap-3">
-              {/* User Info */}
+              {/* User email */}
               <div className="hidden sm:block">
                 <p className="text-xs text-gray-500">{user.email}</p>
               </div>
@@ -50,12 +50,7 @@ const Navbar = () => {
               <div className="relative">
                 <img
                   className="w-10 h-10 rounded-full ring-2 ring-gray-100 hover:ring-blue-200 transition-all duration-200 cursor-pointer"
-                  src={
-                    image
-                      ? URL.createObjectURL(image)
-                      : user.photoURL ||
-                        "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-unknown-social-media-user-photo-default-avatar-profile-icon-vector-unknown-social-media-user-184816085.jpg"
-                  }
+                  src={"/assests/avatar.webp"}
                   alt="Profile"
                 />
               </div>

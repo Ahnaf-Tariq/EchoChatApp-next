@@ -24,8 +24,7 @@ import {
   MdPause,
 } from "react-icons/md";
 import { RiGalleryLine } from "react-icons/ri";
-import ChatsMsgs from "./chats comp/ChatsMsgs";
-
+import ChatsMsgs from "./ChatsMsgs";
 interface Message {
   senderId: string;
   receiverId: string;

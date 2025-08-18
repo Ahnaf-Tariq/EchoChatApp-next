@@ -13,9 +13,8 @@ interface User {
 }
 
 export const Context = ({ children }: any) => {
-  const [image, setImage] = useState<File>();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const loginInputRef = useRef(null)
+  const loginInputRef = useRef(null);
 
   const LoadUserData = async (uid: string) => {
     try {
@@ -41,12 +40,10 @@ export const Context = ({ children }: any) => {
   };
 
   const value = {
-    image,
-    setImage,
     LoadUserData,
     selectedUser,
     setSelectedUser,
-    loginInputRef
+    loginInputRef,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

@@ -6,14 +6,14 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import { auth, db, provider } from "../firebase/config";
+import { auth, db, provider } from "../app/firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
 import { toast } from "react-toastify";
 import { doc, setDoc } from "firebase/firestore";
 
 const Login = () => {
-  const { image, setImage, loginInputRef } = useContext(AppContext);
+  const { loginInputRef } = useContext(AppContext);
   const [currentState, setCurrentState] = useState<string>("Sign In");
   const [email, setEmail] = useState<string>("");
   const [isEmailFocused, setIsEmailFocused] = useState<Boolean>(false);
@@ -29,14 +29,7 @@ const Login = () => {
         router.push("/chat");
       }
     });
-    // localStorage.setItem("image", image);
   }, []);
-
-  const handleImageChange = (e: any) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
 
   const googleLogin = async () => {
     try {
@@ -83,7 +76,7 @@ const Login = () => {
     }
   };
   return (
-    <div className="flex justify-center mt-16 sm:mt-20 items-center px-2">
+    <div className="flex justify-center mt-10 sm:mt-14 items-center px-2">
       <div className="bg-white shadow-md p-4 sm:p-6 rounded-xl w-96 max-w-full sm:w-96">
         <div className="flex justify-center">
           <h1 className="font-bold text-xl sm:text-2xl">{currentState}</h1>
@@ -95,29 +88,6 @@ const Login = () => {
           {/* photo & name field */}
           {currentState === "Sign Up" && (
             <>
-              <div className="">
-                <input
-                  hidden
-                  onChange={handleImageChange}
-                  type="file"
-                  id="photo"
-                />
-                <label
-                  className="flex flex-col items-center gap-2 cursor-pointer"
-                  htmlFor="photo"
-                >
-                  <img
-                    className="size-12 sm:size-16 rounded-full border-2 border-gray-300 object-cover hover:scale-105 transition-transform"
-                    src={
-                      image
-                        ? URL.createObjectURL(image)
-                        : "/assests/avatar.webp"
-                    }
-                    alt=""
-                  />
-                  <span className="text-sm text-gray-500">Upload Photo</span>
-                </label>
-              </div>
               <div className="flex flex-col gap-1 relative">
                 <input
                   type="text"

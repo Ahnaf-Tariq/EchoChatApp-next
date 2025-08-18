@@ -19,7 +19,12 @@ interface ChatsMsgsProps {
   deleteMsg: (timestamp: number) => void;
 }
 
-const ChatsMsgs = ({ msg, playingAudio, toggleAudio, deleteMsg }: ChatsMsgsProps) => {
+const ChatsMsgs = ({
+  msg,
+  playingAudio,
+  toggleAudio,
+  deleteMsg,
+}: ChatsMsgsProps) => {
   return (
     <div
       className={`flex ${

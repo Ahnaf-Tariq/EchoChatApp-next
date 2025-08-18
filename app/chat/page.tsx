@@ -5,8 +5,8 @@ import { useContext, useEffect } from "react";
 import { auth } from "../firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
-import LeftSideChat from "@/components/LeftSideChat";
-import RightSideChat from "@/components/RightSideChat";
+import LeftSideChat from "@/components/chats comp/LeftSideChat";
+import RightSideChat from "@/components/chats comp/RightSideChat";
 
 const Chat = () => {
   const { LoadUserData, selectedUser } = useContext(AppContext);
