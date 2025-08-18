@@ -13,14 +13,15 @@ const Chat = () => {
   const router = useRouter();
 
   useEffect(() => {
-    onAuthStateChanged(auth, (curuser) => {
+    const unsubscribe = onAuthStateChanged(auth, (curuser) => {
       if (!curuser) {
         router.replace("/");
       } else {
         LoadUserData(curuser?.uid);
       }
     });
-  }, []);
+    return () => unsubscribe();
+  }, [router]);
 
   return (
     <div className="bg-gray-50 h-screen">

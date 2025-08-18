@@ -13,6 +13,7 @@ interface User {
 }
 
 export const Context = ({ children }: any) => {
+  const [currentState, setCurrentState] = useState<string>("Sign In");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const loginInputRef = useRef(null);
 
@@ -40,6 +41,8 @@ export const Context = ({ children }: any) => {
   };
 
   const value = {
+    currentState,
+    setCurrentState,
     LoadUserData,
     selectedUser,
     setSelectedUser,

@@ -1,80 +1,38 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-} from "firebase/auth";
-import { auth, db, provider } from "../app/firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../app/firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
-import { toast } from "react-toastify";
-import { doc, setDoc } from "firebase/firestore";
+import { useLogin } from "@/hooks/LoginHooks";
 
 const Login = () => {
-  const { loginInputRef } = useContext(AppContext);
-  const [currentState, setCurrentState] = useState<string>("Sign In");
-  const [email, setEmail] = useState<string>("");
+  const { loginInputRef, currentState, setCurrentState } =
+    useContext(AppContext);
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    name,
+    setName,
+    handleSignIn,
+    googleLogin,
+  } = useLogin();
   const [isEmailFocused, setIsEmailFocused] = useState<Boolean>(false);
-  const [password, setPassword] = useState<string>("");
   const [isPasswordFocused, setIsPasswordFocused] = useState<Boolean>(false);
-  const [name, setName] = useState<any>(null);
   const [isNameFocused, setIsNameFocused] = useState<Boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
-    onAuthStateChanged(auth, (curuser) => {
+    const unsubscribe = onAuthStateChanged(auth, (curuser) => {
       if (curuser) {
         router.push("/chat");
       }
     });
-  }, []);
+    return () => unsubscribe();
+  }, [router]);
 
-  const googleLogin = async () => {
-    try {
-      const res = await signInWithPopup(auth, provider);
-      console.log(res.user);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleSignIn = async () => {
-    try {
-      if (currentState === "Sign In") {
-        if (!email || !password) {
-          toast.error("Please fill all fields");
-          return;
-        }
-        const res = await signInWithEmailAndPassword(auth, email, password);
-        console.log(res.user);
-      } else {
-        if (!name || !email || !password) {
-          toast.error("Please fill all fields");
-          return;
-        } else {
-          const res = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
-          const user = res.user;
-          console.log(user);
-
-          await setDoc(doc(db, "users", user.uid), {
-            id: user.uid,
-            email,
-            username: name.toLowerCase(),
-            lastSeen: Date.now(),
-          });
-        }
-      }
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.code);
-    }
-  };
   return (
     <div className="flex justify-center mt-10 sm:mt-14 items-center px-2">
       <div className="bg-white shadow-md p-4 sm:p-6 rounded-xl w-96 max-w-full sm:w-96">
