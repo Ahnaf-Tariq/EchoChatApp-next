@@ -43,7 +43,7 @@ const Login = () => {
 
         {/* input fields */}
         <div className="flex flex-col gap-3">
-          {/* photo & name field */}
+          {/* name field */}
           {currentState === "Sign Up" && (
             <>
               <div className="flex flex-col gap-1 relative">
