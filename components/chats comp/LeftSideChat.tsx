@@ -88,7 +88,10 @@ const LeftSideChat = () => {
                 />
               </div>
               <div>
-                <p className="font-semibold">{user.username}</p>
+                <p className="font-semibold">
+                  {user.username.charAt(0).toUpperCase() +
+                    user.username.slice(1)}
+                </p>
                 <p className="text-sm text-gray-500">{user.email}</p>
               </div>
             </div>

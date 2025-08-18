@@ -52,24 +52,31 @@ const RightSideChat = () => {
                 >
                   <IoArrowBack className="size-5 text-gray-600" />
                 </button>
-                <div className="hidden sm:block">
+                <div className="hidden sm:block relative">
                   <img
                     className="size-10 rounded-full ring-2 ring-gray-100"
                     src="/assests/avatar.webp"
                     alt=""
                   />
+                  {/* Active Status Dot */}
+                  {Date.now() - selectedUser.lastSeen < 60000 && (
+                    <span className="absolute bottom-0 right-0 block size-3 rounded-full bg-green-500 ring-2 ring-white"></span>
+                  )}
                 </div>
                 <div>
                   <h1 className="text-lg font-semibold text-gray-800 capitalize">
                     {selectedUser?.username}
                   </h1>
                   <p className="text-xs sm:text-sm text-gray-500">
-                    Last seen:{" "}
-                    {selectedUser.lastSeen
-                      ? formatDistanceToNow(new Date(selectedUser.lastSeen), {
-                          addSuffix: true,
-                        })
-                      : "recently"}
+                    {selectedUser.lastSeen &&
+                      (Date.now() - selectedUser.lastSeen < 60000
+                        ? "Active Now"
+                        : `Last seen: ${formatDistanceToNow(
+                            new Date(selectedUser.lastSeen),
+                            {
+                              addSuffix: true,
+                            }
+                          )}`)}
                   </p>
                 </div>
               </div>
