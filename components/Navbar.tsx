@@ -1,11 +1,12 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../app/firebase/config";
+import { auth, db } from "../app/firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
 import { MdOutlineLogin } from "react-icons/md";
 import { BiLogOut } from "react-icons/bi";
+import { doc, updateDoc } from "firebase/firestore";
 
 const Navbar = () => {
   const { loginInputRef, setSelectedUser } = useContext(AppContext);
@@ -14,6 +15,10 @@ const Navbar = () => {
 
   const logOut = async () => {
     try {
+      // active now to false
+      const userRef = doc(db, "users", auth.currentUser?.uid || "");
+      await updateDoc(userRef, { active: false });
+
       await signOut(auth);
       setSelectedUser(null);
       console.log("user logged out", user);

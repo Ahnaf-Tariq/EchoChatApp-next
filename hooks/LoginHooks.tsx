@@ -54,6 +54,9 @@ export const useLogin = () => {
           email,
           username: name.toLowerCase(),
           lastSeen: Date.now(),
+          typing: false,
+          typingTo: null,
+          active: false,
         });
       }
     } catch (error: any) {

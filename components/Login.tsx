@@ -1,10 +1,11 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../app/firebase/config";
+import { auth, db } from "../app/firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
 import { useLogin } from "@/hooks/LoginHooks";
+import { doc, updateDoc } from "firebase/firestore";
 
 const Login = () => {
   const { loginInputRef, currentState, setCurrentState } =
@@ -25,9 +26,14 @@ const Login = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (curuser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (curuser) => {
       if (curuser) {
         router.push("/chat");
+      }
+
+      if (curuser) {
+        const userRef = doc(db, "users", curuser.uid);
+        await updateDoc(userRef, { active: true });
       }
     });
     return () => unsubscribe();

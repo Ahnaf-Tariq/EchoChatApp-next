@@ -21,6 +21,7 @@ interface Message {
   audioUrl?: string;
   type: "text" | "image" | "audio";
   timestamp: number;
+  reactions?: { [emoji: string]: string[] };
 }
 
 export const useChatMsgs = () => {
@@ -214,7 +215,7 @@ export const useChatMsgs = () => {
       clearTimeout(typingTimeoutRef.current);
     }
 
-    // Settimeout to stop typing after 3 seconds of inactivity
+    // Settimeout to stop typing after 2 seconds of inactivity
     if (value.trim() !== "") {
       typingTimeoutRef.current = setTimeout(async () => {
         if (auth.currentUser) {
@@ -222,6 +223,105 @@ export const useChatMsgs = () => {
           await updateDoc(userRef, { typing: false, typingTo: null });
         }
       }, 3000);
+    }
+  };
+
+  // Add emoji reaction function
+  const addEmoji = async (messageTimestamp: number, emoji: string) => {
+    if (!selectedUser || !auth.currentUser) return;
+
+    const currentUserId = auth.currentUser.uid;
+    const receiverId = selectedUser.id;
+    const chatId =
+      currentUserId < receiverId
+        ? `${currentUserId}_${receiverId}`
+        : `${receiverId}_${currentUserId}`;
+
+    const chatRef = doc(db, "chats", chatId);
+    const chatSnap = await getDoc(chatRef);
+
+    if (chatSnap.exists()) {
+      const chatData = chatSnap.data().chatData as Message[];
+      const updatedMessages = chatData.map((msg) => {
+        if (msg.timestamp === messageTimestamp) {
+          let reactions = { ...(msg.reactions || {}) };
+
+          // First, remove the user from ALL emoji reactions for this message
+          Object.keys(reactions).forEach((existingEmoji) => {
+            const userIndex = reactions[existingEmoji].indexOf(currentUserId);
+            if (userIndex > -1) {
+              reactions[existingEmoji].splice(userIndex, 1);
+
+              // Remove emoji key if no reactions left
+              if (reactions[existingEmoji].length === 0) {
+                delete reactions[existingEmoji];
+              }
+            }
+          });
+
+          // Check if user is clicking the same emoji they already reacted with
+          const wasAlreadyReacted =
+            msg.reactions?.[emoji]?.includes(currentUserId);
+
+          // If it wasn't the same emoji, add the new reaction
+          if (!wasAlreadyReacted) {
+            if (!reactions[emoji]) {
+              reactions[emoji] = [];
+            }
+            reactions[emoji].push(currentUserId);
+          }
+
+          return { ...msg, reactions };
+        }
+        return msg;
+      });
+
+      await updateDoc(chatRef, {
+        chatData: updatedMessages,
+      });
+    }
+  };
+
+  // Remove emoji reaction function
+  const deleteEmoji = async (messageTimestamp: number, emoji: string) => {
+    if (!selectedUser || !auth.currentUser) return;
+
+    const currentUserId = auth.currentUser.uid;
+    const receiverId = selectedUser.id;
+    const chatId =
+      currentUserId < receiverId
+        ? `${currentUserId}_${receiverId}`
+        : `${receiverId}_${currentUserId}`;
+
+    const chatRef = doc(db, "chats", chatId);
+    const chatSnap = await getDoc(chatRef);
+
+    if (chatSnap.exists()) {
+      const chatData = chatSnap.data().chatData as Message[];
+
+      const updatedMessages = chatData.map((msg) => {
+        if (msg.timestamp === messageTimestamp) {
+          let reactions = { ...(msg.reactions || {}) };
+
+          if (reactions[emoji]) {
+            reactions[emoji] = reactions[emoji].filter(
+              (uid) => uid !== currentUserId
+            );
+
+            // Remove key if no users left
+            if (reactions[emoji].length === 0) {
+              delete reactions[emoji];
+            }
+          }
+
+          return { ...msg, reactions };
+        }
+        return msg;
+      });
+
+      await updateDoc(chatRef, {
+        chatData: updatedMessages,
+      });
     }
   };
 
@@ -360,5 +460,7 @@ export const useChatMsgs = () => {
     stopRecording,
     toggleAudio,
     deleteMsg,
+    addEmoji,
+    deleteEmoji,
   };
 };

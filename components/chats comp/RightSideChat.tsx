@@ -13,7 +13,6 @@ const RightSideChat = () => {
   const { selectedUser, setSelectedUser } = useContext(AppContext);
   const {
     inputMessage,
-    setInputMessage,
     messages,
     uploading,
     isRecording,
@@ -29,6 +28,8 @@ const RightSideChat = () => {
     stopRecording,
     toggleAudio,
     deleteMsg,
+    addEmoji,
+    deleteEmoji,
   } = useChatMsgs();
 
   // Enter key press
@@ -60,7 +61,7 @@ const RightSideChat = () => {
                     alt=""
                   />
                   {/* Active Status Dot */}
-                  {Date.now() - selectedUser.lastSeen < 60000 && (
+                  {selectedUser.active && (
                     <span className="absolute bottom-0 right-0 block size-3 rounded-full bg-green-500 ring-2 ring-white"></span>
                   )}
                 </div>
@@ -69,15 +70,14 @@ const RightSideChat = () => {
                     {selectedUser?.username}
                   </h1>
                   <p className="text-xs sm:text-sm text-gray-500">
-                    {selectedUser.lastSeen &&
-                      (Date.now() - selectedUser.lastSeen < 60000
-                        ? "Active Now"
-                        : `Last seen: ${formatDistanceToNow(
-                            new Date(selectedUser.lastSeen),
-                            {
-                              addSuffix: true,
-                            }
-                          )}`)}
+                    {selectedUser.active
+                      ? "Active Now"
+                      : `Last seen: ${formatDistanceToNow(
+                          new Date(selectedUser.lastSeen),
+                          {
+                            addSuffix: true,
+                          }
+                        )}`}
                   </p>
                 </div>
               </div>
@@ -97,6 +97,8 @@ const RightSideChat = () => {
                   isPaused={isPaused}
                   toggleAudio={toggleAudio}
                   deleteMsg={deleteMsg}
+                  addEmoji={addEmoji}
+                  deleteEmoji={deleteEmoji}
                 />
               </div>
             ))}

@@ -1,11 +1,12 @@
+"use client";
 import { auth } from "@/app/firebase/config";
-import React, { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import {
   MdDelete,
+  MdOutlineEmojiEmotions,
   MdPause,
   MdPlayArrow,
-  MdMoreVert,
-  MdEdit,
 } from "react-icons/md";
 
 interface Message {
@@ -16,15 +17,20 @@ interface Message {
   audioUrl?: string;
   type: "text" | "image" | "audio";
   timestamp: number;
+  reactions?: { [emoji: string]: string[] };
 }
 
 interface ChatsMsgsProps {
   msg: Message;
   playingAudio: string | null;
   isPaused: boolean;
-  toggleAudio: (url: string) => void;
+  toggleAudio: (audioUrl: string) => void;
   deleteMsg: (timestamp: number) => void;
+  addEmoji: (timestamp: number, emoji: string) => void;
+  deleteEmoji: (timestamp: number, emoji: string) => void;
 }
+
+const EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "😡"];
 
 const ChatsMsgs = ({
   msg,
@@ -32,151 +38,255 @@ const ChatsMsgs = ({
   isPaused,
   toggleAudio,
   deleteMsg,
+  addEmoji,
+  deleteEmoji,
 }: ChatsMsgsProps) => {
-  const [showMenu, setShowMenu] = useState(false);
+  const [menuOption, setmenuOption] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [reactEmoji, setReactEmoji] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const isOwnMessage = msg.senderId === auth.currentUser?.uid;
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowMenu(false);
+        setmenuOption(false);
+        setShowEmojiPicker(false);
+        setReactEmoji(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [menuOption]);
+
+  const handleEmojiClick = (emoji: string) => {
+    if (msg.reactions && msg.reactions[emoji]) {
+      deleteEmoji(msg.timestamp, emoji);
+    } else {
+      addEmoji(msg.timestamp, emoji);
+    }
+
+    setShowEmojiPicker(false);
+    setmenuOption(false);
+    setReactEmoji(false);
+  };
+
+  const handleDeleteClick = () => {
+    deleteMsg(msg.timestamp);
+    setmenuOption(false);
+    setReactEmoji(false);
+  };
+
+  // Get reaction counts
+  const getReactionCounts = () => {
+    if (!msg.reactions) return [];
+
+    return Object.entries(msg.reactions)
+      .map(([emoji, userIds]) => ({
+        emoji,
+        count: userIds.length,
+        hasReacted: userIds.includes(auth.currentUser?.uid || ""),
+      }))
+      .filter((reaction) => reaction.count > 0);
+  };
+
+  const reactionCounts = getReactionCounts();
 
   return (
     <div
-      className={`flex ${
-        msg.senderId === auth.currentUser?.uid ? "justify-end" : "justify-start"
-      }`}
+      className={`flex ${isOwnMessage ? "justify-end" : "justify-start"} mb-2`}
     >
       <div
-        className={`group relative max-w-xs lg:max-w-md px-2 sm:px-3 py-2 rounded-lg sm:rounded-2xl shadow-sm ${
-          msg.type === "image"
-            ? "bg-white p-0"
-            : msg.senderId === auth.currentUser?.uid
-            ? "bg-blue-500 text-white rounded-br-sm"
-            : "bg-white text-gray-800 border border-gray-200 rounded-bl-sm"
-        }`}
+        className="relative group max-w-xs lg:max-w-md"
+        onMouseEnter={() => setmenuOption(true)}
+        onMouseLeave={() => {
+          if (!showEmojiPicker) {
+            setmenuOption(false);
+          }
+        }}
       >
-        {/* Text Message */}
-        {(msg.type === "text" || (!msg.type && msg.text)) && (
-          <>{<p className="text-sm leading-relaxed">{msg.text}</p>}</>
-        )}
-
-        {/* Image Message */}
-        {msg.type === "image" && msg.imageUrl && (
-          <img
-            src={msg.imageUrl}
-            alt="chat image"
-            className="rounded-lg object-cover w-full max-w-[200px] sm:max-w-[250px] md:max-w-[300px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
-          />
-        )}
-
-        {/* Voice Message */}
-        {msg.type === "audio" && msg.audioUrl && (
-          <div className="flex items-center gap-3 min-w-[150px]">
-            <button
-              onClick={() => toggleAudio(msg.audioUrl!)}
-              className={`p-2 rounded-full cursor-pointer ${
-                msg.senderId === auth.currentUser?.uid
-                  ? "bg-blue-600 hover:bg-blue-700"
-                  : "bg-gray-200 hover:bg-gray-300"
-              } transition-colors`}
-            >
-              {playingAudio === msg.audioUrl && !isPaused ? (
-                <MdPause
-                  className={`size-4 ${
-                    msg.senderId === auth.currentUser?.uid
-                      ? "text-white"
-                      : "text-gray-600"
-                  }`}
-                />
-              ) : (
-                <MdPlayArrow
-                  className={`size-4 ${
-                    msg.senderId === auth.currentUser?.uid
-                      ? "text-white"
-                      : "text-gray-600"
-                  }`}
-                />
-              )}
-            </button>
-            <div className="flex-1">
-              <div
-                className={`h-1 rounded-full ${
-                  msg.senderId === auth.currentUser?.uid
-                    ? "bg-blue-300"
-                    : "bg-gray-300"
-                }`}
+        {/* Three dots menu */}
+        {menuOption && (
+          <div
+            ref={menuRef}
+            className={`absolute top-0 ${
+              isOwnMessage
+                ? "left-0 -translate-x-full"
+                : "right-0 translate-x-full"
+            } z-10`}
+          >
+            <div className="relative">
+              <button
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 cursor-pointer"
               >
+                <BsThreeDotsVertical className="size-4 text-gray-600" />
+              </button>
+
+              {/* Options Menu */}
+              {showEmojiPicker && (
                 <div
-                  className={`h-full w-2/3 rounded-full ${
-                    msg.senderId === auth.currentUser?.uid
-                      ? "bg-white"
-                      : "bg-blue-500"
-                  }`}
-                ></div>
-              </div>
-              <p
-                className={`text-xs mt-1 ${
-                  msg.senderId === auth.currentUser?.uid
-                    ? "text-blue-100"
-                    : "text-gray-500"
-                }`}
-              >
-                Voice message
-              </p>
+                  className={`absolute top-8 ${
+                    isOwnMessage ? "right-0" : "left-0"
+                  } bg-white rounded-lg shadow-lg border p-1 z-20`}
+                >
+                  <div className="flex flex-col gap-1">
+                    {/* Emoji Button */}
+                    <div className="relative">
+                      <button
+                        onClick={() => setReactEmoji(!reactEmoji)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md w-full text-left cursor-pointer"
+                      >
+                        <MdOutlineEmojiEmotions className="size-4" />
+                        React
+                      </button>
+
+                      {/* Emoji Options */}
+                      {reactEmoji && (
+                        <div
+                          className={`absolute top-0 ${
+                            isOwnMessage ? "right-full mr-2" : "left-full ml-2"
+                          } bg-white rounded-lg shadow-lg border p-2 flex gap-1`}
+                        >
+                          {EMOJIS.map((emoji) => (
+                            <button
+                              key={emoji}
+                              onClick={() => handleEmojiClick(emoji)}
+                              className="text-lg hover:bg-gray-100 rounded p-1 cursor-pointer transition-colors"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Delete Button - only for own messages */}
+                    {isOwnMessage && (
+                      <button
+                        onClick={handleDeleteClick}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
+                      >
+                        <MdDelete className="size-4" />
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Timestamp */}
-        <p
-          className={`text-xs mt-1 ${
+        {/* Message Content */}
+        <div
+          className={`rounded-2xl p-3 ${
             msg.type === "image"
-              ? "text-gray-400"
-              : msg.senderId === auth.currentUser?.uid
-              ? "text-blue-100"
-              : "text-gray-500"
+              ? "bg-white p-0"
+              : isOwnMessage
+              ? "bg-blue-500 text-white rounded-br-sm"
+              : "bg-white text-gray-800 border border-gray-200 rounded-bl-sm"
           }`}
         >
-          {new Date(msg.timestamp).toLocaleTimeString()}
-        </p>
+          {/* Text Message */}
+          {(msg.type === "text" || (!msg.type && msg.text)) && (
+            <p className="text-sm break-words">{msg.text}</p>
+          )}
 
-        {msg.senderId === auth.currentUser?.uid && (
-          <div
-            className="absolute top-1/2 -translate-y-1/2 -left-8"
-            ref={menuRef}
-          >
-            {/* Three dot button */}
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="opacity-0 group-hover:opacity-100 p-1 rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-all duration-200 cursor-pointer"
-            >
-              <MdMoreVert className="size-4" />
-            </button>
+          {/* Image msg */}
+          {msg.type === "image" && msg.imageUrl && (
+            <img
+              src={msg.imageUrl}
+              alt="chat image"
+              className="rounded-lg object-cover w-full max-w-[200px] sm:max-w-[250px] md:max-w-[300px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
+            />
+          )}
 
-            {/* Dropdown Menu */}
-            {showMenu && (
-              <div className="absolute left-0 top-6 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
-                {/* Delete btn */}
-                <button
-                  onClick={() => {
-                    deleteMsg(msg.timestamp);
-                    setShowMenu(false);
-                  }}
-                  className="w-full px-2 py-1 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer"
+          {/* voice msg */}
+          {msg.type === "audio" && msg.audioUrl && (
+            <div className="flex items-center gap-3 min-w-[150px]">
+              <button
+                onClick={() => toggleAudio(msg.audioUrl!)}
+                className={`p-2 rounded-full cursor-pointer ${
+                  isOwnMessage
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "bg-gray-200 hover:bg-gray-300"
+                } transition-colors`}
+              >
+                {playingAudio === msg.audioUrl && !isPaused ? (
+                  <MdPause
+                    className={`size-4 ${
+                      isOwnMessage ? "text-white" : "text-gray-600"
+                    }`}
+                  />
+                ) : (
+                  <MdPlayArrow
+                    className={`size-4 ${
+                      isOwnMessage ? "text-white" : "text-gray-600"
+                    }`}
+                  />
+                )}
+              </button>
+              <div className="flex-1">
+                <div
+                  className={`h-1 rounded-full ${
+                    isOwnMessage ? "bg-blue-300" : "bg-gray-300"
+                  }`}
                 >
-                  <MdDelete className="size-4" />
-                  Delete
-                </button>
+                  <div
+                    className={`h-full w-2/3 rounded-full ${
+                      isOwnMessage ? "bg-white" : "bg-blue-500"
+                    }`}
+                  ></div>
+                </div>
+                <p
+                  className={`text-xs mt-1 ${
+                    isOwnMessage ? "text-blue-100" : "text-gray-500"
+                  }`}
+                >
+                  Voice message
+                </p>
               </div>
-            )}
+            </div>
+          )}
+
+          {/* Timestamp */}
+          <p
+            className={`text-xs mt-1 ${
+              msg.type === "image"
+                ? "text-gray-400"
+                : isOwnMessage
+                ? "text-blue-100"
+                : "text-gray-500"
+            }`}
+          >
+            {new Date(msg.timestamp).toLocaleTimeString()}
+          </p>
+        </div>
+
+        {/* Reactions Display */}
+        {reactionCounts.length > 0 && (
+          <div
+            className={`flex flex-wrap gap-1 mt-1 ${
+              isOwnMessage ? "justify-end" : "justify-start"
+            }`}
+          >
+            {reactionCounts.map((reaction) => (
+              <div
+                key={reaction.emoji}
+                onClick={() => deleteEmoji(msg.timestamp, reaction.emoji)}
+                className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs cursor-pointer border ${
+                  reaction.hasReacted
+                    ? "bg-blue-100 border-blue-300"
+                    : "bg-gray-100 border-gray-300"
+                }`}
+              >
+                <span>{reaction.emoji}</span>
+                <span className="text-gray-600">{reaction.count}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>

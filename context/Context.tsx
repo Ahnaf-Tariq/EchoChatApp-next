@@ -12,6 +12,7 @@ interface User {
   lastSeen: number;
   typing: boolean;
   typingTo: string | null;
+  active: boolean;
 }
 
 export const Context = ({ children }: { children: ReactNode }) => {
