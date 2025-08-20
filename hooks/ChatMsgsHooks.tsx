@@ -40,6 +40,7 @@ export const useChatMsgs = () => {
   const msgSendInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatScrollRef = useRef<HTMLInputElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // scroll to bottom function
   const scrollToBottom = () => {
@@ -194,6 +195,36 @@ export const useChatMsgs = () => {
     }
   };
 
+  // handle input typing
+  const handleTyping = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputMessage(value);
+
+    if (!auth.currentUser) return;
+
+    const userRef = doc(db, "users", auth.currentUser.uid);
+
+    if (value.trim() !== "") {
+      await updateDoc(userRef, { typing: true, typingTo: selectedUser.id });
+    } else {
+      await updateDoc(userRef, { typing: false, typingTo: null });
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Settimeout to stop typing after 3 seconds of inactivity
+    if (value.trim() !== "") {
+      typingTimeoutRef.current = setTimeout(async () => {
+        if (auth.currentUser) {
+          const userRef = doc(db, "users", auth.currentUser.uid);
+          await updateDoc(userRef, { typing: false, typingTo: null });
+        }
+      }, 3000);
+    }
+  };
+
   // send message function
   const sendMessage = async () => {
     if (!selectedUser || !auth.currentUser) return;
@@ -232,6 +263,8 @@ export const useChatMsgs = () => {
     }
 
     setInputMessage("");
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    await updateDoc(userRef, { typing: false, typingTo: null });
   };
 
   // image upload function
@@ -320,6 +353,7 @@ export const useChatMsgs = () => {
     msgSendInputRef,
     fileInputRef,
     chatScrollRef,
+    handleTyping,
     sendMessage,
     handleImageUpload,
     startRecording,

@@ -1,7 +1,7 @@
 "use client";
 import { auth, db } from "@/app/firebase/config";
 import { AppContext } from "@/context/Context";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
@@ -11,6 +11,8 @@ interface User {
   username: string;
   email: string;
   lastSeen: number;
+  typing: boolean;
+  typingTo: string | null;
 }
 
 const LeftSideChat = () => {
@@ -20,20 +22,16 @@ const LeftSideChat = () => {
   const [originalUsersList, setOriginalUsersList] = useState<User[]>([]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const userRef = collection(db, "users");
-      const snap = await getDocs(userRef);
-
-      const users: User[] = snap.docs.map((doc) => ({
+    const userRef = collection(db, "users");
+    const unsub = onSnapshot(userRef, (snap) => {
+      const users = snap.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as User[];
-
-      console.log(users);
       setUsersList(users);
       setOriginalUsersList(users);
-    };
-    fetchUsers();
+    });
+    return () => unsub();
   }, []);
 
   const change = (e: any) => {
@@ -92,7 +90,13 @@ const LeftSideChat = () => {
                   {user.username.charAt(0).toUpperCase() +
                     user.username.slice(1)}
                 </p>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="text-sm text-gray-500">
+                  {user.typing && user.typingTo === auth.currentUser?.uid ? (
+                    <span className="text-green-600">Typing...</span>
+                  ) : (
+                    user.email
+                  )}
+                </p>
               </div>
             </div>
           ))}

@@ -22,6 +22,7 @@ const RightSideChat = () => {
     msgSendInputRef,
     fileInputRef,
     chatScrollRef,
+    handleTyping,
     sendMessage,
     handleImageUpload,
     startRecording,
@@ -141,7 +142,7 @@ const RightSideChat = () => {
               <div className="flex-1 relative">
                 <input
                   value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
+                  onChange={handleTyping}
                   onKeyDown={handleKeyPress}
                   ref={msgSendInputRef}
                   type="text"

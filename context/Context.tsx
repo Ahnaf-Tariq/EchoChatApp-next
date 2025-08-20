@@ -10,6 +10,8 @@ interface User {
   username: string;
   email: string;
   lastSeen: number;
+  typing: boolean;
+  typingTo: string | null;
 }
 
 export const Context = ({ children }: { children: ReactNode }) => {
