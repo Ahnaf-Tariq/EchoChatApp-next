@@ -8,6 +8,7 @@ import { MdKeyboardVoice, MdStop } from "react-icons/md";
 import { RiGalleryLine } from "react-icons/ri";
 import ChatsMsgs from "./ChatsMsgs";
 import { useChatMsgs } from "@/hooks/ChatMsgsHooks";
+import Image from "next/image";
 
 const RightSideChat = () => {
   const { selectedUser, setSelectedUser } = useContext(AppContext);
@@ -55,10 +56,12 @@ const RightSideChat = () => {
                   <IoArrowBack className="size-5 text-gray-600" />
                 </button>
                 <div className="hidden sm:block relative">
-                  <img
-                    className="size-10 rounded-full ring-2 ring-gray-100"
+                  <Image
+                    className="rounded-full ring-2 ring-gray-100"
                     src="/assests/avatar.webp"
                     alt=""
+                    width={40}
+                    height={40}
                   />
                   {/* Active Status Dot */}
                   {selectedUser.active && (

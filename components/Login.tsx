@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
 import { useLogin } from "@/hooks/LoginHooks";
 import { doc, updateDoc } from "firebase/firestore";
+import Image from "next/image";
 
 const Login = () => {
   const { loginInputRef, currentState, setCurrentState } =
@@ -20,9 +21,9 @@ const Login = () => {
     handleSignIn,
     googleLogin,
   } = useLogin();
-  const [isEmailFocused, setIsEmailFocused] = useState<Boolean>(false);
-  const [isPasswordFocused, setIsPasswordFocused] = useState<Boolean>(false);
-  const [isNameFocused, setIsNameFocused] = useState<Boolean>(false);
+  const [isEmailFocused, setIsEmailFocused] = useState<boolean>(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState<boolean>(false);
+  const [isNameFocused, setIsNameFocused] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -159,9 +160,10 @@ const Login = () => {
             onClick={googleLogin}
             className="w-full flex justify-center items-center gap-2 border border-[#14b8a6] rounded-lg py-1 sm:py-2 hover:bg-gray-50 transition cursor-pointer"
           >
-            <img
+            <Image
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOHI2JLXYQ0StQ1vzNLvULyckAUF1uIUnoxg&s"
-              className="size-5"
+              width={20}
+              height={20}
               alt=""
             />
             <span className="text-sm font-medium text-gray-700 hidden sm:block">
@@ -173,7 +175,7 @@ const Login = () => {
         {/* logic last */}
         {currentState === "Sign In" ? (
           <p className="mt-4 text-sm">
-            Don't have an account?{" "}
+            Dont have an account?{" "}
             <span
               onClick={() => setCurrentState("Sign Up")}
               className="text-blue-500 font-semibold hover:underline cursor-pointer"

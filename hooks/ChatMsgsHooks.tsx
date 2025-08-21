@@ -26,7 +26,7 @@ interface Message {
 }
 
 export const useChatMsgs = () => {
-  const { selectedUser, setSelectedUser } = useContext(AppContext);
+  const { selectedUser } = useContext(AppContext);
   const [inputMessage, setInputMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [uploading, setUploading] = useState(false);

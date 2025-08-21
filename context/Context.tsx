@@ -18,8 +18,8 @@ interface User {
 export const Context = ({ children }: { children: ReactNode }) => {
   const [currentState, setCurrentState] = useState<string>("Sign In");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const loginInputRef = useRef(null);
-  const chatAppName = "Chattr";
+  const loginInputRef = useRef<HTMLInputElement>(null);
+  const chatAppName = "Echo";
 
   const LoadUserData = async (uid: string) => {
     try {

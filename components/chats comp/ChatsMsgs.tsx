@@ -1,5 +1,6 @@
 "use client";
 import { auth } from "@/app/firebase/config";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import {
@@ -195,13 +196,13 @@ const ChatsMsgs = ({
           }`}
         >
           {/* Text Message */}
-          {(msg.type === "text" || (!msg.type && msg.text)) && (
+          {msg.type === "text" && msg.text && (
             <p className="text-sm break-words">{msg.text}</p>
           )}
 
           {/* Image msg */}
           {msg.type === "image" && msg.imageUrl && (
-            <img
+            <Image
               src={msg.imageUrl}
               alt="chat image"
               className="rounded-lg object-cover w-full max-w-[160px] sm:max-w-[180px] md:max-w-[220px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
@@ -272,7 +273,7 @@ const ChatsMsgs = ({
             {isOwnMessage && (
               <MdDoneAll
                 className={`size-4 ${
-                  msg.hasUserSeen ? "text-green-500" : "text-gray-400"
+                  msg.hasUserSeen ? "text-green-300" : "text-gray-400"
                 }`}
               />
             )}

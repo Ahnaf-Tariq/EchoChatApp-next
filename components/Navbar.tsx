@@ -1,6 +1,10 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import {
+  User as FirebaseUser,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
 import { auth, db } from "../app/firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
@@ -8,11 +12,12 @@ import { MdOutlineLogin } from "react-icons/md";
 import { BiLogOut } from "react-icons/bi";
 import { doc, updateDoc } from "firebase/firestore";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
+import Image from "next/image";
 
 const Navbar = () => {
   const { chatAppName, loginInputRef, setSelectedUser } =
     useContext(AppContext);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
   const router = useRouter();
 
   const logOut = async () => {
@@ -56,10 +61,12 @@ const Navbar = () => {
 
               {/* Profile Picture */}
               <div className="">
-                <img
-                  className="w-10 h-10 rounded-full border-2 border-gray-100 cursor-pointer"
+                <Image
+                  className="rounded-full border-2 border-gray-100 cursor-pointer"
                   src={"/assests/avatar.webp"}
                   alt="Profile"
+                  width={40}
+                  height={40}
                 />
               </div>
             </div>

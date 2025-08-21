@@ -1,7 +1,8 @@
 "use client";
 import { auth, db } from "@/app/firebase/config";
 import { AppContext } from "@/context/Context";
-import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
+import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
@@ -35,7 +36,7 @@ const LeftSideChat = () => {
     return () => unsub();
   }, []);
 
-  const change = (e: any) => {
+  const change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchInput(value);
 
@@ -80,10 +81,12 @@ const LeftSideChat = () => {
               }`}
             >
               <div className="">
-                <img
+                <Image
                   src="/assests/avatar.webp"
                   alt="avatar"
-                  className="size-10 rounded-full border border-gray-300"
+                  className="rounded-full border border-gray-300"
+                  width={40}
+                  height={40}
                 />
               </div>
               <div>
