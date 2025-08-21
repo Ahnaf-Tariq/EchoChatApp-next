@@ -7,9 +7,11 @@ import { AppContext } from "@/context/Context";
 import { MdOutlineLogin } from "react-icons/md";
 import { BiLogOut } from "react-icons/bi";
 import { doc, updateDoc } from "firebase/firestore";
+import { IoChatboxEllipsesOutline } from "react-icons/io5";
 
 const Navbar = () => {
-  const { loginInputRef, setSelectedUser } = useContext(AppContext);
+  const { chatAppName, loginInputRef, setSelectedUser } =
+    useContext(AppContext);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
@@ -38,8 +40,9 @@ const Navbar = () => {
     <nav className="bg-white shadow-sm border-b border-gray-200">
       <div className="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
         {/* Logo/Brand */}
-        <h1 className="text-gray-800 text-xl sm:text-2xl font-bold tracking-tight">
-          ChatApp
+        <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-blue-500">
+          <IoChatboxEllipsesOutline className="size-4 sm:size-5" />
+          {chatAppName}
         </h1>
 
         {/* User Section */}

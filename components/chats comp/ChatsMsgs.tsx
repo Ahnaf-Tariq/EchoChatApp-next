@@ -117,7 +117,7 @@ const ChatsMsgs = ({
               isOwnMessage
                 ? "left-0 -translate-x-full"
                 : "right-0 translate-x-full"
-            } z-10`}
+            } z-50`}
           >
             <div className="relative">
               <button
@@ -139,7 +139,7 @@ const ChatsMsgs = ({
                     <div className="relative">
                       <button
                         onClick={() => setReactEmoji(!reactEmoji)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md w-full text-left cursor-pointer"
+                        className="flex items-center gap-2 px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md w-full text-left cursor-pointer"
                       >
                         <MdOutlineEmojiEmotions className="size-4" />
                         React
@@ -148,9 +148,11 @@ const ChatsMsgs = ({
                       {/* Emoji Options */}
                       {reactEmoji && (
                         <div
-                          className={`absolute top-0 ${
-                            isOwnMessage ? "right-full mr-2" : "left-full ml-2"
-                          } bg-white rounded-lg shadow-lg border p-2 flex gap-1`}
+                          className={`absolute bottom-[34px] ${
+                            isOwnMessage
+                              ? "right-[-120px] sm:right-0"
+                              : "left-[-105px] sm:left-0"
+                          } bg-white rounded-lg shadow-lg border p-1 flex gap-1`}
                         >
                           {EMOJIS.map((emoji) => (
                             <button
@@ -169,7 +171,7 @@ const ChatsMsgs = ({
                     {isOwnMessage && (
                       <button
                         onClick={handleDeleteClick}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
+                        className="flex items-center gap-2 px-2 py-1 text-sm text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
                       >
                         <MdDelete className="size-4" />
                         Delete
@@ -184,12 +186,12 @@ const ChatsMsgs = ({
 
         {/* Message Content */}
         <div
-          className={`rounded-2xl p-3 ${
+          className={`rounded-2xl ${
             msg.type === "image"
-              ? "bg-white p-0"
+              ? "bg-white p-2"
               : isOwnMessage
-              ? "bg-blue-500 text-white rounded-br-sm"
-              : "bg-white text-gray-800 border border-gray-200 rounded-bl-sm"
+              ? "bg-blue-500 text-white rounded-br-sm p-3"
+              : "bg-white text-gray-800 border border-gray-200 rounded-bl-sm p-3"
           }`}
         >
           {/* Text Message */}
@@ -202,7 +204,7 @@ const ChatsMsgs = ({
             <img
               src={msg.imageUrl}
               alt="chat image"
-              className="rounded-lg object-cover w-full max-w-[200px] sm:max-w-[250px] md:max-w-[300px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
+              className="rounded-lg object-cover w-full max-w-[160px] sm:max-w-[180px] md:max-w-[220px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
             />
           )}
 

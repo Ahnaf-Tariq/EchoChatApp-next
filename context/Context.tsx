@@ -19,6 +19,7 @@ export const Context = ({ children }: { children: ReactNode }) => {
   const [currentState, setCurrentState] = useState<string>("Sign In");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const loginInputRef = useRef(null);
+  const chatAppName = "Chattr";
 
   const LoadUserData = async (uid: string) => {
     try {
@@ -44,6 +45,7 @@ export const Context = ({ children }: { children: ReactNode }) => {
   };
 
   const value = {
+    chatAppName,
     currentState,
     setCurrentState,
     LoadUserData,

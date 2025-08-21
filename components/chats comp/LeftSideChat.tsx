@@ -17,7 +17,7 @@ interface User {
 }
 
 const LeftSideChat = () => {
-  const { selectedUser, setSelectedUser } = useContext(AppContext);
+  const { chatAppName, selectedUser, setSelectedUser } = useContext(AppContext);
   const [searchInput, setSearchInput] = useState("");
   const [usersList, setUsersList] = useState<User[]>([]);
   const [originalUsersList, setOriginalUsersList] = useState<User[]>([]);
@@ -49,7 +49,7 @@ const LeftSideChat = () => {
     <div className="h-[500px] sm:h-[550px] bg-white text-black border-r border-gray-200 flex flex-col">
       {/* Header */}
       <div className="flex justify-between items-center gap-1 p-4 border-b border-gray-200">
-        <h1 className="text-xl font-bold">ChatApp</h1>
+        <h1 className="text-xl font-bold text-blue-500">{chatAppName}</h1>
         <HiDotsVertical className="cursor-pointer text-gray-500 hover:text-gray-700" />
       </div>
 
