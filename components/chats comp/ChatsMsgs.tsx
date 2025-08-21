@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import {
   MdDelete,
+  MdDoneAll,
   MdOutlineEmojiEmotions,
   MdPause,
   MdPlayArrow,
@@ -18,6 +19,7 @@ interface Message {
   type: "text" | "image" | "audio";
   timestamp: number;
   reactions?: { [emoji: string]: string[] };
+  hasUserSeen: boolean;
 }
 
 interface ChatsMsgsProps {
@@ -111,7 +113,7 @@ const ChatsMsgs = ({
         {menuOption && (
           <div
             ref={menuRef}
-            className={`absolute top-0 ${
+            className={`absolute top-[2px] ${
               isOwnMessage
                 ? "left-0 -translate-x-full"
                 : "right-0 translate-x-full"
@@ -253,17 +255,26 @@ const ChatsMsgs = ({
           )}
 
           {/* Timestamp */}
-          <p
-            className={`text-xs mt-1 ${
-              msg.type === "image"
-                ? "text-gray-400"
-                : isOwnMessage
-                ? "text-blue-100"
-                : "text-gray-500"
-            }`}
-          >
-            {new Date(msg.timestamp).toLocaleTimeString()}
-          </p>
+          <div className="flex items-center justify-between gap-1 mt-1">
+            <p
+              className={`text-xs ${
+                msg.type === "image"
+                  ? "text-gray-400"
+                  : isOwnMessage
+                  ? "text-blue-100"
+                  : "text-gray-500"
+              }`}
+            >
+              {new Date(msg.timestamp).toLocaleTimeString()}
+            </p>
+            {isOwnMessage && (
+              <MdDoneAll
+                className={`size-4 ${
+                  msg.hasUserSeen ? "text-green-500" : "text-gray-400"
+                }`}
+              />
+            )}
+          </div>
         </div>
 
         {/* Reactions Display */}

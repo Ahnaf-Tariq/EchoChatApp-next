@@ -22,6 +22,7 @@ interface Message {
   type: "text" | "image" | "audio";
   timestamp: number;
   reactions?: { [emoji: string]: string[] };
+  hasUserSeen: boolean;
 }
 
 export const useChatMsgs = () => {
@@ -65,9 +66,24 @@ export const useChatMsgs = () => {
 
     const chatRef = doc(db, "chats", chatId);
 
-    const unsub = onSnapshot(chatRef, (docSnap) => {
+    const unsub = onSnapshot(chatRef, async (docSnap) => {
       if (docSnap.exists()) {
-        setMessages(docSnap.data().chatData || []);
+        const data = docSnap.data().chatData || [];
+        setMessages(data);
+
+        // Mark messages as seen
+        let updated = false;
+        const updatedMessages = data.map((msg: Message) => {
+          if (msg.receiverId === currentUserId && !msg.hasUserSeen) {
+            updated = true;
+            return { ...msg, hasUserSeen: true };
+          }
+          return msg;
+        });
+
+        if (updated) {
+          await updateDoc(chatRef, { chatData: updatedMessages });
+        }
       } else {
         setMessages([]);
       }
@@ -136,6 +152,7 @@ export const useChatMsgs = () => {
           audioUrl,
           type: "audio",
           timestamp: Date.now(),
+          hasUserSeen: false,
         };
 
         if (chatSnap.exists()) {
@@ -350,6 +367,7 @@ export const useChatMsgs = () => {
       text: inputMessage,
       type: "text",
       timestamp: Date.now(),
+      hasUserSeen: false,
     };
 
     if (chatSnap.exists()) {
@@ -394,6 +412,7 @@ export const useChatMsgs = () => {
           imageUrl,
           type: "image",
           timestamp: Date.now(),
+          hasUserSeen: false,
         };
 
         if (chatSnap.exists()) {
