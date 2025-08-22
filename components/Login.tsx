@@ -161,7 +161,7 @@ const Login = () => {
             className="w-full flex justify-center items-center gap-2 border border-[#14b8a6] rounded-lg py-1 sm:py-2 hover:bg-gray-50 transition cursor-pointer"
           >
             <Image
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOHI2JLXYQ0StQ1vzNLvULyckAUF1uIUnoxg&s"
+              src={"/assests/google_img.jpeg"}
               width={20}
               height={20}
               alt=""

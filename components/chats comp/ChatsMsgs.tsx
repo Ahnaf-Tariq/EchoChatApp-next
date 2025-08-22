@@ -114,7 +114,7 @@ const ChatsMsgs = ({
         {menuOption && (
           <div
             ref={menuRef}
-            className={`absolute top-[2px] ${
+            className={`absolute top-1/2 -translate-y-1/2 ${
               isOwnMessage
                 ? "left-0 -translate-x-full"
                 : "right-0 translate-x-full"
@@ -133,7 +133,7 @@ const ChatsMsgs = ({
                 <div
                   className={`absolute top-8 ${
                     isOwnMessage ? "right-0" : "left-0"
-                  } bg-white rounded-lg shadow-lg border p-1 z-20`}
+                  } bg-white rounded-lg shadow-md border border-gray-400 p-1 z-20`}
                 >
                   <div className="flex flex-col gap-1">
                     {/* Emoji Button */}
@@ -153,7 +153,7 @@ const ChatsMsgs = ({
                             isOwnMessage
                               ? "right-[-120px] sm:right-0"
                               : "left-[-105px] sm:left-0"
-                          } bg-white rounded-lg shadow-lg border p-1 flex gap-1`}
+                          } bg-white rounded-lg shadow-lg border border-gray-400 p-1 flex gap-1`}
                         >
                           {EMOJIS.map((emoji) => (
                             <button
@@ -206,6 +206,8 @@ const ChatsMsgs = ({
               src={msg.imageUrl}
               alt="chat image"
               className="rounded-lg object-cover w-full max-w-[160px] sm:max-w-[180px] md:max-w-[220px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
+              width={400}
+              height={400}
             />
           )}
 
