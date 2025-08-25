@@ -6,11 +6,12 @@ import { BsExclamationCircle } from "react-icons/bs";
 import { IoArrowBack, IoChatboxEllipsesOutline, IoSend } from "react-icons/io5";
 import { MdKeyboardVoice, MdStop } from "react-icons/md";
 import { RiGalleryLine } from "react-icons/ri";
-import ChatsMsgs from "./ChatsMsgs";
-import { useChatMsgs } from "@/hooks/ChatMsgsHooks";
+import ChatMessages from "./Chat-messages";
 import Image from "next/image";
+import useChatMessage from "@/hooks/useChatMessage";
+import { cn } from "@/lib/utils";
 
-const RightSideChat = () => {
+const Chats = () => {
   const { selectedUser, setSelectedUser } = useContext(AppContext);
   const {
     inputMessage,
@@ -31,7 +32,7 @@ const RightSideChat = () => {
     deleteMsg,
     addEmoji,
     deleteEmoji,
-  } = useChatMsgs();
+  } = useChatMessage();
 
   // Enter key press
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -94,7 +95,7 @@ const RightSideChat = () => {
           <div className="flex-1 max-h-[450px] overflow-y-auto scrollbar-hide p-4 space-y-2">
             {messages.map((msg, ind) => (
               <div key={ind}>
-                <ChatsMsgs
+                <ChatMessages
                   msg={msg}
                   playingAudio={playingAudio}
                   isPaused={isPaused}
@@ -133,11 +134,12 @@ const RightSideChat = () => {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading || isRecording}
-                className={`p-2 sm:p-3 rounded-lg ${
+                className={cn(
+                  "p-2 sm:p-3 rounded-lg",
                   uploading || isRecording
                     ? "text-gray-400 cursor-not-allowed"
                     : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
-                }`}
+                )}
                 title="Upload Image"
               >
                 <RiGalleryLine className="size-5" />
@@ -161,13 +163,14 @@ const RightSideChat = () => {
               <button
                 onClick={isRecording ? stopRecording : startRecording}
                 disabled={uploading}
-                className={`p-2 sm:p-3 rounded-lg transition-all duration-200 ${
+                className={cn(
+                  "p-2 sm:p-3 rounded-lg transition-all duration-200",
                   isRecording
                     ? "bg-red-500 hover:bg-red-600 text-white"
                     : uploading
                     ? "text-gray-400 cursor-not-allowed"
                     : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
-                }`}
+                )}
                 title={isRecording ? "Stop Recording" : "Start Voice Recording"}
               >
                 {isRecording ? (
@@ -181,11 +184,12 @@ const RightSideChat = () => {
               <button
                 onClick={sendMessage}
                 disabled={isRecording}
-                className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-colors ${
+                className={cn(
+                  "p-2 sm:p-3 rounded-lg sm:rounded-xl transition-colors text-white",
                   isRecording
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-500 hover:bg-blue-600 cursor-pointer"
-                } text-white`}
+                )}
               >
                 <IoSend className="size-3 sm:size-5" />
               </button>
@@ -211,4 +215,4 @@ const RightSideChat = () => {
   );
 };
 
-export default RightSideChat;
+export default Chats;

@@ -1,12 +1,13 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../app/firebase/config";
+import { auth, db } from "@/lib/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
-import { useLogin } from "@/hooks/LoginHooks";
+import { useLogin } from "@/hooks/useLogin";
 import { doc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 const Login = () => {
   const { loginInputRef, currentState, setCurrentState } =
@@ -56,9 +57,10 @@ const Login = () => {
               <div className="flex flex-col gap-1 relative">
                 <input
                   type="text"
-                  className={`px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out
-              ${isNameFocused ? "border-blue-500" : "border-gray-400"}
-            `}
+                  className={cn(
+                    "px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out",
+                    isNameFocused ? "border-blue-500" : "border-gray-400"
+                  )}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   onFocus={() => setIsNameFocused(true)}
@@ -68,14 +70,13 @@ const Login = () => {
                 />
                 <label
                   htmlFor="name"
-                  className={`absolute left-3 transition-all duration-200 ease-in-out pointer-events-none
-              ${
-                isNameFocused || name
-                  ? "text-xs -top-2 px-1 bg-white"
-                  : "text-base top-2"
-              }
-              ${isNameFocused ? "text-blue-500" : "text-gray-400"}
-            `}
+                  className={cn(
+                    "absolute left-3 transition-all duration-200 ease-in-out pointer-events-none",
+                    isNameFocused || name
+                      ? "text-xs -top-2 px-1 bg-white"
+                      : "text-base top-2",
+                    isNameFocused ? "text-blue-500" : "text-gray-400"
+                  )}
                 >
                   Name
                 </label>
@@ -87,9 +88,10 @@ const Login = () => {
           <div className="flex flex-col gap-1 relative">
             <input
               type="email"
-              className={`px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out
-              ${isEmailFocused ? "border-blue-500" : "border-gray-400"}
-            `}
+              className={cn(
+                "px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out",
+                isEmailFocused ? "border-blue-500" : "border-gray-400"
+              )}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onFocus={() => setIsEmailFocused(true)}
@@ -100,14 +102,13 @@ const Login = () => {
             />
             <label
               htmlFor="email"
-              className={`absolute left-3 transition-all duration-200 ease-in-out pointer-events-none
-              ${
+              className={cn(
+                "absolute left-3 transition-all duration-200 ease-in-out pointer-events-none",
                 isEmailFocused || email
                   ? "text-xs -top-2 px-1 bg-white"
-                  : "text-base top-2"
-              }
-              ${isEmailFocused ? "text-blue-500" : "text-gray-400"}
-            `}
+                  : "text-base top-2",
+                isEmailFocused ? "text-blue-500" : "text-gray-400"
+              )}
             >
               Email
             </label>
@@ -116,9 +117,10 @@ const Login = () => {
           <div className="flex flex-col gap-1 relative">
             <input
               type="password"
-              className={`px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out
-              ${isPasswordFocused ? "border-blue-500" : "border-gray-400"}
-            `}
+              className={cn(
+                "px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out",
+                isPasswordFocused ? "border-blue-500" : "border-gray-400"
+              )}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onFocus={() => setIsPasswordFocused(true)}
@@ -128,14 +130,13 @@ const Login = () => {
             />
             <label
               htmlFor="password"
-              className={`absolute left-3 transition-all duration-200 ease-in-out pointer-events-none
-              ${
+              className={cn(
+                "absolute left-3 transition-all duration-200 ease-in-out pointer-events-none",
                 isPasswordFocused || password
                   ? "text-xs -top-2 px-1 bg-white"
-                  : "text-base top-2"
-              }
-              ${isPasswordFocused ? "text-blue-500" : "text-gray-400"}
-            `}
+                  : "text-base top-2",
+                isPasswordFocused ? "text-blue-500" : "text-gray-400"
+              )}
             >
               Password
             </label>

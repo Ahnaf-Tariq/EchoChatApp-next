@@ -5,7 +5,7 @@ import {
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
-import { auth, db } from "../app/firebase/config";
+import { auth, db } from "@/lib/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
 import { MdOutlineLogin } from "react-icons/md";
@@ -13,6 +13,7 @@ import { BiLogOut } from "react-icons/bi";
 import { doc, updateDoc } from "firebase/firestore";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const { chatAppName, loginInputRef, setSelectedUser } =
@@ -42,7 +43,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+    <nav className="shadow-sm">
       <div className="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
         {/* Logo/Brand */}
         <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-blue-500">
@@ -73,23 +74,19 @@ const Navbar = () => {
           )}
 
           {/* Login || logout Buttons */}
-          {user ? (
-            <button
-              onClick={logOut}
-              className="flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg transition-all duration-200 hover:shadow-sm focus:outline-none cursor-pointer"
-            >
-              <BiLogOut className="text-lg sm:text-base" />
-              <span className="hidden sm:inline">Logout</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => loginInputRef.current.focus()}
-              className="flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-all duration-200 hover:shadow-sm cursor-pointer"
-            >
-              <MdOutlineLogin className="text-lg sm:text-base" />
-              <span className="hidden sm:inline">Sign In</span>
-            </button>
-          )}
+          <button
+            className={cn(
+              "flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm cursor-pointer",
+              user
+                ? "text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200"
+                : "text-white bg-blue-500 hover:bg-blue-600"
+            )}
+          >
+            {user ? <BiLogOut /> : <MdOutlineLogin />}
+            <span className="hidden sm:inline">
+              {user ? "Logout" : "Sign In"}
+            </span>
+          </button>
         </div>
       </div>
     </nav>

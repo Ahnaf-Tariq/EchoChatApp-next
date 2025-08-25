@@ -1,11 +1,12 @@
 "use client";
-import { auth, db } from "@/app/firebase/config";
+import { auth, db } from "@/lib/firebaseConfig";
 import { AppContext } from "@/context/Context";
 import { collection, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
+import { cn } from "@/lib/utils";
 
 interface User {
   id: string;
@@ -17,7 +18,7 @@ interface User {
   active: boolean;
 }
 
-const LeftSideChat = () => {
+const UsersDisplay = () => {
   const { chatAppName, selectedUser, setSelectedUser } = useContext(AppContext);
   const [searchInput, setSearchInput] = useState("");
   const [usersList, setUsersList] = useState<User[]>([]);
@@ -74,11 +75,11 @@ const LeftSideChat = () => {
             <div
               onClick={() => setSelectedUser(user)}
               key={user.id}
-              className={`flex items-center gap-3 px-2 sm:px-4 py-2 sm:py-3 cursor-pointer transition-colors ${
-                selectedUser?.id === user.id
-                  ? "bg-blue-100"
-                  : "hover:bg-gray-100"
-              }`}
+              className={cn(
+                "flex items-center gap-3 px-2 sm:px-4 py-2 sm:py-3 cursor-pointer transition-colors",
+                selectedUser?.id === user.id && "bg-blue-100",
+                selectedUser?.id !== user.id && "hover:bg-gray-100"
+              )}
             >
               <div className="">
                 <Image
@@ -109,4 +110,4 @@ const LeftSideChat = () => {
   );
 };
 
-export default LeftSideChat;
+export default UsersDisplay;

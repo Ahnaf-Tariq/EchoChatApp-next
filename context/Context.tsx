@@ -1,10 +1,9 @@
 "use client";
-import { auth, db } from "@/app/firebase/config";
+import { auth, db } from "@/lib/firebaseConfig";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { createContext, ReactNode, useRef, useState } from "react";
 
 export const AppContext = createContext<any>(null);
-
 interface User {
   id: string;
   username: string;

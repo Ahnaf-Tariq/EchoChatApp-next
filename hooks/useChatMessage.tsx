@@ -1,5 +1,5 @@
-import { auth, db } from "@/app/firebase/config";
 import { AppContext } from "@/context/Context";
+import { auth, db } from "@/lib/firebaseConfig";
 import { uploadImageCloudinary } from "@/lib/imageCloudinary";
 import { uploadVoiceCloudinary } from "@/lib/voiceCloudinary";
 import {
@@ -25,7 +25,7 @@ interface Message {
   hasUserSeen: boolean;
 }
 
-export const useChatMsgs = () => {
+const useChatMessage = () => {
   const { selectedUser } = useContext(AppContext);
   const [inputMessage, setInputMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -483,3 +483,5 @@ export const useChatMsgs = () => {
     deleteEmoji,
   };
 };
+
+export default useChatMessage;

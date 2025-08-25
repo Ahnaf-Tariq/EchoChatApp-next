@@ -1,5 +1,6 @@
 "use client";
-import { auth } from "@/app/firebase/config";
+import { auth } from "@/lib/firebaseConfig";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -23,7 +24,7 @@ interface Message {
   hasUserSeen: boolean;
 }
 
-interface ChatsMsgsProps {
+interface ChatMessagesProps {
   msg: Message;
   playingAudio: string | null;
   isPaused: boolean;
@@ -35,7 +36,7 @@ interface ChatsMsgsProps {
 
 const EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "😡"];
 
-const ChatsMsgs = ({
+const ChatMessages = ({
   msg,
   playingAudio,
   isPaused,
@@ -43,7 +44,7 @@ const ChatsMsgs = ({
   deleteMsg,
   addEmoji,
   deleteEmoji,
-}: ChatsMsgsProps) => {
+}: ChatMessagesProps) => {
   const [menuOption, setmenuOption] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [reactEmoji, setReactEmoji] = useState(false);
@@ -99,7 +100,10 @@ const ChatsMsgs = ({
 
   return (
     <div
-      className={`flex ${isOwnMessage ? "justify-end" : "justify-start"} mb-2`}
+      className={cn(
+        "flex mb-2",
+        isOwnMessage ? "justify-end" : "justify-start"
+      )}
     >
       <div
         className="relative group max-w-xs lg:max-w-md"
@@ -114,11 +118,12 @@ const ChatsMsgs = ({
         {menuOption && (
           <div
             ref={menuRef}
-            className={`absolute top-1/2 -translate-y-1/2 ${
+            className={cn(
+              "absolute top-1/2 -translate-y-1/2 z-50",
               isOwnMessage
                 ? "left-0 -translate-x-full"
                 : "right-0 translate-x-full"
-            } z-50`}
+            )}
           >
             <div className="relative">
               <button
@@ -131,9 +136,10 @@ const ChatsMsgs = ({
               {/* Options Menu */}
               {showEmojiPicker && (
                 <div
-                  className={`absolute top-8 ${
+                  className={cn(
+                    "absolute top-8 bg-white rounded-lg shadow-md border border-gray-400 p-1 z-20",
                     isOwnMessage ? "right-0" : "left-0"
-                  } bg-white rounded-lg shadow-md border border-gray-400 p-1 z-20`}
+                  )}
                 >
                   <div className="flex flex-col gap-1">
                     {/* Emoji Button */}
@@ -149,11 +155,12 @@ const ChatsMsgs = ({
                       {/* Emoji Options */}
                       {reactEmoji && (
                         <div
-                          className={`absolute bottom-[34px] ${
+                          className={cn(
+                            "absolute bottom-[34px] bg-white rounded-lg shadow-lg border border-gray-400 p-1 flex gap-1",
                             isOwnMessage
                               ? "right-[-120px] sm:right-0"
                               : "left-[-105px] sm:left-0"
-                          } bg-white rounded-lg shadow-lg border border-gray-400 p-1 flex gap-1`}
+                          )}
                         >
                           {EMOJIS.map((emoji) => (
                             <button
@@ -187,13 +194,14 @@ const ChatsMsgs = ({
 
         {/* Message Content */}
         <div
-          className={`rounded-2xl ${
-            msg.type === "image"
-              ? "bg-white p-2"
-              : isOwnMessage
-              ? "bg-blue-500 text-white rounded-br-sm p-3"
-              : "bg-white text-gray-800 border border-gray-200 rounded-bl-sm p-3"
-          }`}
+          className={cn(
+            "rounded-2xl",
+            msg.type === "image" && "bg-white p-2",
+            msg.type !== "image" &&
+              (isOwnMessage
+                ? "bg-blue-500 text-white rounded-br-sm p-3"
+                : "bg-white text-gray-800 border border-gray-200 rounded-bl-sm p-3")
+          )}
         >
           {/* Text Message */}
           {msg.type === "text" && msg.text && (
@@ -216,42 +224,48 @@ const ChatsMsgs = ({
             <div className="flex items-center gap-3 min-w-[150px]">
               <button
                 onClick={() => toggleAudio(msg.audioUrl!)}
-                className={`p-2 rounded-full cursor-pointer ${
+                className={cn(
+                  "p-2 rounded-full cursor-pointer transition-colors",
                   isOwnMessage
                     ? "bg-blue-600 hover:bg-blue-700"
                     : "bg-gray-200 hover:bg-gray-300"
-                } transition-colors`}
+                )}
               >
                 {playingAudio === msg.audioUrl && !isPaused ? (
                   <MdPause
-                    className={`size-4 ${
+                    className={cn(
+                      "size-4",
                       isOwnMessage ? "text-white" : "text-gray-600"
-                    }`}
+                    )}
                   />
                 ) : (
                   <MdPlayArrow
-                    className={`size-4 ${
+                    className={cn(
+                      "size-4",
                       isOwnMessage ? "text-white" : "text-gray-600"
-                    }`}
+                    )}
                   />
                 )}
               </button>
               <div className="flex-1">
                 <div
-                  className={`h-1 rounded-full ${
+                  className={cn(
+                    "h-1 rounded-full",
                     isOwnMessage ? "bg-blue-300" : "bg-gray-300"
-                  }`}
+                  )}
                 >
                   <div
-                    className={`h-full w-2/3 rounded-full ${
+                    className={cn(
+                      "h-full w-2/3 rounded-full",
                       isOwnMessage ? "bg-white" : "bg-blue-500"
-                    }`}
+                    )}
                   ></div>
                 </div>
                 <p
-                  className={`text-xs mt-1 ${
+                  className={cn(
+                    "text-xs mt-1",
                     isOwnMessage ? "text-blue-100" : "text-gray-500"
-                  }`}
+                  )}
                 >
                   Voice message
                 </p>
@@ -262,21 +276,23 @@ const ChatsMsgs = ({
           {/* Timestamp */}
           <div className="flex items-center justify-between gap-1 mt-1">
             <p
-              className={`text-xs ${
+              className={cn(
+                "text-xs",
                 msg.type === "image"
                   ? "text-gray-400"
                   : isOwnMessage
                   ? "text-blue-100"
                   : "text-gray-500"
-              }`}
+              )}
             >
               {new Date(msg.timestamp).toLocaleTimeString()}
             </p>
             {isOwnMessage && (
               <MdDoneAll
-                className={`size-4 ${
+                className={cn(
+                  "size-4",
                   msg.hasUserSeen ? "text-green-300" : "text-gray-400"
-                }`}
+                )}
               />
             )}
           </div>
@@ -285,19 +301,21 @@ const ChatsMsgs = ({
         {/* Reactions Display */}
         {reactionCounts.length > 0 && (
           <div
-            className={`flex flex-wrap gap-1 mt-1 ${
+            className={cn(
+              "flex flex-wrap gap-1 mt-1",
               isOwnMessage ? "justify-end" : "justify-start"
-            }`}
+            )}
           >
             {reactionCounts.map((reaction) => (
               <div
                 key={reaction.emoji}
                 onClick={() => deleteEmoji(msg.timestamp, reaction.emoji)}
-                className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs cursor-pointer border ${
+                className={cn(
+                  "flex items-center gap-1 px-2 py-1 rounded-full text-xs cursor-pointer border",
                   reaction.hasReacted
                     ? "bg-blue-100 border-blue-300"
                     : "bg-gray-100 border-gray-300"
-                }`}
+                )}
               >
                 <span>{reaction.emoji}</span>
                 <span className="text-gray-600">{reaction.count}</span>
@@ -310,4 +328,4 @@ const ChatsMsgs = ({
   );
 };
 
-export default ChatsMsgs;
+export default ChatMessages;

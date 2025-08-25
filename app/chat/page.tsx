@@ -1,12 +1,12 @@
 "use client";
-import Navbar from "@/components/Navbar";
 import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebaseConfig";
 import { useContext, useEffect } from "react";
-import { auth } from "../firebase/config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
-import LeftSideChat from "@/components/chats comp/LeftSideChat";
-import RightSideChat from "@/components/chats comp/RightSideChat";
+import UsersDisplay from "@/components/chatComponents/Users-display";
+import Chats from "@/components/chatComponents/ChatMessageComponent/Chats";
+import { cn } from "@/lib/utils";
 
 const Chat = () => {
   const { LoadUserData, selectedUser } = useContext(AppContext);
@@ -24,17 +24,16 @@ const Chat = () => {
   }, [router]);
 
   return (
-    <div className="bg-gray-50 h-screen">
-      <Navbar />
-      <div className="max-w-6xl mx-auto my-3 sm:my-6 grid grid-cols-1 sm:grid-cols-[1fr_2fr] h-[550px] sm:h-[550px] shadow-md">
+    <div className="bg-gray-50">
+      <div className="max-w-6xl mx-auto my-3 sm:my-6 grid grid-cols-1 sm:grid-cols-[1fr_2fr] shadow-md">
         {/* left side users */}
-        <div className={`${selectedUser ? "hidden sm:block" : "block"}`}>
-          <LeftSideChat />
+        <div className={cn(selectedUser ? "hidden sm:block" : "block")}>
+          <UsersDisplay />
         </div>
 
         {/* right side chat display */}
-        <div className={`${selectedUser ? "block" : "hidden sm:block"}`}>
-          <RightSideChat />
+        <div className={cn(selectedUser ? "block" : "hidden sm:block")}>
+          <Chats />
         </div>
       </div>
     </div>

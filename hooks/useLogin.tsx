@@ -5,7 +5,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import { auth, db, provider } from "@/app/firebase/config";
+import { auth, db, provider } from "@/lib/firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { AppContext } from "@/context/Context";
