@@ -10,6 +10,7 @@ interface NavbarButtonProps {
 
 const NavbarButton = ({ isLoggedIn, onClick }: NavbarButtonProps) => {
   return (
+    // navbar button
     <button
       onClick={onClick}
       className={cn(

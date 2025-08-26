@@ -24,6 +24,7 @@ const InputLogin = ({
   inputRef,
 }: InputLoginProps) => {
   return (
+    // login page input
     <div className="flex flex-col gap-1 relative">
       <input
         type={type}
