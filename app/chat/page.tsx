@@ -4,7 +4,7 @@ import { auth } from "@/lib/firebase.config";
 import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
-import UsersDisplay from "@/components/chat/users-display";
+import UsersDisplay from "@/components/users/users-display";
 import Chats from "@/components/chat/chats";
 import { cn } from "@/lib/utils";
 
@@ -26,12 +26,12 @@ const Chat = () => {
   return (
     <div className="bg-gray-50">
       <div className="max-w-6xl mx-auto my-3 sm:my-6 grid grid-cols-1 sm:grid-cols-[1fr_2fr] shadow-md">
-        {/* left side users */}
+        {/* all users display */}
         <div className={cn(selectedUser ? "hidden sm:block" : "block")}>
           <UsersDisplay />
         </div>
 
-        {/* right side chat display */}
+        {/* chatting section */}
         <div className={cn(selectedUser ? "block" : "hidden sm:block")}>
           <Chats />
         </div>

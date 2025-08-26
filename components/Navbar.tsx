@@ -8,12 +8,10 @@ import {
 import { auth, db } from "@/lib/firebase.config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
-import { MdOutlineLogin } from "react-icons/md";
-import { BiLogOut } from "react-icons/bi";
 import { doc, updateDoc } from "firebase/firestore";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import NavbarButton from "./ui/navbar-button";
 
 const Navbar = () => {
   const { chatAppName, loginInputRef, setSelectedUser } =
@@ -78,20 +76,10 @@ const Navbar = () => {
           )}
 
           {/* Login || logout Buttons */}
-          <button
+          <NavbarButton
+            isLoggedIn={user ? true : false}
             onClick={user ? logOut : signIn}
-            className={cn(
-              "flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm cursor-pointer",
-              user
-                ? "text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200"
-                : "text-white bg-blue-500 hover:bg-blue-600"
-            )}
-          >
-            {user ? <BiLogOut /> : <MdOutlineLogin />}
-            <span className="hidden sm:inline">
-              {user ? "Logout" : "Sign In"}
-            </span>
-          </button>
+          />
         </div>
       </div>
     </nav>

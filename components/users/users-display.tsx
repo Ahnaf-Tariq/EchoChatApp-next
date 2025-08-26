@@ -7,6 +7,7 @@ import { useContext, useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
 import { cn } from "@/lib/utils";
+import UsersList from "./users-list";
 
 interface User {
   id: string;
@@ -72,38 +73,7 @@ const UsersDisplay = () => {
         {usersList
           .filter((user) => user.id !== auth.currentUser?.uid)
           .map((user) => (
-            <div
-              onClick={() => setSelectedUser(user)}
-              key={user.id}
-              className={cn(
-                "flex items-center gap-3 px-2 sm:px-4 py-2 sm:py-3 cursor-pointer transition-colors",
-                selectedUser?.id === user.id && "bg-blue-100",
-                selectedUser?.id !== user.id && "hover:bg-gray-100"
-              )}
-            >
-              <div className="">
-                <Image
-                  src="/assests/avatar.webp"
-                  alt="avatar"
-                  className="rounded-full border border-gray-300"
-                  width={40}
-                  height={40}
-                />
-              </div>
-              <div>
-                <p className="font-semibold">
-                  {user.username.charAt(0).toUpperCase() +
-                    user.username.slice(1)}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {user.typing && user.typingTo === auth.currentUser?.uid ? (
-                    <span className="text-green-600">Typing...</span>
-                  ) : (
-                    user.email
-                  )}
-                </p>
-              </div>
-            </div>
+            <UsersList key={user.id} user={user} />
           ))}
       </div>
     </div>

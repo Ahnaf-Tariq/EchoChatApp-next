@@ -8,6 +8,7 @@ import { useLogin } from "@/hooks/use-login";
 import { doc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import InputLogin from "./ui/input-login";
 
 const Login = () => {
   const { loginInputRef, currentState, setCurrentState } =
@@ -53,94 +54,39 @@ const Login = () => {
         <div className="flex flex-col gap-3">
           {/* name field */}
           {currentState === "Sign Up" && (
-            <>
-              <div className="flex flex-col gap-1 relative">
-                <input
-                  type="text"
-                  className={cn(
-                    "px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out",
-                    isNameFocused ? "border-blue-500" : "border-gray-400"
-                  )}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onFocus={() => setIsNameFocused(true)}
-                  onBlur={() => setIsNameFocused(false)}
-                  id="name"
-                  required
-                />
-                <label
-                  htmlFor="name"
-                  className={cn(
-                    "absolute left-3 transition-all duration-200 ease-in-out pointer-events-none",
-                    isNameFocused || name
-                      ? "text-xs -top-2 px-1 bg-white"
-                      : "text-base top-2",
-                    isNameFocused ? "text-blue-500" : "text-gray-400"
-                  )}
-                >
-                  Name
-                </label>
-              </div>
-            </>
+            <InputLogin
+              val={name}
+              setVal={setName}
+              isFocused={isNameFocused}
+              setIsFocused={setIsNameFocused}
+              label="Name"
+              type="text"
+              id="name"
+            />
           )}
 
           {/* email field */}
-          <div className="flex flex-col gap-1 relative">
-            <input
-              type="email"
-              className={cn(
-                "px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out",
-                isEmailFocused ? "border-blue-500" : "border-gray-400"
-              )}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onFocus={() => setIsEmailFocused(true)}
-              onBlur={() => setIsEmailFocused(false)}
-              id="email"
-              ref={loginInputRef}
-              required
-            />
-            <label
-              htmlFor="email"
-              className={cn(
-                "absolute left-3 transition-all duration-200 ease-in-out pointer-events-none",
-                isEmailFocused || email
-                  ? "text-xs -top-2 px-1 bg-white"
-                  : "text-base top-2",
-                isEmailFocused ? "text-blue-500" : "text-gray-400"
-              )}
-            >
-              Email
-            </label>
-          </div>
+          <InputLogin
+            val={email}
+            setVal={setEmail}
+            isFocused={isEmailFocused}
+            setIsFocused={setIsEmailFocused}
+            label="Email"
+            type="email"
+            id="email"
+            inputRef={loginInputRef}
+          />
+
           {/* password field */}
-          <div className="flex flex-col gap-1 relative">
-            <input
-              type="password"
-              className={cn(
-                "px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out",
-                isPasswordFocused ? "border-blue-500" : "border-gray-400"
-              )}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setIsPasswordFocused(true)}
-              onBlur={() => setIsPasswordFocused(false)}
-              id="password"
-              required
-            />
-            <label
-              htmlFor="password"
-              className={cn(
-                "absolute left-3 transition-all duration-200 ease-in-out pointer-events-none",
-                isPasswordFocused || password
-                  ? "text-xs -top-2 px-1 bg-white"
-                  : "text-base top-2",
-                isPasswordFocused ? "text-blue-500" : "text-gray-400"
-              )}
-            >
-              Password
-            </label>
-          </div>
+          <InputLogin
+            val={password}
+            setVal={setPassword}
+            isFocused={isPasswordFocused}
+            setIsFocused={setIsPasswordFocused}
+            label="Password"
+            type="password"
+            id="password"
+          />
 
           {/* button sign in */}
           <button
