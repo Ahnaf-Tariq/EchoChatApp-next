@@ -1,18 +1,16 @@
 "use client";
 import { AppContext } from "@/context/Context";
-import { formatDistanceToNow } from "date-fns";
 import { useContext } from "react";
-import { BsExclamationCircle } from "react-icons/bs";
-import { IoArrowBack, IoChatboxEllipsesOutline, IoSend } from "react-icons/io5";
+import { IoChatboxEllipsesOutline, IoSend } from "react-icons/io5";
 import { MdKeyboardVoice, MdStop } from "react-icons/md";
 import { RiGalleryLine } from "react-icons/ri";
-import ChatMessages from "./Chat-messages";
-import Image from "next/image";
-import useChatMessage from "@/hooks/useChatMessage";
+import ChatMessages from "./chat-messages";
+import useChatMessage from "@/hooks/use-chat-message";
 import { cn } from "@/lib/utils";
+import ChatHeader from "./chat-header";
 
 const Chats = () => {
-  const { selectedUser, setSelectedUser } = useContext(AppContext);
+  const { selectedUser } = useContext(AppContext);
   const {
     inputMessage,
     messages,
@@ -47,49 +45,7 @@ const Chats = () => {
       {selectedUser ? (
         <>
           {/* Chat Header */}
-          <div className="bg-white border-b border-gray-200 p-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setSelectedUser(null)}
-                  className="sm:hidden p-1 hover:bg-gray-100 rounded-full cursor-pointer"
-                >
-                  <IoArrowBack className="size-5 text-gray-600" />
-                </button>
-                <div className="hidden sm:block relative">
-                  <Image
-                    className="rounded-full ring-2 ring-gray-100"
-                    src="/assests/avatar.webp"
-                    alt=""
-                    width={40}
-                    height={40}
-                  />
-                  {/* Active Status Dot */}
-                  {selectedUser.active && (
-                    <span className="absolute bottom-0 right-0 block size-3 rounded-full bg-green-500 ring-2 ring-white"></span>
-                  )}
-                </div>
-                <div>
-                  <h1 className="text-lg font-semibold text-gray-800 capitalize">
-                    {selectedUser?.username}
-                  </h1>
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    {selectedUser.active
-                      ? "Active Now"
-                      : `Last seen: ${formatDistanceToNow(
-                          new Date(selectedUser.lastSeen),
-                          {
-                            addSuffix: true,
-                          }
-                        )}`}
-                  </p>
-                </div>
-              </div>
-              <button className="cursor-pointer">
-                <BsExclamationCircle className="size-5 text-gray-600" />
-              </button>
-            </div>
-          </div>
+          <ChatHeader />
 
           {/* Messages */}
           <div className="flex-1 max-h-[450px] overflow-y-auto scrollbar-hide p-4 space-y-2">

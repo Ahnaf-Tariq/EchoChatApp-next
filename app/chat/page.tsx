@@ -1,11 +1,11 @@
 "use client";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebaseConfig";
+import { auth } from "@/lib/firebase.config";
 import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
-import UsersDisplay from "@/components/chatComponents/Users-display";
-import Chats from "@/components/chatComponents/ChatMessageComponent/Chats";
+import UsersDisplay from "@/components/chat/users-display";
+import Chats from "@/components/chat/chats";
 import { cn } from "@/lib/utils";
 
 const Chat = () => {

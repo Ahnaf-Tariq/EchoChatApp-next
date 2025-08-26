@@ -1,7 +1,7 @@
 import { AppContext } from "@/context/Context";
-import { auth, db } from "@/lib/firebaseConfig";
-import { uploadImageCloudinary } from "@/lib/imageCloudinary";
-import { uploadVoiceCloudinary } from "@/lib/voiceCloudinary";
+import { auth, db } from "@/lib/firebase.config";
+import { uploadImageCloudinary } from "@/lib/cloudinary/cloudinary-image";
+import { uploadVoiceCloudinary } from "@/lib/cloudinary/cloudinary-voice";
 import {
   arrayRemove,
   arrayUnion,
@@ -358,9 +358,6 @@ const useChatMessage = () => {
         ? `${currentUserId}_${receiverId}`
         : `${receiverId}_${currentUserId}`;
 
-    const chatRef = doc(db, "chats", chatId);
-    const chatSnap = await getDoc(chatRef);
-
     const newMsg: Message = {
       senderId: currentUserId,
       receiverId,
@@ -370,19 +367,27 @@ const useChatMessage = () => {
       hasUserSeen: false,
     };
 
-    if (chatSnap.exists()) {
-      await updateDoc(chatRef, {
-        chatData: arrayUnion(newMsg),
-      });
-    } else {
-      await setDoc(chatRef, {
-        chatData: [newMsg],
-      });
-    }
-
     setInputMessage("");
-    const userRef = doc(db, "users", auth.currentUser.uid);
-    await updateDoc(userRef, { typing: false, typingTo: null });
+
+    try {
+      const chatRef = doc(db, "chats", chatId);
+      const chatSnap = await getDoc(chatRef);
+
+      if (chatSnap.exists()) {
+        await updateDoc(chatRef, {
+          chatData: arrayUnion(newMsg),
+        });
+      } else {
+        await setDoc(chatRef, {
+          chatData: [newMsg],
+        });
+      }
+
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(userRef, { typing: false, typingTo: null });
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   // image upload function

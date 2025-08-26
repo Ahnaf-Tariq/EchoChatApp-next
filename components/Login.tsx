@@ -1,10 +1,10 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "@/lib/firebaseConfig";
+import { auth, db } from "@/lib/firebase.config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
-import { useLogin } from "@/hooks/useLogin";
+import { useLogin } from "@/hooks/use-login";
 import { doc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
 import { cn } from "@/lib/utils";

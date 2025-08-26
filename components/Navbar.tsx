@@ -5,7 +5,7 @@ import {
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
-import { auth, db } from "@/lib/firebaseConfig";
+import { auth, db } from "@/lib/firebase.config";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/context/Context";
 import { MdOutlineLogin } from "react-icons/md";
@@ -36,6 +36,10 @@ const Navbar = () => {
     }
   };
 
+  const signIn = () => {
+    loginInputRef.current?.focus();
+  };
+
   useEffect(() => {
     const getUser = onAuthStateChanged(auth, (curuser) => setUser(curuser));
 
@@ -43,7 +47,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="shadow-sm">
+    <nav className="shadow-sm bg-white">
       <div className="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
         {/* Logo/Brand */}
         <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-blue-500">
@@ -75,6 +79,7 @@ const Navbar = () => {
 
           {/* Login || logout Buttons */}
           <button
+            onClick={user ? logOut : signIn}
             className={cn(
               "flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm cursor-pointer",
               user

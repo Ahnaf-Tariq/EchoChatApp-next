@@ -1,5 +1,5 @@
 "use client";
-import { auth, db } from "@/lib/firebaseConfig";
+import { auth, db } from "@/lib/firebase.config";
 import { AppContext } from "@/context/Context";
 import { collection, onSnapshot } from "firebase/firestore";
 import Image from "next/image";

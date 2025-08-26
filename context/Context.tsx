@@ -1,5 +1,5 @@
 "use client";
-import { auth, db } from "@/lib/firebaseConfig";
+import { auth, db } from "@/lib/firebase.config";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { createContext, ReactNode, useRef, useState } from "react";
 
