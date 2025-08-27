@@ -1,7 +1,7 @@
-import { AppContext } from "@/context/Context";
 import { auth, db } from "@/lib/firebase.config";
-import { uploadImageCloudinary } from "@/lib/cloudinary/cloudinary-image";
-import { uploadVoiceCloudinary } from "@/lib/cloudinary/cloudinary-voice";
+import { useChat } from "@/context/ChatContext";
+import { UploadCloudinaryImage } from "@/lib/cloudinary/cloudinaryImage";
+import { UploadCloudinaryVoice } from "@/lib/cloudinary/cloudinaryVoice";
 import {
   arrayRemove,
   arrayUnion,
@@ -11,7 +11,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Message {
   senderId: string;
@@ -26,7 +26,7 @@ interface Message {
 }
 
 const useChatMessage = () => {
-  const { selectedUser } = useContext(AppContext);
+  const { selectedUser } = useChat();
   const [inputMessage, setInputMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -133,7 +133,7 @@ const useChatMessage = () => {
     setUploading(true);
 
     try {
-      const audioUrl = await uploadVoiceCloudinary(audioBlob);
+      const audioUrl = await UploadCloudinaryVoice(audioBlob);
 
       if (audioUrl) {
         const currentUserId = auth.currentUser.uid;
@@ -218,7 +218,7 @@ const useChatMessage = () => {
     const value = e.target.value;
     setInputMessage(value);
 
-    if (!auth.currentUser) return;
+    if (!auth.currentUser || !selectedUser) return;
 
     const userRef = doc(db, "users", auth.currentUser.uid);
 
@@ -398,7 +398,7 @@ const useChatMessage = () => {
     setUploading(true);
 
     try {
-      const imageUrl = await uploadImageCloudinary(file);
+      const imageUrl = await UploadCloudinaryImage(file);
 
       if (imageUrl) {
         const currentUserId = auth.currentUser.uid;

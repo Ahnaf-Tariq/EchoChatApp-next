@@ -1,25 +1,26 @@
 "use client";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase.config";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AppContext } from "@/context/Context";
+import { useChat } from "@/context/ChatContext";
 import UsersDisplay from "@/components/users/users-display";
 import Chats from "@/components/chat/chats";
 import { cn } from "@/lib/utils";
 
 const Chat = () => {
-  const { LoadUserData, selectedUser } = useContext(AppContext);
+  const { loadUserData, selectedUser } = useChat();
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (curuser) => {
-      if (!curuser) {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (!currentUser) {
         router.replace("/");
       } else {
-        LoadUserData(curuser?.uid);
+        loadUserData(currentUser.uid);
       }
     });
+
     return () => unsubscribe();
   }, [router]);
 

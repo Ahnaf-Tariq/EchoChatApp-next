@@ -1,8 +1,8 @@
-import { AppContext } from "@/context/Context";
+import { useChat } from "@/context/ChatContext";
 import { auth } from "@/lib/firebase.config";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import React, { useContext } from "react";
+import React from "react";
 
 interface User {
   id: string;
@@ -15,7 +15,7 @@ interface User {
 }
 
 const UsersList = ({ user }: { user: User }) => {
-  const { selectedUser, setSelectedUser } = useContext(AppContext);
+  const { selectedUser, setSelectedUser } = useChat();
   return (
     <div
       onClick={() => setSelectedUser(user)}

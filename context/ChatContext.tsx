@@ -1,9 +1,8 @@
 "use client";
 import { auth, db } from "@/lib/firebase.config";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { createContext, ReactNode, useRef, useState } from "react";
+import { createContext, ReactNode, useContext, useRef, useState } from "react";
 
-export const AppContext = createContext<any>(null);
 interface User {
   id: string;
   username: string;
@@ -14,18 +13,27 @@ interface User {
   active: boolean;
 }
 
-export const Context = ({ children }: { children: ReactNode }) => {
+interface ChatContextType {
+  chatAppName: string;
+  currentState: string;
+  setCurrentState: (state: string) => void;
+  loadUserData: (uid: string) => Promise<void>;
+  selectedUser: User | null;
+  setSelectedUser: (user: User | null) => void;
+  loginInputRef: React.RefObject<HTMLInputElement | null>;
+}
+
+export const ChatContext = createContext<ChatContextType | null>(null);
+
+export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [currentState, setCurrentState] = useState<string>("Sign In");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const loginInputRef = useRef<HTMLInputElement | null>(null);
   const chatAppName = "Echo";
 
-  const LoadUserData = async (uid: string) => {
+  const loadUserData = async (uid: string) => {
     try {
       const userRef = doc(db, "users", uid);
-      const userSnap = await getDoc(userRef);
-      const userInfo = userSnap.data();
-      console.log(userInfo);
 
       await updateDoc(userRef, {
         lastSeen: Date.now(),
@@ -39,7 +47,7 @@ export const Context = ({ children }: { children: ReactNode }) => {
         }
       }, 60000); // update user's last seen after every 1 minute
     } catch (error) {
-      console.log(error);
+      console.error("Error loading user data:", error);
     }
   };
 
@@ -47,10 +55,19 @@ export const Context = ({ children }: { children: ReactNode }) => {
     chatAppName,
     currentState,
     setCurrentState,
-    LoadUserData,
+    loadUserData,
     selectedUser,
     setSelectedUser,
     loginInputRef,
   };
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
+};
+
+// custom context hook
+export const useChat = () => {
+  const context = useContext(ChatContext);
+  if (!context) {
+    throw new Error("useChat must be used within a ChatProvider");
+  }
+  return context;
 };

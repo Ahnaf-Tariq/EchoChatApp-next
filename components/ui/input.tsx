@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 
-interface InputLoginProps {
+interface InputProps {
   val: string;
   setVal: (val: string) => void;
   isFocused: boolean;
@@ -13,7 +13,7 @@ interface InputLoginProps {
   inputRef?: React.Ref<HTMLInputElement>;
 }
 
-const InputLogin = ({
+const Input = ({
   val,
   setVal,
   isFocused,
@@ -22,7 +22,7 @@ const InputLogin = ({
   label,
   id,
   inputRef,
-}: InputLoginProps) => {
+}: InputProps) => {
   return (
     // login page input
     <div className="flex flex-col gap-1 relative">
@@ -53,4 +53,4 @@ const InputLogin = ({
   );
 };
 
-export default InputLogin;
+export default Input;

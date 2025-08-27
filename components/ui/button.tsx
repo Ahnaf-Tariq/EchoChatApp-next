@@ -2,13 +2,12 @@ import React from "react";
 import { MdOutlineLogin } from "react-icons/md";
 import { BiLogOut } from "react-icons/bi";
 import { cn } from "@/lib/utils";
-
-interface NavbarButtonProps {
+interface ButtonProps {
   isLoggedIn: boolean;
   onClick: () => void;
 }
 
-const NavbarButton = ({ isLoggedIn, onClick }: NavbarButtonProps) => {
+const Button = ({ isLoggedIn, onClick }: ButtonProps) => {
   return (
     // navbar button
     <button
@@ -28,4 +27,4 @@ const NavbarButton = ({ isLoggedIn, onClick }: NavbarButtonProps) => {
   );
 };
 
-export default NavbarButton;
+export default Button;

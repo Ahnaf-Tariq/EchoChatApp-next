@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   User as FirebaseUser,
   onAuthStateChanged,
@@ -7,15 +7,14 @@ import {
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase.config";
 import { useRouter } from "next/navigation";
-import { AppContext } from "@/context/Context";
+import { useChat } from "@/context/ChatContext";
 import { doc, updateDoc } from "firebase/firestore";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import Image from "next/image";
-import NavbarButton from "./ui/navbar-button";
+import Button from "./ui/button";
 
 const Navbar = () => {
-  const { chatAppName, loginInputRef, setSelectedUser } =
-    useContext(AppContext);
+  const { chatAppName, loginInputRef, setSelectedUser } = useChat();
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const router = useRouter();
 
@@ -27,10 +26,9 @@ const Navbar = () => {
 
       await signOut(auth);
       setSelectedUser(null);
-      console.log("user logged out", user);
       router.replace("/");
     } catch (error) {
-      console.log(error);
+      console.error("Error logging out:", error);
     }
   };
 
@@ -39,7 +37,9 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const getUser = onAuthStateChanged(auth, (curuser) => setUser(curuser));
+    const getUser = onAuthStateChanged(auth, (currentUser) =>
+      setUser(currentUser)
+    );
 
     return () => getUser();
   }, []);
@@ -76,7 +76,7 @@ const Navbar = () => {
           )}
 
           {/* Login || logout Buttons */}
-          <NavbarButton
+          <Button
             isLoggedIn={user ? true : false}
             onClick={user ? logOut : signIn}
           />

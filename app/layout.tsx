@@ -3,8 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import { Context } from "@/context/Context";
-import Navbar from "@/components/Navbar";
+import { ChatProvider } from "@/context/ChatContext";
+import Navbar from "@/components/navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,10 +41,10 @@ export default function RootLayout({
           draggable
           theme="light"
         />
-        <Context>
+        <ChatProvider>
           <Navbar />
           {children}
-        </Context>
+        </ChatProvider>
       </body>
     </html>
   );

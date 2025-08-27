@@ -1,18 +1,16 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase.config";
 import { useRouter } from "next/navigation";
-import { AppContext } from "@/context/Context";
-import { useLogin } from "@/hooks/use-login";
+import { useChat } from "@/context/ChatContext";
+import { useLogin } from "@/hooks/useLogin";
 import { doc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
-import InputLogin from "./ui/input-login";
+import Input from "./ui/input";
 
 const Login = () => {
-  const { loginInputRef, currentState, setCurrentState } =
-    useContext(AppContext);
+  const { loginInputRef, currentState, setCurrentState } = useChat();
   const {
     email,
     setEmail,
@@ -29,13 +27,13 @@ const Login = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (curuser) => {
-      if (curuser) {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
         router.push("/chat");
       }
 
-      if (curuser) {
-        const userRef = doc(db, "users", curuser.uid);
+      if (currentUser) {
+        const userRef = doc(db, "users", currentUser.uid);
         await updateDoc(userRef, { active: true });
       }
     });
@@ -54,7 +52,7 @@ const Login = () => {
         <div className="flex flex-col gap-3">
           {/* name field */}
           {currentState === "Sign Up" && (
-            <InputLogin
+            <Input
               val={name}
               setVal={setName}
               isFocused={isNameFocused}
@@ -66,7 +64,7 @@ const Login = () => {
           )}
 
           {/* email field */}
-          <InputLogin
+          <Input
             val={email}
             setVal={setEmail}
             isFocused={isEmailFocused}
@@ -78,7 +76,7 @@ const Login = () => {
           />
 
           {/* password field */}
-          <InputLogin
+          <Input
             val={password}
             setVal={setPassword}
             isFocused={isPasswordFocused}

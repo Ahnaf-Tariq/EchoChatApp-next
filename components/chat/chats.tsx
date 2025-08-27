@@ -1,17 +1,13 @@
 "use client";
-import { AppContext } from "@/context/Context";
-import { useContext } from "react";
-import { IoChatboxEllipsesOutline, IoSend } from "react-icons/io5";
-import { MdKeyboardVoice, MdStop } from "react-icons/md";
-import { RiGalleryLine } from "react-icons/ri";
+import { useChat } from "@/context/ChatContext";
+import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import ChatMessages from "./chat-messages";
-import useChatMessage from "@/hooks/use-chat-message";
-import { cn } from "@/lib/utils";
+import useChatMessage from "@/hooks/useChatMessage";
 import ChatHeader from "./chat-header";
 import ChatInputs from "./chat-inputs";
 
 const Chats = () => {
-  const { selectedUser } = useContext(AppContext);
+  const { selectedUser } = useChat();
   const {
     inputMessage,
     messages,

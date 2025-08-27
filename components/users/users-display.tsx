@@ -1,12 +1,10 @@
 "use client";
 import { auth, db } from "@/lib/firebase.config";
-import { AppContext } from "@/context/Context";
+import { useChat } from "@/context/ChatContext";
 import { collection, onSnapshot } from "firebase/firestore";
-import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
-import { cn } from "@/lib/utils";
 import UsersList from "./users-list";
 
 interface User {
@@ -20,13 +18,14 @@ interface User {
 }
 
 const UsersDisplay = () => {
-  const { chatAppName, selectedUser, setSelectedUser } = useContext(AppContext);
+  const { chatAppName } = useChat();
   const [searchInput, setSearchInput] = useState("");
   const [usersList, setUsersList] = useState<User[]>([]);
   const [originalUsersList, setOriginalUsersList] = useState<User[]>([]);
 
   useEffect(() => {
     const userRef = collection(db, "users");
+
     const unsub = onSnapshot(userRef, (snap) => {
       const users = snap.docs.map((doc) => ({
         id: doc.id,
@@ -35,6 +34,7 @@ const UsersDisplay = () => {
       setUsersList(users);
       setOriginalUsersList(users);
     });
+
     return () => unsub();
   }, []);
 
