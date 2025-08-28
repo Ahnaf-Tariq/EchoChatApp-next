@@ -1,32 +1,20 @@
 "use client";
 import { auth, db } from "@/lib/firebase.config";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { createContext, ReactNode, useContext, useRef, useState } from "react";
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  lastSeen: number;
-  typing: boolean;
-  typingTo: string | null;
-  active: boolean;
-}
-
-interface ChatContextType {
-  chatAppName: string;
-  currentState: string;
-  setCurrentState: (state: string) => void;
-  loadUserData: (uid: string) => Promise<void>;
-  selectedUser: User | null;
-  setSelectedUser: (user: User | null) => void;
-  loginInputRef: React.RefObject<HTMLInputElement | null>;
-}
+import { AuthState } from "@/types/enums";
+import { ChatContextType, User } from "@/types/interfaces";
+import { doc, updateDoc } from "firebase/firestore";
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 
 export const ChatContext = createContext<ChatContextType | null>(null);
 
-export const ChatProvider = ({ children }: { children: ReactNode }) => {
-  const [currentState, setCurrentState] = useState<string>("Sign In");
+export const ChatProvider = ({ children }: PropsWithChildren) => {
+  const [currentState, setCurrentState] = useState<AuthState>(AuthState.signin);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const loginInputRef = useRef<HTMLInputElement | null>(null);
   const chatAppName = "Echo";

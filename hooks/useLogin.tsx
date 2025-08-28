@@ -9,6 +9,7 @@ import { auth, db, provider } from "@/lib/firebase.config";
 import { doc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useChat } from "@/context/ChatContext";
+import { AuthState } from "@/types/enums";
 
 export const useLogin = () => {
   const { currentState } = useChat();
@@ -18,8 +19,7 @@ export const useLogin = () => {
 
   const googleLogin = async () => {
     try {
-      const res = await signInWithPopup(auth, provider);
-      // console.log(res.user);
+      await signInWithPopup(auth, provider);
     } catch (error) {
       console.error("Error in logging: " + error);
     }
@@ -27,14 +27,13 @@ export const useLogin = () => {
 
   const handleSignIn = async () => {
     try {
-      if (currentState === "Sign In") {
+      if (currentState === AuthState.signin) {
         if (!email || !password) {
           toast.error("Please fill all fields");
           return;
         }
 
-        const res = await signInWithEmailAndPassword(auth, email, password);
-        // console.log(res.user);
+        await signInWithEmailAndPassword(auth, email, password);
       } else {
         if (!name || !email || !password) {
           toast.error("Please fill all fields");
@@ -48,7 +47,6 @@ export const useLogin = () => {
 
         const res = await createUserWithEmailAndPassword(auth, email, password);
         const user = res.user;
-        // console.log(user);
 
         await setDoc(doc(db, "users", user.uid), {
           id: user.uid,

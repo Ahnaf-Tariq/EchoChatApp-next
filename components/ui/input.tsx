@@ -1,17 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
+import { InputProps } from "@/types/interfaces";
 import React from "react";
-
-interface InputProps {
-  val: string;
-  setVal: (val: string) => void;
-  isFocused: boolean;
-  setIsFocused: (val: boolean) => void;
-  type: string;
-  label: string;
-  id: string;
-  inputRef?: React.Ref<HTMLInputElement>;
-}
 
 const Input = ({
   val,

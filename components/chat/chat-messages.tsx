@@ -1,6 +1,7 @@
 "use client";
 import { auth } from "@/lib/firebase.config";
 import { cn } from "@/lib/utils";
+import { ChatMessagesProps } from "@/types/interfaces";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -12,36 +13,14 @@ import {
   MdPlayArrow,
 } from "react-icons/md";
 
-interface Message {
-  senderId: string;
-  receiverId: string;
-  text?: string;
-  imageUrl?: string;
-  audioUrl?: string;
-  type: "text" | "image" | "audio";
-  timestamp: number;
-  reactions?: { [emoji: string]: string[] };
-  hasUserSeen: boolean;
-}
-
-interface ChatMessagesProps {
-  msg: Message;
-  playingAudio: string | null;
-  isPaused: boolean;
-  toggleAudio: (audioUrl: string) => void;
-  deleteMsg: (timestamp: number) => void;
-  addEmoji: (timestamp: number, emoji: string) => void;
-  deleteEmoji: (timestamp: number, emoji: string) => void;
-}
-
 const EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "😡"];
 
 const ChatMessages = ({
-  msg,
+  message,
   playingAudio,
   isPaused,
   toggleAudio,
-  deleteMsg,
+  deleteMessage,
   addEmoji,
   deleteEmoji,
 }: ChatMessagesProps) => {
@@ -49,7 +28,7 @@ const ChatMessages = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [reactEmoji, setReactEmoji] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const isOwnMessage = msg.senderId === auth.currentUser?.uid;
+  const isOwnMessage = message.senderId === auth.currentUser?.uid;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -66,10 +45,10 @@ const ChatMessages = ({
   }, [menuOption]);
 
   const handleEmojiClick = (emoji: string) => {
-    if (msg.reactions && msg.reactions[emoji]) {
-      deleteEmoji(msg.timestamp, emoji);
+    if (message.reactions && message.reactions[emoji]) {
+      deleteEmoji(message.timestamp, emoji);
     } else {
-      addEmoji(msg.timestamp, emoji);
+      addEmoji(message.timestamp, emoji);
     }
 
     setShowEmojiPicker(false);
@@ -78,16 +57,15 @@ const ChatMessages = ({
   };
 
   const handleDeleteClick = () => {
-    deleteMsg(msg.timestamp);
+    deleteMessage(message.timestamp);
     setmenuOption(false);
     setReactEmoji(false);
   };
 
-  // Get reaction counts
   const getReactionCounts = () => {
-    if (!msg.reactions) return [];
+    if (!message.reactions) return [];
 
-    return Object.entries(msg.reactions)
+    return Object.entries(message.reactions)
       .map(([emoji, userIds]) => ({
         emoji,
         count: userIds.length,
@@ -133,7 +111,6 @@ const ChatMessages = ({
                 <BsThreeDotsVertical className="size-4 text-gray-600" />
               </button>
 
-              {/* Options Menu */}
               {showEmojiPicker && (
                 <div
                   className={cn(
@@ -142,7 +119,6 @@ const ChatMessages = ({
                   )}
                 >
                   <div className="flex flex-col gap-1">
-                    {/* Emoji Button */}
                     <div className="relative">
                       <button
                         onClick={() => setReactEmoji(!reactEmoji)}
@@ -152,7 +128,6 @@ const ChatMessages = ({
                         React
                       </button>
 
-                      {/* Emoji Options */}
                       {reactEmoji && (
                         <div
                           className={cn(
@@ -175,7 +150,6 @@ const ChatMessages = ({
                       )}
                     </div>
 
-                    {/* Delete Button - only for own messages */}
                     {isOwnMessage && (
                       <button
                         onClick={handleDeleteClick}
@@ -196,22 +170,20 @@ const ChatMessages = ({
         <div
           className={cn(
             "rounded-2xl",
-            msg.type === "image" && "bg-white p-2",
-            msg.type !== "image" &&
+            message.type === "image" && "bg-white p-2",
+            message.type !== "image" &&
               (isOwnMessage
                 ? "bg-blue-500 text-white rounded-br-sm p-3"
                 : "bg-white text-gray-800 border border-gray-200 rounded-bl-sm p-3")
           )}
         >
-          {/* Text Message */}
-          {msg.type === "text" && msg.text && (
-            <p className="text-sm break-words">{msg.text}</p>
+          {message.type === "text" && message.text && (
+            <p className="text-sm break-words">{message.text}</p>
           )}
 
-          {/* Image msg */}
-          {msg.type === "image" && msg.imageUrl && (
+          {message.type === "image" && message.imageUrl && (
             <Image
-              src={msg.imageUrl}
+              src={message.imageUrl}
               alt="chat image"
               className="rounded-lg object-cover w-full max-w-[160px] sm:max-w-[180px] md:max-w-[220px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
               width={400}
@@ -219,11 +191,10 @@ const ChatMessages = ({
             />
           )}
 
-          {/* voice msg */}
-          {msg.type === "audio" && msg.audioUrl && (
+          {message.type === "audio" && message.audioUrl && (
             <div className="flex items-center gap-3 min-w-[150px]">
               <button
-                onClick={() => toggleAudio(msg.audioUrl!)}
+                onClick={() => toggleAudio(message.audioUrl!)}
                 className={cn(
                   "p-2 rounded-full cursor-pointer transition-colors",
                   isOwnMessage
@@ -231,7 +202,7 @@ const ChatMessages = ({
                     : "bg-gray-200 hover:bg-gray-300"
                 )}
               >
-                {playingAudio === msg.audioUrl && !isPaused ? (
+                {playingAudio === message.audioUrl && !isPaused ? (
                   <MdPause
                     className={cn(
                       "size-4",
@@ -273,32 +244,30 @@ const ChatMessages = ({
             </div>
           )}
 
-          {/* Timestamp */}
           <div className="flex items-center justify-between gap-1 mt-1">
             <p
               className={cn(
                 "text-xs",
-                msg.type === "image"
+                message.type === "image"
                   ? "text-gray-400"
                   : isOwnMessage
                   ? "text-blue-100"
                   : "text-gray-500"
               )}
             >
-              {new Date(msg.timestamp).toLocaleTimeString()}
+              {new Date(message.timestamp).toLocaleTimeString()}
             </p>
             {isOwnMessage && (
               <MdDoneAll
                 className={cn(
                   "size-4",
-                  msg.hasUserSeen ? "text-green-300" : "text-gray-400"
+                  message.hasUserSeen ? "text-green-300" : "text-gray-400"
                 )}
               />
             )}
           </div>
         </div>
 
-        {/* Reactions Display */}
         {reactionCounts.length > 0 && (
           <div
             className={cn(
@@ -309,7 +278,7 @@ const ChatMessages = ({
             {reactionCounts.map((reaction) => (
               <div
                 key={reaction.emoji}
-                onClick={() => deleteEmoji(msg.timestamp, reaction.emoji)}
+                onClick={() => deleteEmoji(message.timestamp, reaction.emoji)}
                 className={cn(
                   "flex items-center gap-1 px-2 py-1 rounded-full text-xs cursor-pointer border",
                   reaction.hasReacted

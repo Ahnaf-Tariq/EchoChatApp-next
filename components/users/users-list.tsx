@@ -1,18 +1,9 @@
 import { useChat } from "@/context/ChatContext";
 import { auth } from "@/lib/firebase.config";
 import { cn } from "@/lib/utils";
+import { User } from "@/types/interfaces";
 import Image from "next/image";
 import React from "react";
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  lastSeen: number;
-  typing: boolean;
-  typingTo: string | null;
-  active: boolean;
-}
 
 const UsersList = ({ user }: { user: User }) => {
   const { selectedUser, setSelectedUser } = useChat();
@@ -28,7 +19,7 @@ const UsersList = ({ user }: { user: User }) => {
       <div>
         <Image
           src="/assests/avatar.webp"
-          alt="avatar"
+          alt="profile"
           className="rounded-full border border-gray-300"
           width={40}
           height={40}

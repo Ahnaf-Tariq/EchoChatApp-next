@@ -24,11 +24,10 @@ const ChatHeader = () => {
               <Image
                 className="rounded-full ring-2 ring-gray-100"
                 src="/assests/avatar.webp"
-                alt=""
                 width={40}
                 height={40}
+                alt="profile"
               />
-              {/* Active Status Dot */}
               {selectedUser.active && (
                 <span className="absolute bottom-0 right-0 block size-3 rounded-full bg-green-500 ring-2 ring-white"></span>
               )}

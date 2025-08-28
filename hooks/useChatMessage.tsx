@@ -12,18 +12,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
-
-interface Message {
-  senderId: string;
-  receiverId: string;
-  text?: string;
-  imageUrl?: string;
-  audioUrl?: string;
-  type: "text" | "image" | "audio";
-  timestamp: number;
-  reactions?: { [emoji: string]: string[] };
-  hasUserSeen: boolean;
-}
+import { Message } from "@/types/interfaces";
 
 const useChatMessage = () => {
   const { selectedUser } = useChat();
@@ -73,12 +62,12 @@ const useChatMessage = () => {
 
         // Mark messages as seen
         let updated = false;
-        const updatedMessages = data.map((msg: Message) => {
-          if (msg.receiverId === currentUserId && !msg.hasUserSeen) {
+        const updatedMessages = data.map((message: Message) => {
+          if (message.receiverId === currentUserId && !message.hasUserSeen) {
             updated = true;
-            return { ...msg, hasUserSeen: true };
+            return { ...message, hasUserSeen: true };
           }
-          return msg;
+          return message;
         });
 
         if (updated) {
@@ -92,7 +81,6 @@ const useChatMessage = () => {
     return () => unsub();
   }, [selectedUser]);
 
-  // Start voice recording
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -115,18 +103,21 @@ const useChatMessage = () => {
       setIsRecording(true);
     } catch (error) {
       alert("Could not access microphone");
+      console.error("Microphone access error:", error);
     }
   };
 
-  // Stop voice recording
   const stopRecording = () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      setIsRecording(false);
+    try {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        setIsRecording(false);
+      }
+    } catch (error) {
+      console.error("Error stopping recording:", error);
     }
   };
 
-  // Send voice message
   const sendVoiceMessage = async (audioBlob: Blob) => {
     if (!selectedUser || !auth.currentUser) return;
 
@@ -167,182 +158,185 @@ const useChatMessage = () => {
       }
       setUploading(false);
     } catch (error) {
-      console.error("Voice message error:", error);
+      console.error("Error in sending voice message:", error);
     }
   };
 
   // Play/pause audio
   const toggleAudio = (audioUrl: string) => {
-    if (playingAudio === audioUrl && currentAudio) {
-      if (isPaused) {
-        // Resume the paused audio
-        currentAudio.play();
-        setIsPaused(false);
-      } else {
-        // Pause the playing audio
-        currentAudio.pause();
-        setIsPaused(true);
-      }
-    } else {
-      if (currentAudio) {
-        currentAudio.pause();
-        setCurrentAudio(null);
-      }
-
-      // Play new audio
-      const audio = new Audio(audioUrl);
-
-      audio.onended = () => {
-        setPlayingAudio(null);
-        setCurrentAudio(null);
-        setIsPaused(false);
-      };
-
-      audio.onpause = () => {
-        setIsPaused(true);
-      };
-
-      audio.onplay = () => {
-        setIsPaused(false);
-      };
-
-      audio.play();
-      setPlayingAudio(audioUrl);
-      setCurrentAudio(audio);
-      setIsPaused(false);
-    }
-  };
-
-  // handle input typing
-  const handleTyping = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setInputMessage(value);
-
-    if (!auth.currentUser || !selectedUser) return;
-
-    const userRef = doc(db, "users", auth.currentUser.uid);
-
-    if (value.trim() !== "") {
-      await updateDoc(userRef, { typing: true, typingTo: selectedUser.id });
-    } else {
-      await updateDoc(userRef, { typing: false, typingTo: null });
-    }
-
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    // Settimeout to stop typing after 2 seconds of inactivity
-    if (value.trim() !== "") {
-      typingTimeoutRef.current = setTimeout(async () => {
-        if (auth.currentUser) {
-          const userRef = doc(db, "users", auth.currentUser.uid);
-          await updateDoc(userRef, { typing: false, typingTo: null });
+    try {
+      if (playingAudio === audioUrl && currentAudio) {
+        if (isPaused) {
+          currentAudio.play();
+          setIsPaused(false);
+        } else {
+          currentAudio.pause();
+          setIsPaused(true);
         }
-      }, 3000);
+      } else {
+        if (currentAudio) {
+          currentAudio.pause();
+          setCurrentAudio(null);
+        }
+
+        const audio = new Audio(audioUrl);
+
+        audio.onended = () => {
+          setPlayingAudio(null);
+          setCurrentAudio(null);
+          setIsPaused(false);
+        };
+
+        audio.onpause = () => {
+          setIsPaused(true);
+        };
+
+        audio.onplay = () => {
+          setIsPaused(false);
+        };
+
+        audio.play();
+        setPlayingAudio(audioUrl);
+        setCurrentAudio(audio);
+        setIsPaused(false);
+      }
+    } catch (error) {
+      console.error("Error toggling audio:", error);
     }
   };
 
-  // Add emoji reaction function
+  const handleTyping = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const value = e.target.value;
+      setInputMessage(value);
+
+      if (!auth.currentUser || !selectedUser) return;
+
+      const userRef = doc(db, "users", auth.currentUser.uid);
+
+      if (value.trim() !== "") {
+        await updateDoc(userRef, { typing: true, typingTo: selectedUser.id });
+      } else {
+        await updateDoc(userRef, { typing: false, typingTo: null });
+      }
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      if (value.trim() !== "") {
+        typingTimeoutRef.current = setTimeout(async () => {
+          if (auth.currentUser) {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            await updateDoc(userRef, { typing: false, typingTo: null });
+          }
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error in handle typing:", error);
+    }
+  };
+
   const addEmoji = async (messageTimestamp: number, emoji: string) => {
     if (!selectedUser || !auth.currentUser) return;
 
-    const currentUserId = auth.currentUser.uid;
-    const receiverId = selectedUser.id;
-    const chatId =
-      currentUserId < receiverId
-        ? `${currentUserId}_${receiverId}`
-        : `${receiverId}_${currentUserId}`;
+    try {
+      const currentUserId = auth.currentUser.uid;
+      const receiverId = selectedUser.id;
+      const chatId =
+        currentUserId < receiverId
+          ? `${currentUserId}_${receiverId}`
+          : `${receiverId}_${currentUserId}`;
 
-    const chatRef = doc(db, "chats", chatId);
-    const chatSnap = await getDoc(chatRef);
+      const chatRef = doc(db, "chats", chatId);
+      const chatSnap = await getDoc(chatRef);
 
-    if (chatSnap.exists()) {
-      const chatData = chatSnap.data().chatData as Message[];
-      const updatedMessages = chatData.map((msg) => {
-        if (msg.timestamp === messageTimestamp) {
-          let reactions = { ...(msg.reactions || {}) };
+      if (chatSnap.exists()) {
+        const chatData = chatSnap.data().chatData as Message[];
+        const updatedMessages = chatData.map((message) => {
+          if (message.timestamp === messageTimestamp) {
+            let reactions = { ...(message.reactions || {}) };
 
-          // First, remove the user from ALL emoji reactions for this message
-          Object.keys(reactions).forEach((existingEmoji) => {
-            const userIndex = reactions[existingEmoji].indexOf(currentUserId);
-            if (userIndex > -1) {
-              reactions[existingEmoji].splice(userIndex, 1);
+            Object.keys(reactions).forEach((existingEmoji) => {
+              const userIndex = reactions[existingEmoji].indexOf(currentUserId);
+              if (userIndex > -1) {
+                reactions[existingEmoji].splice(userIndex, 1);
 
-              // Remove emoji key if no reactions left
-              if (reactions[existingEmoji].length === 0) {
-                delete reactions[existingEmoji];
+                if (reactions[existingEmoji].length === 0) {
+                  delete reactions[existingEmoji];
+                }
               }
-            }
-          });
+            });
 
-          // Check if user is clicking the same emoji they already reacted with
-          const wasAlreadyReacted =
-            msg.reactions?.[emoji]?.includes(currentUserId);
+            const wasAlreadyReacted =
+              message.reactions?.[emoji]?.includes(currentUserId);
 
-          // If it wasn't the same emoji, add the new reaction
-          if (!wasAlreadyReacted) {
-            if (!reactions[emoji]) {
-              reactions[emoji] = [];
+            if (!wasAlreadyReacted) {
+              if (!reactions[emoji]) {
+                reactions[emoji] = [];
+              }
+              reactions[emoji].push(currentUserId);
             }
-            reactions[emoji].push(currentUserId);
+
+            return { ...message, reactions };
           }
+          return message;
+        });
 
-          return { ...msg, reactions };
-        }
-        return msg;
-      });
-
-      await updateDoc(chatRef, {
-        chatData: updatedMessages,
-      });
+        await updateDoc(chatRef, {
+          chatData: updatedMessages,
+        });
+      }
+    } catch (error) {
+      console.error("Error in adding Emoji:", error);
     }
   };
 
-  // Remove emoji reaction function
   const deleteEmoji = async (messageTimestamp: number, emoji: string) => {
     if (!selectedUser || !auth.currentUser) return;
 
-    const currentUserId = auth.currentUser.uid;
-    const receiverId = selectedUser.id;
-    const chatId =
-      currentUserId < receiverId
-        ? `${currentUserId}_${receiverId}`
-        : `${receiverId}_${currentUserId}`;
+    try {
+      const currentUserId = auth.currentUser.uid;
+      const receiverId = selectedUser.id;
+      const chatId =
+        currentUserId < receiverId
+          ? `${currentUserId}_${receiverId}`
+          : `${receiverId}_${currentUserId}`;
 
-    const chatRef = doc(db, "chats", chatId);
-    const chatSnap = await getDoc(chatRef);
+      const chatRef = doc(db, "chats", chatId);
+      const chatSnap = await getDoc(chatRef);
 
-    if (chatSnap.exists()) {
-      const chatData = chatSnap.data().chatData as Message[];
+      if (chatSnap.exists()) {
+        const chatData = chatSnap.data().chatData as Message[];
 
-      const updatedMessages = chatData.map((msg) => {
-        if (msg.timestamp === messageTimestamp) {
-          let reactions = { ...(msg.reactions || {}) };
+        const updatedMessages = chatData.map((message) => {
+          if (message.timestamp === messageTimestamp) {
+            let reactions = { ...(message.reactions || {}) };
 
-          if (reactions[emoji]) {
-            reactions[emoji] = reactions[emoji].filter(
-              (uid) => uid !== currentUserId
-            );
+            if (reactions[emoji]) {
+              reactions[emoji] = reactions[emoji].filter(
+                (uid) => uid !== currentUserId
+              );
 
-            // Remove key if no users left
-            if (reactions[emoji].length === 0) {
-              delete reactions[emoji];
+              if (reactions[emoji].length === 0) {
+                delete reactions[emoji];
+              }
             }
+
+            return { ...message, reactions };
           }
+          return message;
+        });
 
-          return { ...msg, reactions };
-        }
-        return msg;
-      });
-
-      await updateDoc(chatRef, {
-        chatData: updatedMessages,
-      });
+        await updateDoc(chatRef, {
+          chatData: updatedMessages,
+        });
+      }
+    } catch (error) {
+      console.error("Error in deleting Emoji:", error);
     }
   };
 
-  // send message function
   const sendMessage = async () => {
     if (!selectedUser || !auth.currentUser) return;
 
@@ -358,7 +352,7 @@ const useChatMessage = () => {
         ? `${currentUserId}_${receiverId}`
         : `${receiverId}_${currentUserId}`;
 
-    const newMsg: Message = {
+    const newMessage: Message = {
       senderId: currentUserId,
       receiverId,
       text: inputMessage,
@@ -375,11 +369,11 @@ const useChatMessage = () => {
 
       if (chatSnap.exists()) {
         await updateDoc(chatRef, {
-          chatData: arrayUnion(newMsg),
+          chatData: arrayUnion(newMessage),
         });
       } else {
         await setDoc(chatRef, {
-          chatData: [newMsg],
+          chatData: [newMessage],
         });
       }
 
@@ -390,7 +384,6 @@ const useChatMessage = () => {
     }
   };
 
-  // image upload function
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !auth.currentUser || !selectedUser) return;
@@ -441,11 +434,10 @@ const useChatMessage = () => {
     }
   };
 
-  // delete message function
-  const deleteMsg = async (timestamp: number) => {
-    try {
-      if (!selectedUser || !auth.currentUser) return;
+  const deleteMessage = async (timestamp: number) => {
+    if (!selectedUser || !auth.currentUser) return;
 
+    try {
       const currentUserId = auth.currentUser.uid;
       const receiverId = selectedUser.id;
       const chatId =
@@ -454,11 +446,13 @@ const useChatMessage = () => {
           : `${receiverId}_${currentUserId}`;
 
       const chatRef = doc(db, "chats", chatId);
-      const msgToDelete = messages.find((msg) => msg.timestamp === timestamp);
+      const messageToDelete = messages.find(
+        (message) => message.timestamp === timestamp
+      );
 
-      if (msgToDelete) {
+      if (messageToDelete) {
         await updateDoc(chatRef, {
-          chatData: arrayRemove(msgToDelete),
+          chatData: arrayRemove(messageToDelete),
         });
       }
     } catch (error) {
@@ -483,7 +477,7 @@ const useChatMessage = () => {
     startRecording,
     stopRecording,
     toggleAudio,
-    deleteMsg,
+    deleteMessage,
     addEmoji,
     deleteEmoji,
   };

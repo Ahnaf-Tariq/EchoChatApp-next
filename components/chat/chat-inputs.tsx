@@ -1,22 +1,9 @@
 import { cn } from "@/lib/utils";
+import { ChatInputsProps } from "@/types/interfaces";
 import React from "react";
 import { IoSend } from "react-icons/io5";
 import { MdKeyboardVoice, MdStop } from "react-icons/md";
 import { RiGalleryLine } from "react-icons/ri";
-
-interface ChatInputsProps {
-  inputMessage: string;
-  uploading: boolean;
-  isRecording: boolean;
-  msgSendInputRef: React.RefObject<HTMLInputElement | null>;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
-  handleTyping: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  startRecording: () => void;
-  stopRecording: () => void;
-  sendMessage: () => void;
-}
 
 const ChatInputs = ({
   inputMessage,
@@ -33,7 +20,6 @@ const ChatInputs = ({
 }: ChatInputsProps) => {
   return (
     <div className="bg-white border-t border-gray-200 p-4">
-      {/* Recording indicator */}
       {isRecording && (
         <div className="flex items-center justify-center gap-2 mb-3 p-2 bg-red-50 rounded-lg">
           <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
@@ -51,7 +37,6 @@ const ChatInputs = ({
           disabled={uploading || isRecording}
         />
 
-        {/* Gallery Button */}
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading || isRecording}
@@ -66,7 +51,6 @@ const ChatInputs = ({
           <RiGalleryLine className="size-5" />
         </button>
 
-        {/* input message */}
         <div className="flex-1 relative">
           <input
             value={inputMessage}
@@ -80,7 +64,6 @@ const ChatInputs = ({
           />
         </div>
 
-        {/* Voice Button */}
         <button
           onClick={isRecording ? stopRecording : startRecording}
           disabled={uploading}
@@ -101,7 +84,6 @@ const ChatInputs = ({
           )}
         </button>
 
-        {/* Send Button */}
         <button
           onClick={sendMessage}
           disabled={isRecording}

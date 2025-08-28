@@ -24,12 +24,11 @@ const Chats = () => {
     startRecording,
     stopRecording,
     toggleAudio,
-    deleteMsg,
+    deleteMessage,
     addEmoji,
     deleteEmoji,
   } = useChatMessage();
 
-  // Enter key press
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -41,19 +40,17 @@ const Chats = () => {
     <div className="h-[550px] sm:h-[550px] bg-gray-50 flex flex-col">
       {selectedUser ? (
         <>
-          {/* Chat Header */}
           <ChatHeader />
 
-          {/* Messages */}
           <div className="flex-1 max-h-[450px] overflow-y-auto scrollbar-hide p-4 space-y-2">
-            {messages.map((msg, ind) => (
+            {messages.map((message, ind) => (
               <div key={ind}>
                 <ChatMessages
-                  msg={msg}
+                  message={message}
                   playingAudio={playingAudio}
                   isPaused={isPaused}
                   toggleAudio={toggleAudio}
-                  deleteMsg={deleteMsg}
+                  deleteMessage={deleteMessage}
                   addEmoji={addEmoji}
                   deleteEmoji={deleteEmoji}
                 />
@@ -63,7 +60,6 @@ const Chats = () => {
             <div ref={chatScrollRef} />
           </div>
 
-          {/* Message Input */}
           <ChatInputs
             inputMessage={inputMessage}
             uploading={uploading}
@@ -79,7 +75,6 @@ const Chats = () => {
           />
         </>
       ) : (
-        // If no user is selected
         <div className="flex-1 flex flex-col justify-center items-center text-center p-8">
           <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4">
             <IoChatboxEllipsesOutline className="size-8" />

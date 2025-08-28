@@ -2,10 +2,7 @@ import React from "react";
 import { MdOutlineLogin } from "react-icons/md";
 import { BiLogOut } from "react-icons/bi";
 import { cn } from "@/lib/utils";
-interface ButtonProps {
-  isLoggedIn: boolean;
-  onClick: () => void;
-}
+import { ButtonProps } from "@/types/interfaces";
 
 const Button = ({ isLoggedIn, onClick }: ButtonProps) => {
   return (

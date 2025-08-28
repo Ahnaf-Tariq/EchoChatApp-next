@@ -10,13 +10,11 @@ export const UploadCloudinaryImage = async (file: File) => {
       return null;
     }
 
-    // form data
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", uploadPreset);
     formData.append("folder", "chat-app");
 
-    // Upload to cloudinary
     const response = await axios.post(
       `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
       formData

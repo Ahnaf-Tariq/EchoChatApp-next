@@ -8,6 +8,7 @@ import { useLogin } from "@/hooks/useLogin";
 import { doc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
 import Input from "./ui/input";
+import { AuthState } from "@/types/enums";
 
 const Login = () => {
   const { loginInputRef, currentState, setCurrentState } = useChat();
@@ -48,10 +49,8 @@ const Login = () => {
         </div>
         <hr className="text-gray-400 my-4" />
 
-        {/* input fields */}
         <div className="flex flex-col gap-3">
-          {/* name field */}
-          {currentState === "Sign Up" && (
+          {currentState === AuthState.signup && (
             <Input
               val={name}
               setVal={setName}
@@ -63,7 +62,6 @@ const Login = () => {
             />
           )}
 
-          {/* email field */}
           <Input
             val={email}
             setVal={setEmail}
@@ -75,7 +73,6 @@ const Login = () => {
             inputRef={loginInputRef}
           />
 
-          {/* password field */}
           <Input
             val={password}
             setVal={setPassword}
@@ -86,7 +83,6 @@ const Login = () => {
             id="password"
           />
 
-          {/* button sign in */}
           <button
             onClick={handleSignIn}
             className="w-full font-semibold text-sm sm:text-base bg-blue-500 hover:bg-blue-600 hover:shadow-md text-white rounded-lg py-1 mt-2 cursor-pointer"
@@ -100,7 +96,6 @@ const Login = () => {
             <hr className="flex-grow border-t border-gray-300" />
           </div>
 
-          {/* Google logo button */}
           <button
             onClick={googleLogin}
             className="w-full flex justify-center items-center gap-2 border border-[#14b8a6] rounded-lg py-1 sm:py-2 hover:bg-gray-50 transition cursor-pointer"
@@ -109,7 +104,7 @@ const Login = () => {
               src={"/assests/google_img.jpeg"}
               width={20}
               height={20}
-              alt=""
+              alt="google_logo"
             />
             <span className="text-sm font-medium text-gray-700 hidden sm:block">
               Continue with Google
@@ -117,25 +112,24 @@ const Login = () => {
           </button>
         </div>
 
-        {/* logic last */}
-        {currentState === "Sign In" ? (
+        {currentState === AuthState.signin ? (
           <p className="mt-4 text-sm">
             Dont have an account?{" "}
             <span
-              onClick={() => setCurrentState("Sign Up")}
+              onClick={() => setCurrentState(AuthState.signup)}
               className="text-blue-500 font-semibold hover:underline cursor-pointer"
             >
-              Sign Up
+              {AuthState.signup}
             </span>
           </p>
         ) : (
           <p className="mt-4 text-sm">
             Already have an account?{" "}
             <span
-              onClick={() => setCurrentState("Sign In")}
+              onClick={() => setCurrentState(AuthState.signin)}
               className="text-blue-500 hover:underline font-semibold cursor-pointer"
             >
-              Sign In
+              {AuthState.signin}
             </span>
           </p>
         )}

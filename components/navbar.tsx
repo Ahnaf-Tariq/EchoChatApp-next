@@ -20,7 +20,6 @@ const Navbar = () => {
 
   const logOut = async () => {
     try {
-      // active now to false
       const userRef = doc(db, "users", auth.currentUser?.uid || "");
       await updateDoc(userRef, { active: false });
 
@@ -36,6 +35,14 @@ const Navbar = () => {
     loginInputRef.current?.focus();
   };
 
+  const handleAuthAction = () => {
+    if (user) {
+      logOut();
+    } else {
+      signIn();
+    }
+  };
+
   useEffect(() => {
     const getUser = onAuthStateChanged(auth, (currentUser) =>
       setUser(currentUser)
@@ -47,39 +54,29 @@ const Navbar = () => {
   return (
     <nav className="shadow-sm bg-white">
       <div className="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
-        {/* Logo/Brand */}
         <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-blue-500">
           <IoChatboxEllipsesOutline className="size-4 sm:size-5" />
           {chatAppName}
         </h1>
 
-        {/* User Section */}
         <div className="flex items-center gap-4">
           {user && (
             <div className="flex items-center gap-3">
-              {/* User email */}
               <div className="hidden sm:block">
                 <p className="text-xs text-gray-500">{user.email}</p>
               </div>
 
-              {/* Profile Picture */}
-              <div className="">
-                <Image
-                  className="rounded-full border-2 border-gray-100 cursor-pointer"
-                  src={"/assests/avatar.webp"}
-                  alt="Profile"
-                  width={40}
-                  height={40}
-                />
-              </div>
+              <Image
+                className="rounded-full border-2 border-gray-100 cursor-pointer"
+                src={"/assests/avatar.webp"}
+                alt="profile"
+                width={40}
+                height={40}
+              />
             </div>
           )}
 
-          {/* Login || logout Buttons */}
-          <Button
-            isLoggedIn={user ? true : false}
-            onClick={user ? logOut : signIn}
-          />
+          <Button isLoggedIn={user ? true : false} onClick={handleAuthAction} />
         </div>
       </div>
     </nav>
