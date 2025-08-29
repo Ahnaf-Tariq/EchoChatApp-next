@@ -1,8 +1,8 @@
 import { AppProps } from "next/app";
-import { appWithTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import "../styles/globals.css";
+import I18nProvider from "../components/I18nProvider";
+import "./globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -15,7 +15,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     document.documentElement.lang = locale || "en";
   }, [router.locale]);
 
-  return <Component {...pageProps} />;
+  return (
+    <I18nProvider locale={router.locale || "en"}>
+      <Component {...pageProps} />
+    </I18nProvider>
+  );
 }
 
-export default appWithTranslation(MyApp);
+export default MyApp;

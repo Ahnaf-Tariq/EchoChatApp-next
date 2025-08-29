@@ -17,6 +17,7 @@ const Button = ({ isLoggedIn, onClick }: ButtonProps) => {
       )}
     >
       {isLoggedIn ? <BiLogOut /> : <MdOutlineLogin />}
+
       <span className="hidden sm:inline">
         {isLoggedIn ? "Logout" : "Sign In"}
       </span>
