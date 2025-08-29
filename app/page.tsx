@@ -1,9 +1,5 @@
-import Login from "@/components/login";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return (
-    <div className="bg-gray-50 h-screen">
-      <Login />
-    </div>
-  );
+export default function RootPage() {
+  redirect("/en");
 }

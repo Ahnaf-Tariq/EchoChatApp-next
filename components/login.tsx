@@ -9,8 +9,12 @@ import { doc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
 import Input from "./ui/input";
 import { AuthState } from "@/types/enums";
+import { Routes } from "@/routes/Routes";
+import { useCommonTranslations } from "@/hooks/useTranslations";
 
 const Login = () => {
+  const { t } = useCommonTranslations();
+
   const { loginInputRef, currentState, setCurrentState } = useChat();
   const {
     email,
@@ -30,14 +34,13 @@ const Login = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        router.push("/chat");
-      }
+        router.push(Routes.chat);
 
-      if (currentUser) {
         const userRef = doc(db, "users", currentUser.uid);
         await updateDoc(userRef, { active: true });
       }
     });
+
     return () => unsubscribe();
   }, [router]);
 
@@ -45,18 +48,22 @@ const Login = () => {
     <div className="flex justify-center mt-10 sm:mt-14 items-center px-2">
       <div className="bg-white shadow-md p-4 sm:p-6 rounded-xl w-96 max-w-full sm:w-96">
         <div className="flex justify-center">
-          <h1 className="font-bold text-xl sm:text-2xl">{currentState}</h1>
+          <h1 className="font-bold text-xl sm:text-2xl">
+            {currentState === AuthState.SIGNIN
+              ? t("auth.login_title")
+              : t("auth.signup_title")}
+          </h1>
         </div>
         <hr className="text-gray-400 my-4" />
 
         <div className="flex flex-col gap-3">
-          {currentState === AuthState.signup && (
+          {currentState === AuthState.SIGNUP && (
             <Input
               val={name}
               setVal={setName}
               isFocused={isNameFocused}
               setIsFocused={setIsNameFocused}
-              label="Name"
+              label={t("common.name")}
               type="text"
               id="name"
             />
@@ -67,7 +74,7 @@ const Login = () => {
             setVal={setEmail}
             isFocused={isEmailFocused}
             setIsFocused={setIsEmailFocused}
-            label="Email"
+            label={t("common.email")}
             type="email"
             id="email"
             inputRef={loginInputRef}
@@ -78,7 +85,7 @@ const Login = () => {
             setVal={setPassword}
             isFocused={isPasswordFocused}
             setIsFocused={setIsPasswordFocused}
-            label="Password"
+            label={t("common.password")}
             type="password"
             id="password"
           />
@@ -87,12 +94,14 @@ const Login = () => {
             onClick={handleSignIn}
             className="w-full font-semibold text-sm sm:text-base bg-blue-500 hover:bg-blue-600 hover:shadow-md text-white rounded-lg py-1 mt-2 cursor-pointer"
           >
-            {currentState}
+            {currentState === AuthState.SIGNIN
+              ? t("common.login")
+              : t("common.signup")}
           </button>
 
           <div className="flex items-center my-1">
             <hr className="flex-grow border-t border-gray-300" />
-            <span className="mx-2 text-gray-700">Or</span>
+            <span className="mx-2 text-gray-700">{t("common.or")}</span>
             <hr className="flex-grow border-t border-gray-300" />
           </div>
 
@@ -107,29 +116,29 @@ const Login = () => {
               alt="google_logo"
             />
             <span className="text-sm font-medium text-gray-700 hidden sm:block">
-              Continue with Google
+              {t("common.continue_google")}
             </span>
           </button>
         </div>
 
-        {currentState === AuthState.signin ? (
+        {currentState === AuthState.SIGNIN ? (
           <p className="mt-4 text-sm">
-            Dont have an account?{" "}
+            {t("common.dont_have_account")}{" "}
             <span
-              onClick={() => setCurrentState(AuthState.signup)}
+              onClick={() => setCurrentState(AuthState.SIGNUP)}
               className="text-blue-500 font-semibold hover:underline cursor-pointer"
             >
-              {AuthState.signup}
+              {AuthState.SIGNUP}
             </span>
           </p>
         ) : (
           <p className="mt-4 text-sm">
-            Already have an account?{" "}
+            {t("common.already_have_account")}{" "}
             <span
-              onClick={() => setCurrentState(AuthState.signin)}
+              onClick={() => setCurrentState(AuthState.SIGNIN)}
               className="text-blue-500 hover:underline font-semibold cursor-pointer"
             >
-              {AuthState.signin}
+              {AuthState.SIGNIN}
             </span>
           </p>
         )}

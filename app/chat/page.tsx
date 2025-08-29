@@ -7,6 +7,7 @@ import { useChat } from "@/context/ChatContext";
 import UsersDisplay from "@/components/users/users-display";
 import Chats from "@/components/chat/chats";
 import { cn } from "@/lib/utils";
+import { Routes } from "@/routes/Routes";
 
 const Chat = () => {
   const { loadUserData, selectedUser } = useChat();
@@ -15,7 +16,7 @@ const Chat = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (!currentUser) {
-        router.replace("/");
+        router.replace(Routes.login);
       } else {
         loadUserData(currentUser.uid);
       }

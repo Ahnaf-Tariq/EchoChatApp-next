@@ -1,7 +1,7 @@
 import { auth, db } from "@/lib/firebase.config";
 import { useChat } from "@/context/ChatContext";
-import { UploadCloudinaryImage } from "@/lib/cloudinary/cloudinaryImage";
-import { UploadCloudinaryVoice } from "@/lib/cloudinary/cloudinaryVoice";
+import { uploadCloudinaryImage } from "@/lib/cloudinary/cloudinaryImage";
+import { uploadCloudinaryVoice } from "@/lib/cloudinary/cloudinaryVoice";
 import {
   arrayRemove,
   arrayUnion,
@@ -44,7 +44,7 @@ const useChatMessage = () => {
 
   // get all chats
   useEffect(() => {
-    if (!selectedUser || !auth.currentUser) return;
+    if (!auth.currentUser || !selectedUser) return;
 
     const currentUserId = auth.currentUser.uid;
     const receiverId = selectedUser.id;
@@ -119,12 +119,13 @@ const useChatMessage = () => {
   };
 
   const sendVoiceMessage = async (audioBlob: Blob) => {
-    if (!selectedUser || !auth.currentUser) return;
+    if (!auth.currentUser) throw new Error("No authenticated user");
+    if (!selectedUser) throw new Error("No selected user");
 
     setUploading(true);
 
     try {
-      const audioUrl = await UploadCloudinaryVoice(audioBlob);
+      const audioUrl = await uploadCloudinaryVoice(audioBlob);
 
       if (audioUrl) {
         const currentUserId = auth.currentUser.uid;
@@ -159,6 +160,7 @@ const useChatMessage = () => {
       setUploading(false);
     } catch (error) {
       console.error("Error in sending voice message:", error);
+      setUploading(false);
     }
   };
 
@@ -206,11 +208,12 @@ const useChatMessage = () => {
   };
 
   const handleTyping = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!auth.currentUser) throw new Error("No authenticated user");
+    if (!selectedUser) throw new Error("No selected user");
+
     try {
       const value = e.target.value;
       setInputMessage(value);
-
-      if (!auth.currentUser || !selectedUser) return;
 
       const userRef = doc(db, "users", auth.currentUser.uid);
 
@@ -238,7 +241,8 @@ const useChatMessage = () => {
   };
 
   const addEmoji = async (messageTimestamp: number, emoji: string) => {
-    if (!selectedUser || !auth.currentUser) return;
+    if (!auth.currentUser) throw new Error("No authenticated user");
+    if (!selectedUser) throw new Error("No selected user");
 
     try {
       const currentUserId = auth.currentUser.uid;
@@ -251,49 +255,49 @@ const useChatMessage = () => {
       const chatRef = doc(db, "chats", chatId);
       const chatSnap = await getDoc(chatRef);
 
-      if (chatSnap.exists()) {
-        const chatData = chatSnap.data().chatData as Message[];
-        const updatedMessages = chatData.map((message) => {
-          if (message.timestamp === messageTimestamp) {
-            let reactions = { ...(message.reactions || {}) };
+      if (!chatSnap.exists()) return;
 
-            Object.keys(reactions).forEach((existingEmoji) => {
-              const userIndex = reactions[existingEmoji].indexOf(currentUserId);
-              if (userIndex > -1) {
-                reactions[existingEmoji].splice(userIndex, 1);
+      const chatData = chatSnap.data().chatData as Message[];
 
-                if (reactions[existingEmoji].length === 0) {
-                  delete reactions[existingEmoji];
-                }
-              }
-            });
+      const targetMessage = chatData.find(
+        (message) => message.timestamp === messageTimestamp
+      );
 
-            const wasAlreadyReacted =
-              message.reactions?.[emoji]?.includes(currentUserId);
+      if (!targetMessage) return;
 
-            if (!wasAlreadyReacted) {
-              if (!reactions[emoji]) {
-                reactions[emoji] = [];
-              }
-              reactions[emoji].push(currentUserId);
-            }
+      const reactions = { ...(targetMessage.reactions || {}) };
 
-            return { ...message, reactions };
-          }
-          return message;
-        });
+      Object.keys(reactions).forEach((existingEmoji) => {
+        reactions[existingEmoji] = reactions[existingEmoji].filter(
+          (userId) => userId !== currentUserId
+        );
+        if (reactions[existingEmoji].length === 0) {
+          delete reactions[existingEmoji];
+        }
+      });
 
-        await updateDoc(chatRef, {
-          chatData: updatedMessages,
-        });
+      const wasAlreadyReacted =
+        targetMessage.reactions?.[emoji]?.includes(currentUserId);
+      if (!wasAlreadyReacted) {
+        reactions[emoji] = reactions[emoji] || [];
+        reactions[emoji].push(currentUserId);
       }
+
+      const updatedMessages = chatData.map((message) =>
+        message.timestamp === messageTimestamp
+          ? { ...message, reactions }
+          : message
+      );
+
+      await updateDoc(chatRef, { chatData: updatedMessages });
     } catch (error) {
       console.error("Error in adding Emoji:", error);
     }
   };
 
   const deleteEmoji = async (messageTimestamp: number, emoji: string) => {
-    if (!selectedUser || !auth.currentUser) return;
+    if (!auth.currentUser) throw new Error("No authenticated user");
+    if (!selectedUser) throw new Error("No selected user");
 
     try {
       const currentUserId = auth.currentUser.uid;
@@ -338,7 +342,8 @@ const useChatMessage = () => {
   };
 
   const sendMessage = async () => {
-    if (!selectedUser || !auth.currentUser) return;
+    if (!auth.currentUser) throw new Error("No authenticated user");
+    if (!selectedUser) throw new Error("No selected user");
 
     if (!inputMessage.trim()) {
       msgSendInputRef.current?.focus();
@@ -386,12 +391,14 @@ const useChatMessage = () => {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !auth.currentUser || !selectedUser) return;
+    if (!file) return;
+    if (!auth.currentUser) throw new Error("No authenticated user");
+    if (!selectedUser) throw new Error("No selected user");
 
     setUploading(true);
 
     try {
-      const imageUrl = await UploadCloudinaryImage(file);
+      const imageUrl = await uploadCloudinaryImage(file);
 
       if (imageUrl) {
         const currentUserId = auth.currentUser.uid;
@@ -435,7 +442,8 @@ const useChatMessage = () => {
   };
 
   const deleteMessage = async (timestamp: number) => {
-    if (!selectedUser || !auth.currentUser) return;
+    if (!auth.currentUser) throw new Error("No authenticated user");
+    if (!selectedUser) throw new Error("No selected user");
 
     try {
       const currentUserId = auth.currentUser.uid;

@@ -1,0 +1,51 @@
+{
+  "common": {
+    "login": "لاگ ان",
+    "signup": "سائن اپ",
+    "name": "نام",
+    "email": "ای میل",
+    "password": "پاس ورڈ",
+    "continue_google": "گوگل کے ساتھ جاری رکھیں",
+    "or": "یا",
+    "dont_have_account": "اکاؤنٹ نہیں ہے؟",
+    "already_have_account": "پہلے سے اکاؤنٹ موجود ہے؟",
+    "submit": "جمع کرائیں",
+    "cancel": "منسوخ کریں",
+    "save": "محفوظ کریں",
+    "delete": "حذف کریں",
+    "edit": "ترمیم کریں",
+    "search": "تلاش کریں",
+    "loading": "لوڈ ہو رہا ہے...",
+    "error": "خرابی",
+    "success": "کامیابی",
+    "welcome": "خوش آمدید",
+    "logout": "لاگ آؤٹ"
+  },
+  "auth": {
+    "login_title": "خوش آمدید",
+    "login_subtitle": "اپنے اکاؤنٹ میں سائن ان کریں",
+    "signup_title": "اکاؤنٹ بنائیں",
+    "signup_subtitle": "نیا اکاؤنٹ بنانے کے لیے سائن اپ کریں",
+    "forgot_password": "پاس ورڈ بھول گئے؟",
+    "remember_me": "مجھے یاد رکھیں",
+    "password_requirements": "پاس ورڈ کم از کم 8 حروف کا ہونا چاہیے"
+  },
+  "chat": {
+    "new_message": "نیا پیغام",
+    "type_message": "پیغام لکھیں...",
+    "send": "بھیجیں",
+    "online": "آن لائن",
+    "offline": "آف لائن",
+    "typing": "لکھ رہے ہیں...",
+    "last_seen": "آخری بار دیکھا گیا",
+    "no_messages": "ابھی تک کوئی پیغام نہیں",
+    "start_conversation": "بات چیت شروع کریں"
+  },
+  "navigation": {
+    "home": "ہوم",
+    "chats": "چیٹس",
+    "profile": "پروفائل",
+    "settings": "ترتیبات",
+    "help": "مدد"
+  }
+}

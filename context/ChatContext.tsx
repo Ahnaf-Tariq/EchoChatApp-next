@@ -14,7 +14,7 @@ import {
 export const ChatContext = createContext<ChatContextType | null>(null);
 
 export const ChatProvider = ({ children }: PropsWithChildren) => {
-  const [currentState, setCurrentState] = useState<AuthState>(AuthState.signin);
+  const [currentState, setCurrentState] = useState<AuthState>(AuthState.SIGNIN);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const loginInputRef = useRef<HTMLInputElement | null>(null);
   const chatAppName = "Echo";

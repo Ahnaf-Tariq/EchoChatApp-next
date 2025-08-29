@@ -1,4 +1,4 @@
 export enum AuthState {
-  signin = "Sign In",
-  signup = "Sign Up",
+  SIGNIN = "Sign In",
+  SIGNUP = "Sign Up",
 }

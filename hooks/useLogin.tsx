@@ -11,6 +11,22 @@ import { toast } from "react-toastify";
 import { useChat } from "@/context/ChatContext";
 import { AuthState } from "@/types/enums";
 
+const validateEmail = (email: string): boolean => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+
+const validatePassword = (password: string): string | null => {
+  if (password.length < 8) return "Password must be at least 8 characters";
+  if (!/[A-Z]/.test(password))
+    return "Password must contain at least one uppercase letter";
+  if (!/[a-z]/.test(password))
+    return "Password must contain at least one lowercase letter";
+  if (!/[0-9]/.test(password))
+    return "Password must contain at least one number";
+  return null;
+};
+
 export const useLogin = () => {
   const { currentState } = useChat();
   const [email, setEmail] = useState<string>("");
@@ -27,9 +43,14 @@ export const useLogin = () => {
 
   const handleSignIn = async () => {
     try {
-      if (currentState === AuthState.signin) {
+      if (currentState === AuthState.SIGNIN) {
         if (!email || !password) {
           toast.error("Please fill all fields");
+          return;
+        }
+
+        if (!validateEmail(email)) {
+          toast.error("Invalid email format");
           return;
         }
 
@@ -40,8 +61,14 @@ export const useLogin = () => {
           return;
         }
 
-        if (password.length < 6) {
-          toast.error("Password must be strong");
+        if (!validateEmail(email)) {
+          toast.error("Invalid email format");
+          return;
+        }
+
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+          toast.error(passwordError);
           return;
         }
 
@@ -58,8 +85,17 @@ export const useLogin = () => {
           active: false,
         });
       }
-    } catch (error) {
-      console.error("Error in logging: ", error);
+    } catch (error: any) {
+      if (
+        error.code === "auth/invalid-credential" ||
+        error.code === "auth/wrong-password"
+      ) {
+        toast.error("Invalid Credentials");
+      } else if (error.code === "auth/email-already-in-use") {
+        toast.error("Email already in use");
+      } else {
+        console.error("Error in logging: " + error);
+      }
     }
   };
 
