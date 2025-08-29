@@ -1,7 +1,7 @@
 "use client";
 import { auth, db } from "@/lib/firebase.config";
 import { AuthState } from "@/types/enums";
-import { ChatContextType, User } from "@/types/interfaces";
+import { ChatContextType, User, Group } from "@/types/interfaces";
 import { doc, updateDoc } from "firebase/firestore";
 import {
   createContext,
@@ -16,6 +16,7 @@ export const ChatContext = createContext<ChatContextType | null>(null);
 export const ChatProvider = ({ children }: PropsWithChildren) => {
   const [currentState, setCurrentState] = useState<AuthState>(AuthState.SIGNIN);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const loginInputRef = useRef<HTMLInputElement | null>(null);
   const chatAppName = "Echo";
 
@@ -46,6 +47,8 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
     loadUserData,
     selectedUser,
     setSelectedUser,
+    selectedGroup,
+    setSelectedGroup,
     loginInputRef,
   };
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

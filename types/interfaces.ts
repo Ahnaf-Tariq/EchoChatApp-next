@@ -22,6 +22,33 @@ export interface Message {
   hasUserSeen: boolean;
 }
 
+export interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  members: string[];
+  memberDetails?: User[];
+  createdBy: string;
+  createdAt: number;
+  lastMessage?: string;
+  lastMessageTime?: number;
+  avatar?: string;
+}
+
+export interface GroupMessage {
+  id: string;
+  groupId: string;
+  senderId: string;
+  senderName?: string;
+  text?: string;
+  imageUrl?: string;
+  audioUrl?: string;
+  type: "text" | "image" | "audio";
+  timestamp: number;
+  reactions?: { [emoji: string]: string[] };
+  taggedUsers?: string[];
+}
+
 export interface ChatMessagesProps {
   message: Message;
   playingAudio: string | null;
@@ -69,5 +96,7 @@ export interface ChatContextType {
   loadUserData: (uid: string) => Promise<void>;
   selectedUser: User | null;
   setSelectedUser: (user: User | null) => void;
+  selectedGroup: Group | null;
+  setSelectedGroup: (group: Group | null) => void;
   loginInputRef: React.RefObject<HTMLInputElement | null>;
 }

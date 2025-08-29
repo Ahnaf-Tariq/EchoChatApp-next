@@ -1,19 +1,23 @@
-import { useChat } from "@/context/ChatContext";
 import { auth } from "@/lib/firebase.config";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/interfaces";
 import Image from "next/image";
 import React from "react";
 
-const UsersList = ({ user }: { user: User }) => {
-  const { selectedUser, setSelectedUser } = useChat();
+interface UsersListProps {
+  user: User;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+const UsersList = ({ user, isSelected, onSelect }: UsersListProps) => {
   return (
     <div
-      onClick={() => setSelectedUser(user)}
+      onClick={onSelect}
       className={cn(
         "flex items-center gap-3 px-2 sm:px-4 py-2 sm:py-3 cursor-pointer transition-colors",
-        selectedUser?.id === user.id && "bg-blue-100",
-        selectedUser?.id !== user.id && "hover:bg-gray-100"
+        isSelected && "bg-blue-100",
+        !isSelected && "hover:bg-gray-100"
       )}
     >
       <div>
