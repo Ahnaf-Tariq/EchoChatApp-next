@@ -25,16 +25,10 @@ export interface Message {
 export interface Group {
   id: string;
   name: string;
-  description?: string;
   members: string[];
-  memberDetails?: User[];
   createdBy: string;
   createdAt: number;
-  lastMessage?: string;
-  lastMessageTime?: number;
-  avatar?: string;
 }
-
 export interface GroupMessage {
   id: string;
   groupId: string;

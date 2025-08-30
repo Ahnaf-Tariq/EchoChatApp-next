@@ -14,7 +14,8 @@ import Image from "next/image";
 import Button from "./ui/button";
 
 const Navbar = () => {
-  const { chatAppName, loginInputRef, setSelectedUser } = useChat();
+  const { chatAppName, loginInputRef, setSelectedUser, setSelectedGroup } =
+    useChat();
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const router = useRouter();
 
@@ -25,6 +26,7 @@ const Navbar = () => {
 
       await signOut(auth);
       setSelectedUser(null);
+      setSelectedGroup(null);
       router.replace("/");
     } catch (error) {
       console.error("Error logging out:", error);

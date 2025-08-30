@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useGroupChat } from "@/hooks/useGroupChat";
-import { useChat } from "@/context/ChatContext";
 import { auth } from "@/lib/firebase.config";
 import { GroupMessage } from "@/types/interfaces";
 import {
@@ -11,13 +10,13 @@ import {
   IoMic,
   IoSend,
 } from "react-icons/io5";
-import { formatDistanceToNow } from "date-fns";
+import { useChat } from "@/context/ChatContext";
 
-interface GroupChatWindowProps {
+interface GroupChatProps {
   group: any; // Using any for now to avoid type conflicts
 }
 
-export default function GroupChatWindow({ group }: GroupChatWindowProps) {
+export default function GroupChat({ group }: GroupChatProps) {
   const { messages, listenMessages, sendMessage } = useGroupChat();
   const { selectedGroup } = useChat();
   const [inputMessage, setInputMessage] = useState("");
@@ -29,8 +28,9 @@ export default function GroupChatWindow({ group }: GroupChatWindowProps) {
     if (!group?.id) return;
 
     const unsubscribe = listenMessages(group.id);
+
     return () => unsubscribe();
-  }, [group?.id, listenMessages]);
+  }, [group?.id, selectedGroup]);
 
   useEffect(() => {
     scrollToBottom();
@@ -43,9 +43,10 @@ export default function GroupChatWindow({ group }: GroupChatWindowProps) {
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || !group?.id) return;
 
+    setInputMessage("");
+
     try {
       await sendMessage(group.id, inputMessage.trim());
-      setInputMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -61,26 +62,17 @@ export default function GroupChatWindow({ group }: GroupChatWindowProps) {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && group?.id) {
-      // TODO: Implement image upload to Cloudinary
       console.log("Image upload:", file);
     }
   };
 
   const handleVoiceRecording = () => {
     setIsRecording(!isRecording);
-    // TODO: Implement voice recording
+
     if (!isRecording) {
       console.log("Started recording");
     } else {
       console.log("Stopped recording");
-    }
-  };
-
-  const formatTime = (timestamp: number) => {
-    try {
-      return formatDistanceToNow(timestamp, { addSuffix: true });
-    } catch {
-      return "";
     }
   };
 
@@ -96,7 +88,7 @@ export default function GroupChatWindow({ group }: GroupChatWindowProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
+    <div className="flex-1 h-[550px] flex flex-col bg-white">
       {/* Group Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
         <div className="flex items-center gap-3">
@@ -110,13 +102,13 @@ export default function GroupChatWindow({ group }: GroupChatWindowProps) {
             </p>
           </div>
         </div>
-        <button className="p-2 hover:bg-gray-100 rounded-full">
+        <button className="p-1 hover:bg-gray-100 rounded-full cursor-pointer">
           <IoEllipsisVertical size={20} className="text-gray-500" />
         </button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-4 bg-gray-50">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
             <IoPeople size={48} className="mx-auto mb-4 text-gray-300" />
@@ -173,7 +165,7 @@ export default function GroupChatWindow({ group }: GroupChatWindowProps) {
                       : "text-gray-500"
                   }`}
                 >
-                  {formatTime(message.timestamp)}
+                  {new Date(message.timestamp).toLocaleTimeString()}
                 </div>
               </div>
             </div>

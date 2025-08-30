@@ -34,34 +34,11 @@ export const useGroupChat = () => {
         ...docSnap.data(),
       })) as Group[];
 
-      // Filter groups where current user is a member
-      const userGroups = groupsData.filter((g) =>
-        g.members.includes(auth.currentUser!.uid)
+      const userGroups = groupsData.filter((group) =>
+        group.members.includes(auth.currentUser!.uid)
       );
 
-      // Fetch member details for each group
-      const groupsWithMembers = await Promise.all(
-        userGroups.map(async (group) => {
-          try {
-            const memberDetails: User[] = [];
-            for (const memberId of group.members) {
-              const userDoc = await getDoc(doc(db, "users", memberId));
-              if (userDoc.exists()) {
-                memberDetails.push({
-                  id: userDoc.id,
-                  ...userDoc.data(),
-                } as User);
-              }
-            }
-            return { ...group, memberDetails };
-          } catch (error) {
-            console.error("Error fetching member details:", error);
-            return group;
-          }
-        })
-      );
-
-      setGroups(groupsWithMembers);
+      setGroups(userGroups);
     });
 
     return () => unsubscribe();
@@ -77,16 +54,13 @@ export const useGroupChat = () => {
         id: docSnap.id,
         ...docSnap.data(),
       })) as GroupMessage[];
+
       setMessages(data);
     });
   };
 
   // Create a new group
-  const createGroup = async (
-    name: string,
-    description: string,
-    memberIds: string[]
-  ) => {
+  const createGroup = async (name: string, memberIds: string[]) => {
     if (!auth.currentUser) throw new Error("User not authenticated");
 
     setLoading(true);
@@ -95,21 +69,12 @@ export const useGroupChat = () => {
       const groupData = {
         id: newGroupRef.id,
         name,
-        description,
         members: arrayUnion(auth.currentUser.uid, ...memberIds),
         createdBy: auth.currentUser.uid,
         createdAt: Date.now(),
-        lastMessage: "",
-        lastMessageTime: Date.now(),
       };
 
       await setDoc(newGroupRef, groupData);
-
-      // Create initial group info document
-      await setDoc(
-        doc(db, "groups", newGroupRef.id, "info", "details"),
-        groupData
-      );
 
       return newGroupRef.id;
     } catch (error) {
@@ -147,13 +112,6 @@ export const useGroupChat = () => {
       };
 
       await addDoc(msgsRef, messageData);
-
-      // Update group's last message
-      const groupRef = doc(db, "groups", groupId);
-      await updateDoc(groupRef, {
-        lastMessage: text,
-        lastMessageTime: Date.now(),
-      });
     } catch (error) {
       console.error("Error sending message:", error);
       throw error;

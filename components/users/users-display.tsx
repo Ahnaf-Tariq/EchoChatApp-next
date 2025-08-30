@@ -7,7 +7,7 @@ import { FaSearch } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
 import { IoPeople, IoPerson } from "react-icons/io5";
 import UsersList from "./users-list";
-import GroupListItem from "@/components/group/group-list-item";
+import GroupList from "../group/group-list";
 import CreateGroupModal from "@/components/group/create-group-modal";
 import { User, Group } from "@/types/interfaces";
 import { useGroupChat } from "@/hooks/useGroupChat";
@@ -66,16 +66,8 @@ const UsersDisplay = () => {
     setSelectedUser(null);
   };
 
-  const handleGroupOptions = (e: React.MouseEvent, group: Group) => {
-    e.stopPropagation();
-    // TODO: Implement group options menu (leave group, delete group, etc.)
-    console.log("Group options for:", group.name);
-  };
-
-  const filteredGroups = groups.filter(
-    (group) =>
-      group.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-      group.description?.toLowerCase().includes(searchInput.toLowerCase())
+  const filteredGroups = groups.filter((group) =>
+    group.name.toLowerCase().includes(searchInput.toLowerCase())
   );
 
   return (
@@ -131,7 +123,7 @@ const UsersDisplay = () => {
           <div className="px-3 mb-2">
             <button
               onClick={() => setShowCreateGroupModal(true)}
-              className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <IoPeople size={18} />
               Create New Group
@@ -156,12 +148,11 @@ const UsersDisplay = () => {
           ) : // Groups List
           filteredGroups.length > 0 ? (
             filteredGroups.map((group) => (
-              <GroupListItem
+              <GroupList
                 key={group.id}
                 group={group}
                 isSelected={selectedGroup?.id === group.id}
                 onSelect={handleGroupSelect}
-                onOptionsClick={handleGroupOptions}
               />
             ))
           ) : (
@@ -173,10 +164,12 @@ const UsersDisplay = () => {
       </div>
 
       {/* Create Group Modal */}
-      <CreateGroupModal
-        isOpen={showCreateGroupModal}
-        onClose={() => setShowCreateGroupModal(false)}
-      />
+      {showCreateGroupModal && (
+        <CreateGroupModal
+          showCreateGroupModal={showCreateGroupModal}
+          setShowCreateGroupModal={setShowCreateGroupModal}
+        />
+      )}
     </>
   );
 };

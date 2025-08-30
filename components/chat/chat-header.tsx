@@ -21,15 +21,11 @@ const ChatHeader = () => {
               <IoArrowBack className="size-5 text-gray-600" />
             </button>
             <div className="hidden sm:block relative">
-              <Image
-                className="rounded-full ring-2 ring-gray-100"
-                src="/assests/avatar.webp"
-                width={40}
-                height={40}
-                alt="profile"
-              />
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                {selectedUser.username.charAt(0).toUpperCase()}
+              </div>
               {selectedUser.active && (
-                <span className="absolute bottom-0 right-0 block size-3 rounded-full bg-green-500 ring-2 ring-white"></span>
+                <span className="absolute bottom-0 right-0 block size-2 rounded-full bg-green-500 ring-2 ring-white"></span>
               )}
             </div>
             <div>

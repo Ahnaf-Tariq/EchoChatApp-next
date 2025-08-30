@@ -20,14 +20,8 @@ const UsersList = ({ user, isSelected, onSelect }: UsersListProps) => {
         !isSelected && "hover:bg-gray-100"
       )}
     >
-      <div>
-        <Image
-          src="/assests/avatar.webp"
-          alt="profile"
-          className="rounded-full border border-gray-300"
-          width={40}
-          height={40}
-        />
+      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+        {user.username.charAt(0).toUpperCase()}
       </div>
       <div>
         <p className="font-semibold">
