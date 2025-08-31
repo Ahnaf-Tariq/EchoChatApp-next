@@ -16,7 +16,7 @@ const UsersList = ({ user, isSelected, onSelect }: UsersListProps) => {
       onClick={onSelect}
       className={cn(
         "flex items-center gap-3 px-2 sm:px-4 py-2 sm:py-3 cursor-pointer transition-colors",
-        isSelected && "bg-blue-100",
+        isSelected && "bg-blue-50 border-r-2 border-blue-500",
         !isSelected && "hover:bg-gray-100"
       )}
     >

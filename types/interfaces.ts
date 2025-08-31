@@ -78,6 +78,18 @@ export interface InputProps {
   inputRef?: React.Ref<HTMLInputElement>;
 }
 
+export interface EmojiModalProps {
+  isOwnMessage: boolean;
+  messageTimestamp: number;
+  reactions?: Record<string, string[]>;
+  addEmoji: (timestamp: number, emoji: string) => void;
+  deleteEmoji: (timestamp: number, emoji: string) => void;
+  deleteMessage: (timestamp: number) => void;
+  menuOption: boolean;
+  setmenuOption: (menuOption: boolean) => void;
+  showEmojiPicker: boolean;
+  setShowEmojiPicker: (showEmojiPicker: boolean) => void;
+}
 export interface ButtonProps {
   isLoggedIn: boolean;
   onClick: () => void;

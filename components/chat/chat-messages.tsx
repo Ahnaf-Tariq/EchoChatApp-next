@@ -4,16 +4,8 @@ import { cn } from "@/lib/utils";
 import { ChatMessagesProps } from "@/types/interfaces";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import {
-  MdDelete,
-  MdDoneAll,
-  MdOutlineEmojiEmotions,
-  MdPause,
-  MdPlayArrow,
-} from "react-icons/md";
-
-const EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "😡"];
+import { MdDoneAll, MdPause, MdPlayArrow } from "react-icons/md";
+import EmojiModal from "../emoji-modal";
 
 const ChatMessages = ({
   message,
@@ -26,41 +18,7 @@ const ChatMessages = ({
 }: ChatMessagesProps) => {
   const [menuOption, setmenuOption] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [reactEmoji, setReactEmoji] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const isOwnMessage = message.senderId === auth.currentUser?.uid;
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setmenuOption(false);
-        setShowEmojiPicker(false);
-        setReactEmoji(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [menuOption]);
-
-  const handleEmojiClick = (emoji: string) => {
-    if (message.reactions && message.reactions[emoji]) {
-      deleteEmoji(message.timestamp, emoji);
-    } else {
-      addEmoji(message.timestamp, emoji);
-    }
-
-    setShowEmojiPicker(false);
-    setmenuOption(false);
-    setReactEmoji(false);
-  };
-
-  const handleDeleteClick = () => {
-    deleteMessage(message.timestamp);
-    setmenuOption(false);
-    setReactEmoji(false);
-  };
 
   const getReactionCounts = () => {
     if (!message.reactions) return [];
@@ -94,76 +52,18 @@ const ChatMessages = ({
       >
         {/* Three dots menu */}
         {menuOption && (
-          <div
-            ref={menuRef}
-            className={cn(
-              "absolute top-1/2 -translate-y-1/2 z-50",
-              isOwnMessage
-                ? "left-0 -translate-x-full"
-                : "right-0 translate-x-full"
-            )}
-          >
-            <div className="relative">
-              <button
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 cursor-pointer"
-              >
-                <BsThreeDotsVertical className="size-4 text-gray-600" />
-              </button>
-
-              {showEmojiPicker && (
-                <div
-                  className={cn(
-                    "absolute top-8 bg-white rounded-lg shadow-md border border-gray-400 p-1 z-20",
-                    isOwnMessage ? "right-0" : "left-0"
-                  )}
-                >
-                  <div className="flex flex-col gap-1">
-                    <div className="relative">
-                      <button
-                        onClick={() => setReactEmoji(!reactEmoji)}
-                        className="flex items-center gap-2 px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md w-full text-left cursor-pointer"
-                      >
-                        <MdOutlineEmojiEmotions className="size-4" />
-                        React
-                      </button>
-
-                      {reactEmoji && (
-                        <div
-                          className={cn(
-                            "absolute bottom-[34px] bg-white rounded-lg shadow-lg border border-gray-400 p-1 flex gap-1",
-                            isOwnMessage
-                              ? "right-[-120px] sm:right-0"
-                              : "left-[-105px] sm:left-0"
-                          )}
-                        >
-                          {EMOJIS.map((emoji) => (
-                            <button
-                              key={emoji}
-                              onClick={() => handleEmojiClick(emoji)}
-                              className="text-lg hover:bg-gray-100 rounded p-1 cursor-pointer transition-colors"
-                            >
-                              {emoji}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {isOwnMessage && (
-                      <button
-                        onClick={handleDeleteClick}
-                        className="flex items-center gap-2 px-2 py-1 text-sm text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
-                      >
-                        <MdDelete className="size-4" />
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <EmojiModal
+            isOwnMessage={isOwnMessage}
+            messageTimestamp={message.timestamp}
+            reactions={message.reactions}
+            addEmoji={addEmoji}
+            deleteEmoji={deleteEmoji}
+            deleteMessage={deleteMessage}
+            menuOption={menuOption}
+            setmenuOption={setmenuOption}
+            showEmojiPicker={showEmojiPicker}
+            setShowEmojiPicker={setShowEmojiPicker}
+          />
         )}
 
         {/* Message Content */}

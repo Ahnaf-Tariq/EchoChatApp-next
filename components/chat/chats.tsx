@@ -44,17 +44,16 @@ const Chats = () => {
 
           <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-2">
             {messages.map((message, ind) => (
-              <div key={ind}>
-                <ChatMessages
-                  message={message}
-                  playingAudio={playingAudio}
-                  isPaused={isPaused}
-                  toggleAudio={toggleAudio}
-                  deleteMessage={deleteMessage}
-                  addEmoji={addEmoji}
-                  deleteEmoji={deleteEmoji}
-                />
-              </div>
+              <ChatMessages
+                key={ind}
+                message={message}
+                playingAudio={playingAudio}
+                isPaused={isPaused}
+                toggleAudio={toggleAudio}
+                deleteMessage={deleteMessage}
+                addEmoji={addEmoji}
+                deleteEmoji={deleteEmoji}
+              />
             ))}
 
             <div ref={chatScrollRef} />
