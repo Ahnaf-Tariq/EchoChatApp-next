@@ -19,9 +19,14 @@ import {
 } from "firebase/firestore";
 import { uploadCloudinaryImage } from "@/lib/cloudinary/cloudinaryImage";
 import { uploadCloudinaryVoice } from "@/lib/cloudinary/cloudinaryVoice";
+import { useChat } from "@/context/ChatContext";
 
 export const useGroupChat = () => {
+  const { selectedGroup } = useChat();
+  const [inputMessage, setInputMessage] = useState("");
+  const [currentUserData, setCurrentUserData] = useState<User | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
+  const [groupMembers, setGroupMembers] = useState<User[]>([]);
   const [messages, setMessages] = useState<GroupMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -34,6 +39,9 @@ export const useGroupChat = () => {
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
     null
   );
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [showMentions, setShowMentions] = useState(false);
+  const [taggedUsers, setTaggedUsers] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch all groups current user is a member of
@@ -56,6 +64,36 @@ export const useGroupChat = () => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      if (!selectedGroup?.members) return;
+
+      const memberDocs = await Promise.all(
+        selectedGroup.members.map((uid) => getDoc(doc(db, "users", uid)))
+      );
+      setGroupMembers(
+        memberDocs
+          .filter((d) => d.exists())
+          .map((d) => ({ id: d.id, ...d.data() } as User))
+      );
+    };
+
+    fetchMembers();
+  }, [selectedGroup]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputMessage(value);
+
+    const match = value.match(/@(\w*)$/);
+    if (match) {
+      setMentionQuery(match[1].toLowerCase());
+      setShowMentions(true);
+    } else {
+      setShowMentions(false);
+    }
+  };
 
   // Listen to messages of a specific group
   const listenMessages = (groupId: string) => {
@@ -98,13 +136,26 @@ export const useGroupChat = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!auth.currentUser) return;
+
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        setCurrentUserData(userSnap.data() as User);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   // Send message to group
   const sendMessage = async (
     groupId: string,
     text: string,
-    type: "text" | "image" | "audio" = "text",
-    imageUrl?: string,
-    audioUrl?: string,
+    type: "text",
     taggedUsers?: string[]
   ) => {
     if (!auth.currentUser) throw new Error("User not authenticated");
@@ -114,11 +165,9 @@ export const useGroupChat = () => {
       const messageData = {
         groupId,
         senderId: auth.currentUser.uid,
-        senderName: auth.currentUser.displayName || auth.currentUser.email,
+        senderName: currentUserData?.username,
         text,
         type,
-        imageUrl: imageUrl || null,
-        audioUrl: audioUrl || null,
         timestamp: Date.now(),
         reactions: {},
         taggedUsers: taggedUsers || [],
@@ -375,6 +424,8 @@ export const useGroupChat = () => {
   return {
     groups,
     messages,
+    inputMessage,
+    handleInputChange,
     loading,
     listenMessages,
     createGroup,
@@ -393,5 +444,12 @@ export const useGroupChat = () => {
     startRecording,
     stopRecording,
     toggleAudio,
+    showMentions,
+    mentionQuery,
+    taggedUsers,
+    setTaggedUsers,
+    groupMembers,
+    setInputMessage,
+    setShowMentions,
   };
 };

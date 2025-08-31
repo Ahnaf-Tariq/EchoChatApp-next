@@ -31,6 +31,8 @@ interface GroupChatProps {
 export default function GroupChat({ group }: GroupChatProps) {
   const {
     messages,
+    inputMessage,
+    handleInputChange,
     listenMessages,
     sendMessage,
     uploading,
@@ -42,9 +44,15 @@ export default function GroupChat({ group }: GroupChatProps) {
     startRecording,
     stopRecording,
     toggleAudio,
+    showMentions,
+    mentionQuery,
+    taggedUsers,
+    setTaggedUsers,
+    groupMembers,
+    setInputMessage,
+    setShowMentions,
   } = useGroupChat();
   const { selectedGroup, setSelectedGroup } = useChat();
-  const [inputMessage, setInputMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [menuOption, setMenuOption] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -68,10 +76,10 @@ export default function GroupChat({ group }: GroupChatProps) {
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || !group?.id) return;
 
-    setInputMessage("");
-
     try {
-      await sendMessage(group.id, inputMessage.trim());
+      await sendMessage(group.id, inputMessage.trim(), "text", taggedUsers);
+      setInputMessage("");
+      setTaggedUsers([]);
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -279,7 +287,25 @@ export default function GroupChat({ group }: GroupChatProps) {
                     )}
 
                     {message.type === "text" && message.text && (
-                      <p className="text-sm break-words">{message.text}</p>
+                      <p className="text-sm break-words">
+                        {message.text.split(/(@\w+)/g).map((text, i) =>
+                          text.startsWith("@") ? (
+                            <span
+                              key={i}
+                              className={cn(
+                                "font-medium cursor-pointer hover:underline",
+                                isOwnMessage
+                                  ? "text-green-300"
+                                  : "text-green-400"
+                              )}
+                            >
+                              {text}
+                            </span>
+                          ) : (
+                            text
+                          )
+                        )}
+                      </p>
                     )}
 
                     {message.type === "image" && message.imageUrl && (
@@ -442,13 +468,43 @@ export default function GroupChat({ group }: GroupChatProps) {
           <div className="flex-1 relative">
             <input
               value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyPress}
               type="text"
               placeholder="Type your message..."
               disabled={isRecording}
               className="w-full px-2 sm:px-4 py-1 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
             />
+            {showMentions && (
+              <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto scrollbar-hide z-50">
+                {group.members
+                  .map((uid) => groupMembers.find((m) => m.id === uid))
+                  .filter(
+                    (m) => m && m.username.toLowerCase().includes(mentionQuery)
+                  )
+                  .map((m) => (
+                    <div
+                      key={m!.id}
+                      onClick={() => {
+                        const newText = inputMessage.replace(
+                          /@\w*$/,
+                          `@${m!.username} `
+                        );
+                        setInputMessage(newText);
+
+                        setTaggedUsers((prev) =>
+                          prev.includes(m!.id) ? prev : [...prev, m!.id]
+                        );
+
+                        setShowMentions(false);
+                      }}
+                      className="p-3 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-gray-50 flex items-center gap-3"
+                    >
+                      @{m!.username}
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
 
           <button

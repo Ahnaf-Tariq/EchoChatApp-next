@@ -3,7 +3,7 @@ import { auth } from "@/lib/firebase.config";
 import { cn } from "@/lib/utils";
 import { ChatMessagesProps } from "@/types/interfaces";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { MdDoneAll, MdPause, MdPlayArrow } from "react-icons/md";
 import EmojiModal from "../emoji-modal";
 
