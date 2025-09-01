@@ -19,7 +19,8 @@
     "error": "خرابی",
     "success": "کامیابی",
     "welcome": "خوش آمدید",
-    "logout": "لاگ آؤٹ"
+    "logout": "لاگ آؤٹ",
+    "signin": "سائن ان"
   },
   "auth": {
     "login_title": "خوش آمدید",
@@ -30,21 +31,33 @@
     "password_requirements": "پاس ورڈ کم از کم 8 حروف کا ہونا چاہیے"
   },
   "chat": {
+    "echo": "ایکو",
     "new_message": "نیا پیغام",
     "type_message": "پیغام لکھیں...",
     "send": "بھیجیں",
-    "online": "آن لائن",
-    "offline": "آف لائن",
+    "active_now": "آن لائن",
     "typing": "لکھ رہے ہیں...",
     "last_seen": "آخری بار دیکھا گیا",
-    "no_messages": "ابھی تک کوئی پیغام نہیں",
-    "start_conversation": "بات چیت شروع کریں"
+    "welcome_to_chat": "ایکو چیٹ میں خوش آمدید",
+    "select_conversation": "میسجنگ شروع کرنے کے لیے سائڈبار سے گفتگو منتخب کریں، یا متعدد افراد سے بات کرنے کے لیے نیا گروپ بنائیں۔",
+    "no_messages": "ابھی تک کوئی پیغام نہیں۔ گفتگو شروع کریں!",
+    "search_users": "صارفین تلاش کریں...",
+    "search_groups": "گروپس تلاش کریں...",
+    "users": "صارفین",
+    "groups": "گروپس",
+    "members": "صارفین",
+    "no_groups_yet": "ابھی تک کوئی گروپ نہیں ہے۔ ایک گروپ بنائیں!",
+    "no_groups_found": "کوئی گروپ نہیں ہے۔"
   },
-  "navigation": {
-    "home": "ہوم",
-    "chats": "چیٹس",
-    "profile": "پروفائل",
-    "settings": "ترتیبات",
-    "help": "مدد"
+  "group_modal": {
+    "create_group": "نیا گروپ بنائیں",
+    "group_name": "گروپ کا نام",
+    "enter_group_name": "گروپ کا نام لکھیں",
+    "add_members": "صارفین شامل کریں",
+    "search_users": "صارفین تلاش کریں",
+    "selected_members": "منتخب صارفین",
+    "cancel": "منسوخ کریں",
+    "creating": "بنانا ہو رہا ہے",
+    "create": "گروپ بنائیں"
   }
 }

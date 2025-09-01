@@ -1,7 +1,7 @@
 "use client";
 import { auth, db } from "@/lib/firebase.config";
 import { AuthState } from "@/types/enums";
-import { ChatContextType, User, Group } from "@/types/interfaces";
+import { ChatContextType, User } from "@/types/chat.interfaces";
 import { doc, updateDoc } from "firebase/firestore";
 import {
   createContext,
@@ -10,15 +10,21 @@ import {
   useRef,
   useState,
 } from "react";
+import { Group } from "@/types/group.interfaces";
+import { useCommonTranslations } from "@/hooks/useTranslations";
 
 export const ChatContext = createContext<ChatContextType | null>(null);
 
 export const ChatProvider = ({ children }: PropsWithChildren) => {
+  const { t } = useCommonTranslations();
   const [currentState, setCurrentState] = useState<AuthState>(AuthState.SIGNIN);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const loginInputRef = useRef<HTMLInputElement | null>(null);
-  const chatAppName = "Echo";
+  const chatAppName = t("chat.echo");
+
+  const getFirstLetterCapitalized = (name: string) =>
+    name.charAt(0).toUpperCase();
 
   const loadUserData = async (uid: string) => {
     try {
@@ -50,6 +56,7 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
     selectedGroup,
     setSelectedGroup,
     loginInputRef,
+    getFirstLetterCapitalized,
   };
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };

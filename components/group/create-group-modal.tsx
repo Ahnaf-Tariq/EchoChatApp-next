@@ -1,20 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
 import { auth, db } from "@/lib/firebase.config";
-import { User } from "@/types/interfaces";
+import { User } from "@/types/chat.interfaces";
 import { collection, onSnapshot } from "firebase/firestore";
 import { useGroupChat } from "@/hooks/useGroupChat";
 import { IoClose, IoPeople, IoAdd, IoRemove } from "react-icons/io5";
-
-interface CreateGroupModalProps {
-  showCreateGroupModal: boolean;
-  setShowCreateGroupModal: (show: boolean) => void;
-}
+import { CreateGroupModalProps } from "@/types/group.interfaces";
+import { cn } from "@/lib/utils";
+import { useChat } from "@/context/ChatContext";
+import { useCommonTranslations } from "@/hooks/useTranslations";
 
 export default function CreateGroupModal({
   showCreateGroupModal,
   setShowCreateGroupModal,
 }: CreateGroupModalProps) {
+  const { t } = useCommonTranslations();
+  const { getFirstLetterCapitalized } = useChat();
   const [groupName, setGroupName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
@@ -24,7 +25,6 @@ export default function CreateGroupModal({
   useEffect(() => {
     if (!showCreateGroupModal) return;
 
-    // Fetch all users except current user
     const usersRef = collection(db, "users");
     const unsubscribe = onSnapshot(usersRef, (snapshot) => {
       const users = snapshot.docs
@@ -74,7 +74,9 @@ export default function CreateGroupModal({
       <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Create New Group</h2>
+            <h2 className="text-xl font-bold">
+              {t("group_modal.create_group")}
+            </h2>
             <button
               onClick={closeButton}
               className="text-gray-500 hover:text-gray-700 cursor-pointer"
@@ -86,14 +88,14 @@ export default function CreateGroupModal({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Group Name
+                {t("group_modal.group_name")}
               </label>
               <input
                 type="text"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter group name"
+                placeholder={t("group_modal.enter_group_name")}
                 maxLength={50}
               />
             </div>
@@ -102,11 +104,13 @@ export default function CreateGroupModal({
             {selectedUsers.length > 0 && (
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Selected Members: {selectedUsers.length}
+                  {t("group_modal.selected_members")}: {selectedUsers.length}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {selectedUsers.map((userId) => {
-                    const user = availableUsers.find((u) => u.id === userId);
+                    const user = availableUsers.find(
+                      (user) => user.id === userId
+                    );
                     return (
                       <div
                         key={userId}
@@ -129,27 +133,28 @@ export default function CreateGroupModal({
             {/* Member Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Add Members *
+                {t("group_modal.add_members")}
               </label>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
-                placeholder="Search users..."
+                placeholder={t("group_modal.search_users")}
               />
               <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-md">
                 {filteredUsers.map((user) => (
                   <div
                     key={user.id}
-                    className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer ${
+                    className={cn(
+                      "flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer",
                       selectedUsers.includes(user.id) ? "bg-blue-50" : ""
-                    }`}
+                    )}
                     onClick={() => handleUserToggle(user.id)}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                        {user.username.charAt(0).toUpperCase()}
+                        {getFirstLetterCapitalized(user.username)}
                       </div>
                       <div>
                         <div className="font-medium">{user.username}</div>
@@ -168,13 +173,12 @@ export default function CreateGroupModal({
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
               <button
                 onClick={closeButton}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 cursor-pointer"
               >
-                Cancel
+                {t("group_modal.cancel")}
               </button>
               <button
                 onClick={handleCreateGroup}
@@ -184,11 +188,11 @@ export default function CreateGroupModal({
                 className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2  cursor-pointer"
               >
                 {loading ? (
-                  "Creating..."
+                  t("group_modal.creating")
                 ) : (
                   <>
                     <IoPeople size={20} />
-                    Create Group
+                    {t("group_modal.create")}
                   </>
                 )}
               </button>

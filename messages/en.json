@@ -19,7 +19,8 @@
     "error": "Error",
     "success": "Success",
     "welcome": "Welcome",
-    "logout": "Logout"
+    "logout": "Logout",
+    "signin": "Sign In"
   },
   "auth": {
     "login_title": "Welcome Back",
@@ -30,18 +31,33 @@
     "password_requirements": "Password must be at least 8 characters"
   },
   "chat": {
+    "echo": "Echo",
     "new_message": "New Message",
     "type_message": "Type a message...",
     "send": "Send",
-    "online": "Online",
-    "offline": "Offline",
+    "active_now": "Active Now",
     "typing": "typing...",
     "last_seen": "Last seen",
-    "no_messages": "No messages yet",
-    "start_conversation": "Start a conversation"
+    "welcome_to_chat": "Welcome to Echo Chat",
+    "select_conversation": "Select a conversation from the sidebar to start messaging, or create a new group to chat with multiple people.",
+    "no_messages": "No messages yet. Start the conversation!",
+    "search_users": "Search Users...",
+    "search_groups": "Search Groups...",
+    "users": "Users",
+    "groups": "Groups",
+    "members": "Members",
+    "no_groups_yet": "No groups yet. Create one!",
+    "no_groups_found": "No groups found"
   },
-  "navigation": {
-    "home": "Home",
-    "chats": "Chats"
+  "group_modal": {
+    "create_group": "Create New Group",
+    "group_name": "Group Name",
+    "enter_group_name": "Enter group name",
+    "add_members": "Add Members",
+    "search_users": "Search Users...",
+    "selected_members": "Selected Members",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "create": "Create Group"
   }
 }

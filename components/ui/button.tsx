@@ -2,9 +2,11 @@ import React from "react";
 import { MdOutlineLogin } from "react-icons/md";
 import { BiLogOut } from "react-icons/bi";
 import { cn } from "@/lib/utils";
-import { ButtonProps } from "@/types/interfaces";
+import { ButtonProps } from "@/types/chat.interfaces";
+import { useCommonTranslations } from "@/hooks/useTranslations";
 
 const Button = ({ isLoggedIn, onClick }: ButtonProps) => {
+  const { t } = useCommonTranslations();
   return (
     // navbar button
     <button
@@ -19,7 +21,7 @@ const Button = ({ isLoggedIn, onClick }: ButtonProps) => {
       {isLoggedIn ? <BiLogOut /> : <MdOutlineLogin />}
 
       <span className="hidden sm:inline">
-        {isLoggedIn ? "Logout" : "Sign In"}
+        {isLoggedIn ? t("common.logout") : t("common.signin")}
       </span>
     </button>
   );

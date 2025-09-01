@@ -11,14 +11,15 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
-import { Message } from "@/types/interfaces";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { Message } from "@/types/chat.interfaces";
+import { MessageType } from "@/types/enums";
 
 const useChatMessage = () => {
   const { selectedUser } = useChat();
-  const [inputMessage, setInputMessage] = useState<string>("");
+  const [textMessage, setTextMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
@@ -29,7 +30,7 @@ const useChatMessage = () => {
     null
   );
   const msgSendInputRef = useRef<HTMLInputElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const chatScrollRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -122,7 +123,7 @@ const useChatMessage = () => {
     if (!auth.currentUser) throw new Error("No authenticated user");
     if (!selectedUser) throw new Error("No selected user");
 
-    setUploading(true);
+    setIsUploading(true);
 
     try {
       const audioUrl = await uploadCloudinaryVoice(audioBlob);
@@ -142,7 +143,7 @@ const useChatMessage = () => {
           senderId: currentUserId,
           receiverId,
           audioUrl,
-          type: "audio",
+          type: MessageType.AUDIO,
           timestamp: Date.now(),
           hasUserSeen: false,
         };
@@ -157,10 +158,10 @@ const useChatMessage = () => {
           });
         }
       }
-      setUploading(false);
+      setIsUploading(false);
     } catch (error) {
       console.error("Error in sending voice message:", error);
-      setUploading(false);
+      setIsUploading(false);
     }
   };
 
@@ -207,13 +208,13 @@ const useChatMessage = () => {
     }
   };
 
-  const handleTyping = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTyping = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!auth.currentUser) throw new Error("No authenticated user");
     if (!selectedUser) throw new Error("No selected user");
 
     try {
       const value = e.target.value;
-      setInputMessage(value);
+      setTextMessage(value);
 
       const userRef = doc(db, "users", auth.currentUser.uid);
 
@@ -345,7 +346,7 @@ const useChatMessage = () => {
     if (!auth.currentUser) throw new Error("No authenticated user");
     if (!selectedUser) throw new Error("No selected user");
 
-    if (!inputMessage.trim()) {
+    if (!textMessage.trim()) {
       msgSendInputRef.current?.focus();
       return null;
     }
@@ -360,13 +361,13 @@ const useChatMessage = () => {
     const newMessage: Message = {
       senderId: currentUserId,
       receiverId,
-      text: inputMessage,
-      type: "text",
+      text: textMessage,
+      type: MessageType.TEXT,
       timestamp: Date.now(),
       hasUserSeen: false,
     };
 
-    setInputMessage("");
+    setTextMessage("");
 
     try {
       const chatRef = doc(db, "chats", chatId);
@@ -389,13 +390,13 @@ const useChatMessage = () => {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!auth.currentUser) throw new Error("No authenticated user");
     if (!selectedUser) throw new Error("No selected user");
 
-    setUploading(true);
+    setIsUploading(true);
 
     try {
       const imageUrl = await uploadCloudinaryImage(file);
@@ -415,7 +416,7 @@ const useChatMessage = () => {
           senderId: currentUserId,
           receiverId,
           imageUrl,
-          type: "image",
+          type: MessageType.IMAGE,
           timestamp: Date.now(),
           hasUserSeen: false,
         };
@@ -430,14 +431,14 @@ const useChatMessage = () => {
           });
         }
 
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
+        if (fileRef.current) {
+          fileRef.current.value = "";
         }
       }
     } catch (error) {
       console.error("Image upload error:", error);
     } finally {
-      setUploading(false);
+      setIsUploading(false);
     }
   };
 
@@ -469,15 +470,15 @@ const useChatMessage = () => {
   };
 
   return {
-    inputMessage,
-    setInputMessage,
+    textMessage,
+    setTextMessage,
     messages,
-    uploading,
+    isUploading,
     isRecording,
     playingAudio,
     isPaused,
     msgSendInputRef,
-    fileInputRef,
+    fileRef,
     chatScrollRef,
     handleTyping,
     sendMessage,

@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { auth, db } from "@/lib/firebase.config";
-import { Group, GroupMessage, User } from "@/types/interfaces";
+import { User } from "@/types/chat.interfaces";
+import { Group, GroupMessage } from "@/types/group.interfaces";
 import {
   addDoc,
   arrayUnion,
@@ -20,16 +21,17 @@ import {
 import { uploadCloudinaryImage } from "@/lib/cloudinary/cloudinaryImage";
 import { uploadCloudinaryVoice } from "@/lib/cloudinary/cloudinaryVoice";
 import { useChat } from "@/context/ChatContext";
+import { MessageType } from "@/types/enums";
 
 export const useGroupChat = () => {
   const { selectedGroup } = useChat();
-  const [inputMessage, setInputMessage] = useState("");
+  const [textMessage, setTextMessage] = useState("");
   const [currentUserData, setCurrentUserData] = useState<User | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
   const [groupMembers, setGroupMembers] = useState<User[]>([]);
   const [messages, setMessages] = useState<GroupMessage[]>([]);
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
@@ -42,7 +44,7 @@ export const useGroupChat = () => {
   const [mentionQuery, setMentionQuery] = useState("");
   const [showMentions, setShowMentions] = useState(false);
   const [taggedUsers, setTaggedUsers] = useState<string[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   // Fetch all groups current user is a member of
   useEffect(() => {
@@ -65,6 +67,7 @@ export const useGroupChat = () => {
     return () => unsubscribe();
   }, []);
 
+  // fetch all group members
   useEffect(() => {
     const fetchMembers = async () => {
       if (!selectedGroup?.members) return;
@@ -82,9 +85,9 @@ export const useGroupChat = () => {
     fetchMembers();
   }, [selectedGroup]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setInputMessage(value);
+    setTextMessage(value);
 
     const match = value.match(/@(\w*)$/);
     if (match) {
@@ -110,7 +113,7 @@ export const useGroupChat = () => {
     });
   };
 
-  // Create a new group
+  // create a new group
   const createGroup = async (name: string, memberIds: string[]) => {
     if (!auth.currentUser) throw new Error("User not authenticated");
 
@@ -137,7 +140,7 @@ export const useGroupChat = () => {
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchCurrentUser = async () => {
       if (!auth.currentUser) return;
 
       const userRef = doc(db, "users", auth.currentUser.uid);
@@ -148,14 +151,13 @@ export const useGroupChat = () => {
       }
     };
 
-    fetchUser();
+    fetchCurrentUser();
   }, []);
 
   // Send message to group
   const sendMessage = async (
     groupId: string,
     text: string,
-    type: "text",
     taggedUsers?: string[]
   ) => {
     if (!auth.currentUser) throw new Error("User not authenticated");
@@ -167,7 +169,7 @@ export const useGroupChat = () => {
         senderId: auth.currentUser.uid,
         senderName: currentUserData?.username,
         text,
-        type,
+        type: MessageType.TEXT,
         timestamp: Date.now(),
         reactions: {},
         taggedUsers: taggedUsers || [],
@@ -274,14 +276,14 @@ export const useGroupChat = () => {
 
   const handleImageUpload = async (
     group: Group,
-    e: React.ChangeEvent<HTMLInputElement>
+    e: ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!auth.currentUser) throw new Error("No authenticated user");
     if (!group?.id) throw new Error("No group selected");
 
-    setUploading(true);
+    setIsUploading(true);
 
     try {
       const imageUrl = await uploadCloudinaryImage(file);
@@ -291,8 +293,8 @@ export const useGroupChat = () => {
         const imageMessage = {
           groupId: group.id,
           senderId: auth.currentUser.uid,
-          senderName: auth.currentUser.displayName || auth.currentUser.email,
-          type: "image",
+          senderName: currentUserData?.username,
+          type: MessageType.IMAGE,
           imageUrl,
           timestamp: Date.now(),
           reactions: {},
@@ -300,14 +302,14 @@ export const useGroupChat = () => {
 
         await addDoc(msgsRef, imageMessage);
 
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
+        if (fileRef.current) {
+          fileRef.current.value = "";
         }
       }
     } catch (error) {
       console.error("Image upload error:", error);
     } finally {
-      setUploading(false);
+      setIsUploading(false);
     }
   };
 
@@ -352,7 +354,7 @@ export const useGroupChat = () => {
     if (!auth.currentUser) throw new Error("No authenticated user");
     if (!group?.id) throw new Error("No group selected");
 
-    setUploading(true);
+    setIsUploading(true);
 
     try {
       const audioUrl = await uploadCloudinaryVoice(audioBlob);
@@ -362,8 +364,8 @@ export const useGroupChat = () => {
         const audioMessage = {
           groupId: group.id,
           senderId: auth.currentUser.uid,
-          senderName: auth.currentUser.displayName || auth.currentUser.email,
-          type: "audio",
+          senderName: currentUserData?.username,
+          type: MessageType.AUDIO,
           audioUrl,
           timestamp: Date.now(),
           reactions: {},
@@ -371,10 +373,10 @@ export const useGroupChat = () => {
 
         await addDoc(msgsRef, audioMessage);
       }
-      setUploading(false);
+      setIsUploading(false);
     } catch (error) {
       console.error("Error in sending voice message:", error);
-      setUploading(false);
+      setIsUploading(false);
     }
   };
 
@@ -424,7 +426,8 @@ export const useGroupChat = () => {
   return {
     groups,
     messages,
-    inputMessage,
+    textMessage,
+    setTextMessage,
     handleInputChange,
     loading,
     listenMessages,
@@ -435,11 +438,11 @@ export const useGroupChat = () => {
     leaveGroup,
     deleteGroup,
     getUsersNotInGroup,
-    uploading,
+    isUploading,
     isRecording,
     playingAudio,
     isPaused,
-    fileInputRef,
+    fileRef,
     handleImageUpload,
     startRecording,
     stopRecording,
@@ -449,7 +452,6 @@ export const useGroupChat = () => {
     taggedUsers,
     setTaggedUsers,
     groupMembers,
-    setInputMessage,
     setShowMentions,
   };
 };

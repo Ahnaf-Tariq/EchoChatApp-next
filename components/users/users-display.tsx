@@ -9,10 +9,13 @@ import { IoPeople, IoPerson } from "react-icons/io5";
 import UsersList from "./users-list";
 import GroupList from "../group/group-list";
 import CreateGroupModal from "@/components/group/create-group-modal";
-import { User, Group } from "@/types/interfaces";
+import { User } from "@/types/chat.interfaces";
 import { useGroupChat } from "@/hooks/useGroupChat";
-
-type TabType = "users" | "groups";
+import { Group } from "@/types/group.interfaces";
+import { TabType } from "@/types/enums";
+import { cn } from "@/lib/utils";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useCommonTranslations } from "@/hooks/useTranslations";
 
 const UsersDisplay = () => {
   const {
@@ -22,12 +25,14 @@ const UsersDisplay = () => {
     selectedGroup,
     setSelectedGroup,
   } = useChat();
-  const [activeTab, setActiveTab] = useState<TabType>("users");
+  const { t } = useCommonTranslations();
+  const [activeTab, setActiveTab] = useState<TabType>(TabType.USERS);
   const [searchInput, setSearchInput] = useState("");
   const [usersList, setUsersList] = useState<User[]>([]);
   const [originalUsersList, setOriginalUsersList] = useState<User[]>([]);
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const { groups } = useGroupChat();
+  const debouncedSearch = useDebounce(searchInput, 300);
 
   useEffect(() => {
     const userRef = collection(db, "users");
@@ -44,17 +49,14 @@ const UsersDisplay = () => {
     return () => unsub();
   }, []);
 
-  const change = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchInput(value);
-
-    if (activeTab === "users") {
+  useEffect(() => {
+    if (activeTab === TabType.USERS) {
       const filtered = originalUsersList.filter((item) =>
-        item.username.toLowerCase().includes(value.toLowerCase())
+        item.username.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
       setUsersList(filtered);
     }
-  };
+  }, [debouncedSearch, activeTab, originalUsersList]);
 
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
@@ -67,7 +69,7 @@ const UsersDisplay = () => {
   };
 
   const filteredGroups = groups.filter((group) =>
-    group.name.toLowerCase().includes(searchInput.toLowerCase())
+    group.name.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
   return (
@@ -81,60 +83,60 @@ const UsersDisplay = () => {
         {/* Tabs */}
         <div className="flex border-b border-gray-200">
           <button
-            onClick={() => setActiveTab("users")}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 transition-colors ${
-              activeTab === "users"
+            onClick={() => setActiveTab(TabType.USERS)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 py-3 px-4 transition-colors",
+              activeTab === TabType.USERS
                 ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
                 : "text-gray-600 hover:bg-gray-50"
-            }`}
+            )}
           >
             <IoPerson size={18} />
-            Users
+            {t("chat.users")}
           </button>
           <button
-            onClick={() => setActiveTab("groups")}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 transition-colors ${
-              activeTab === "groups"
+            onClick={() => setActiveTab(TabType.GROUPS)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 py-3 px-4 transition-colors",
+              activeTab === TabType.GROUPS
                 ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
                 : "text-gray-600 hover:bg-gray-50"
-            }`}
+            )}
           >
             <IoPeople size={18} />
-            Groups
+            {t("chat.groups")}
           </button>
         </div>
 
-        {/* Search Bar */}
         <div className="flex items-center gap-2 bg-gray-100 rounded-md px-3 py-2 m-3">
           <FaSearch className="text-gray-400 text-sm" />
           <input
             type="text"
-            onChange={change}
+            onChange={(e) => setSearchInput(e.target.value)}
             value={searchInput}
-            placeholder={`Search ${
-              activeTab === "users" ? "users" : "groups"
-            }...`}
+            placeholder={
+              activeTab === TabType.USERS
+                ? t("chat.search_users")
+                : t("chat.search_groups")
+            }
             className="bg-transparent text-gray-700 placeholder-gray-400 outline-none w-full"
           />
         </div>
 
-        {/* Create Group Button (only visible in groups tab) */}
-        {activeTab === "groups" && (
+        {activeTab === TabType.GROUPS && (
           <div className="px-3 mb-2">
             <button
               onClick={() => setShowCreateGroupModal(true)}
               className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <IoPeople size={18} />
-              Create New Group
+              {t("group_modal.create_group")}
             </button>
           </div>
         )}
 
-        {/* Content */}
         <div className="max-h-[450px] overflow-y-auto scrollbar-hide">
-          {activeTab === "users" ? (
-            // Users List
+          {activeTab === TabType.USERS ? (
             usersList
               .filter((user) => user.id !== auth.currentUser?.uid)
               .map((user) => (
@@ -145,8 +147,7 @@ const UsersDisplay = () => {
                   onSelect={() => handleUserSelect(user)}
                 />
               ))
-          ) : // Groups List
-          filteredGroups.length > 0 ? (
+          ) : filteredGroups.length > 0 ? (
             filteredGroups.map((group) => (
               <GroupList
                 key={group.id}
@@ -157,13 +158,14 @@ const UsersDisplay = () => {
             ))
           ) : (
             <div className="p-4 text-center text-gray-500">
-              {searchInput ? "No groups found" : "No groups yet. Create one!"}
+              {searchInput
+                ? t("chat.no_groups_found")
+                : t("chat.no_groups_yet")}
             </div>
           )}
         </div>
       </div>
 
-      {/* Create Group Modal */}
       {showCreateGroupModal && (
         <CreateGroupModal
           showCreateGroupModal={showCreateGroupModal}

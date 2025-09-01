@@ -1,22 +1,22 @@
 "use client";
 import { useChat } from "@/context/ChatContext";
-import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import ChatMessages from "./chat-messages";
 import useChatMessage from "@/hooks/useChatMessage";
 import ChatHeader from "./chat-header";
 import ChatInputs from "./chat-inputs";
+import { KeyboardEvent } from "react";
 
 const Chats = () => {
   const { selectedUser } = useChat();
   const {
-    inputMessage,
+    textMessage,
     messages,
-    uploading,
+    isUploading,
     isRecording,
     playingAudio,
     isPaused,
     msgSendInputRef,
-    fileInputRef,
+    fileRef,
     chatScrollRef,
     handleTyping,
     sendMessage,
@@ -29,7 +29,7 @@ const Chats = () => {
     deleteEmoji,
   } = useChatMessage();
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -60,11 +60,11 @@ const Chats = () => {
           </div>
 
           <ChatInputs
-            inputMessage={inputMessage}
-            uploading={uploading}
+            textMessage={textMessage}
+            isUploading={isUploading}
             isRecording={isRecording}
             msgSendInputRef={msgSendInputRef}
-            fileInputRef={fileInputRef}
+            fileRef={fileRef}
             handleTyping={handleTyping}
             handleKeyPress={handleKeyPress}
             handleImageUpload={handleImageUpload}

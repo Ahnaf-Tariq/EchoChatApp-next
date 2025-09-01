@@ -1,10 +1,9 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, KeyboardEvent } from "react";
 import { useGroupChat } from "@/hooks/useGroupChat";
 import { auth } from "@/lib/firebase.config";
 import { db } from "@/lib/firebase.config";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import { Group, GroupMessage } from "@/types/interfaces";
 import {
   IoPeople,
   IoEllipsisVertical,
@@ -23,6 +22,8 @@ import EmojiModal from "../emoji-modal";
 import { cn } from "@/lib/utils";
 import { RiGalleryLine } from "react-icons/ri";
 import Image from "next/image";
+import { Group, GroupMessage } from "@/types/group.interfaces";
+import { useCommonTranslations } from "@/hooks/useTranslations";
 
 interface GroupChatProps {
   group: Group;
@@ -31,15 +32,16 @@ interface GroupChatProps {
 export default function GroupChat({ group }: GroupChatProps) {
   const {
     messages,
-    inputMessage,
+    textMessage,
+    setTextMessage,
     handleInputChange,
     listenMessages,
     sendMessage,
-    uploading,
+    isUploading,
     isRecording,
     playingAudio,
     isPaused,
-    fileInputRef,
+    fileRef,
     handleImageUpload,
     startRecording,
     stopRecording,
@@ -49,10 +51,11 @@ export default function GroupChat({ group }: GroupChatProps) {
     taggedUsers,
     setTaggedUsers,
     groupMembers,
-    setInputMessage,
     setShowMentions,
   } = useGroupChat();
-  const { selectedGroup, setSelectedGroup } = useChat();
+  const { selectedGroup, setSelectedGroup, getFirstLetterCapitalized } =
+    useChat();
+  const { t } = useCommonTranslations();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [menuOption, setMenuOption] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -74,18 +77,19 @@ export default function GroupChat({ group }: GroupChatProps) {
   };
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() || !group?.id) return;
+    if (!textMessage.trim() || !group?.id) return;
+
+    setTextMessage("");
 
     try {
-      await sendMessage(group.id, inputMessage.trim(), "text", taggedUsers);
-      setInputMessage("");
+      await sendMessage(group.id, textMessage.trim(), taggedUsers);
       setTaggedUsers([]);
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -207,12 +211,12 @@ export default function GroupChat({ group }: GroupChatProps) {
             <IoArrowBack className="size-5 text-gray-600" />
           </button>
           <div className="w-10 h-10 hidden bg-gradient-to-br from-blue-500 to-purple-600 rounded-full sm:flex items-center justify-center text-white font-semibold">
-            {group.name.charAt(0).toUpperCase()}
+            {getFirstLetterCapitalized(group.name)}
           </div>
           <div>
             <h2 className="font-semibold text-gray-900">{group.name}</h2>
             <p className="text-sm text-gray-500">
-              {group.members.length} members
+              {group.members.length} {t("chat.members")}
             </p>
           </div>
         </div>
@@ -226,7 +230,7 @@ export default function GroupChat({ group }: GroupChatProps) {
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
             <IoPeople size={48} className="mx-auto mb-4 text-gray-300" />
-            <p>No messages yet. Start the conversation!</p>
+            <p>{t("chat.no_messages")}</p>
           </div>
         ) : (
           messages.map((message: GroupMessage) => {
@@ -237,9 +241,10 @@ export default function GroupChat({ group }: GroupChatProps) {
             return (
               <div
                 key={messageId}
-                className={`flex ${
+                className={cn(
+                  "flex",
                   isOwnMessage ? "justify-end" : "justify-start"
-                }`}
+                )}
               >
                 <div
                   className="relative group max-w-xs lg:max-w-md"
@@ -250,7 +255,6 @@ export default function GroupChat({ group }: GroupChatProps) {
                     }
                   }}
                 >
-                  {/* Emoji Modal */}
                   {menuOption === messageId && (
                     <EmojiModal
                       isOwnMessage={isOwnMessage}
@@ -268,7 +272,6 @@ export default function GroupChat({ group }: GroupChatProps) {
                     />
                   )}
 
-                  {/* Message Content */}
                   <div
                     className={cn(
                       "rounded-2xl",
@@ -279,7 +282,6 @@ export default function GroupChat({ group }: GroupChatProps) {
                           : "bg-white text-gray-900 border border-gray-200 rounded-bl-sm p-3")
                     )}
                   >
-                    {/* Sender name for group messages (non-own messages) */}
                     {!isOwnMessage && (
                       <div className="text-xs font-medium text-green-600 mb-1">
                         {message.senderName || "Unknown User"}
@@ -395,7 +397,6 @@ export default function GroupChat({ group }: GroupChatProps) {
                     </div>
                   </div>
 
-                  {/* Reactions */}
                   {reactionCounts.length > 0 && (
                     <div
                       className={cn(
@@ -432,7 +433,7 @@ export default function GroupChat({ group }: GroupChatProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input */}
+      {/* Message Inputs */}
       <div className="bg-white border-t border-gray-200 p-4">
         {isRecording && (
           <div className="flex items-center justify-center gap-2 mb-3 p-2 bg-red-50 rounded-lg">
@@ -444,19 +445,19 @@ export default function GroupChat({ group }: GroupChatProps) {
         <div className="flex items-center gap-3">
           <input
             type="file"
-            ref={fileInputRef}
+            ref={fileRef}
             accept="image/*"
             onChange={(e) => handleImageUpload(group, e)}
             hidden
-            disabled={uploading || isRecording}
+            disabled={isUploading || isRecording}
           />
 
           <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading || isRecording}
+            onClick={() => fileRef.current?.click()}
+            disabled={isUploading || isRecording}
             className={cn(
               "p-2 sm:p-3 rounded-lg",
-              uploading || isRecording
+              isUploading || isRecording
                 ? "text-gray-400 cursor-not-allowed"
                 : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
             )}
@@ -467,40 +468,46 @@ export default function GroupChat({ group }: GroupChatProps) {
 
           <div className="flex-1 relative">
             <input
-              value={inputMessage}
+              value={textMessage}
               onChange={handleInputChange}
               onKeyDown={handleKeyPress}
               type="text"
-              placeholder="Type your message..."
+              placeholder={t("chat.type_message")}
               disabled={isRecording}
               className="w-full px-2 sm:px-4 py-1 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
             />
             {showMentions && (
               <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto scrollbar-hide z-50">
                 {group.members
-                  .map((uid) => groupMembers.find((m) => m.id === uid))
-                  .filter(
-                    (m) => m && m.username.toLowerCase().includes(mentionQuery)
+                  .map((memberId) =>
+                    groupMembers.find((member) => member.id === memberId)
                   )
-                  .map((m) => (
+                  .filter(
+                    (member) =>
+                      member &&
+                      member.username.toLowerCase().includes(mentionQuery)
+                  )
+                  .map((member) => (
                     <div
-                      key={m!.id}
+                      key={member!.id}
                       onClick={() => {
-                        const newText = inputMessage.replace(
+                        const newText = textMessage.replace(
                           /@\w*$/,
-                          `@${m!.username} `
+                          `@${member!.username} `
                         );
-                        setInputMessage(newText);
+                        setTextMessage(newText);
 
                         setTaggedUsers((prev) =>
-                          prev.includes(m!.id) ? prev : [...prev, m!.id]
+                          prev.includes(member!.id)
+                            ? prev
+                            : [...prev, member!.id]
                         );
 
                         setShowMentions(false);
                       }}
                       className="p-3 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-gray-50 flex items-center gap-3"
                     >
-                      @{m!.username}
+                      @{member!.username}
                     </div>
                   ))}
               </div>
@@ -511,12 +518,12 @@ export default function GroupChat({ group }: GroupChatProps) {
             onClick={() =>
               isRecording ? stopRecording() : startRecording(group)
             }
-            disabled={uploading}
+            disabled={isUploading}
             className={cn(
               "p-2 sm:p-3 rounded-lg transition-all duration-200",
               isRecording
                 ? "bg-red-500 hover:bg-red-600 text-white"
-                : uploading
+                : isUploading
                 ? "text-gray-400 cursor-not-allowed"
                 : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
             )}

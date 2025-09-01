@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { InputProps } from "@/types/interfaces";
+import { InputProps } from "@/types/chat.interfaces";
 import React from "react";
 
 const Input = ({

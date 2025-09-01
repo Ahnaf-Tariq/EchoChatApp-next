@@ -1,4 +1,5 @@
 import { AuthState } from "./enums";
+import { Group } from "./group.interfaces";
 
 export interface User {
   id: string;
@@ -22,27 +23,6 @@ export interface Message {
   hasUserSeen: boolean;
 }
 
-export interface Group {
-  id: string;
-  name: string;
-  members: string[];
-  createdBy: string;
-  createdAt: number;
-}
-export interface GroupMessage {
-  id: string;
-  groupId: string;
-  senderId: string;
-  senderName?: string;
-  text?: string;
-  imageUrl?: string;
-  audioUrl?: string;
-  type: "text" | "image" | "audio";
-  timestamp: number;
-  reactions?: { [emoji: string]: string[] };
-  taggedUsers?: string[];
-}
-
 export interface ChatMessagesProps {
   message: Message;
   playingAudio: string | null;
@@ -54,11 +34,11 @@ export interface ChatMessagesProps {
 }
 
 export interface ChatInputsProps {
-  inputMessage: string;
-  uploading: boolean;
+  textMessage: string;
+  isUploading: boolean;
   isRecording: boolean;
   msgSendInputRef: React.RefObject<HTMLInputElement | null>;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  fileRef: React.RefObject<HTMLInputElement | null>;
   handleTyping: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -90,6 +70,7 @@ export interface EmojiModalProps {
   showEmojiPicker: boolean;
   setShowEmojiPicker: (showEmojiPicker: boolean) => void;
 }
+
 export interface ButtonProps {
   isLoggedIn: boolean;
   onClick: () => void;
@@ -105,4 +86,5 @@ export interface ChatContextType {
   selectedGroup: Group | null;
   setSelectedGroup: (group: Group | null) => void;
   loginInputRef: React.RefObject<HTMLInputElement | null>;
+  getFirstLetterCapitalized: (name: string) => string;
 }

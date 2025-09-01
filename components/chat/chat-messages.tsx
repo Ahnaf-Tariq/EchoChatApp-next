@@ -1,7 +1,7 @@
 "use client";
 import { auth } from "@/lib/firebase.config";
 import { cn } from "@/lib/utils";
-import { ChatMessagesProps } from "@/types/interfaces";
+import { ChatMessagesProps } from "@/types/chat.interfaces";
 import Image from "next/image";
 import { useState } from "react";
 import { MdDoneAll, MdPause, MdPlayArrow } from "react-icons/md";
@@ -50,7 +50,6 @@ const ChatMessages = ({
           }
         }}
       >
-        {/* Three dots menu */}
         {menuOption && (
           <EmojiModal
             isOwnMessage={isOwnMessage}

@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdDelete, MdOutlineEmojiEmotions } from "react-icons/md";
-import { EmojiModalProps } from "@/types/interfaces";
+import { EmojiModalProps } from "@/types/chat.interfaces";
 
 const EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "😡"];
 

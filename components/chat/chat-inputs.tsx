@@ -1,16 +1,17 @@
+import { useCommonTranslations } from "@/hooks/useTranslations";
 import { cn } from "@/lib/utils";
-import { ChatInputsProps } from "@/types/interfaces";
+import { ChatInputsProps } from "@/types/chat.interfaces";
 import React from "react";
 import { IoSend } from "react-icons/io5";
 import { MdKeyboardVoice, MdStop } from "react-icons/md";
 import { RiGalleryLine } from "react-icons/ri";
 
 const ChatInputs = ({
-  inputMessage,
-  uploading,
+  textMessage,
+  isUploading,
   isRecording,
   msgSendInputRef,
-  fileInputRef,
+  fileRef,
   handleTyping,
   handleKeyPress,
   handleImageUpload,
@@ -18,6 +19,7 @@ const ChatInputs = ({
   stopRecording,
   sendMessage,
 }: ChatInputsProps) => {
+  const { t } = useCommonTranslations();
   return (
     <div className="bg-white border-t border-gray-200 p-4">
       {isRecording && (
@@ -30,19 +32,19 @@ const ChatInputs = ({
       <div className="flex items-center gap-3">
         <input
           type="file"
-          ref={fileInputRef}
+          ref={fileRef}
           accept="image/*"
           onChange={handleImageUpload}
           hidden
-          disabled={uploading || isRecording}
+          disabled={isUploading || isRecording}
         />
 
         <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading || isRecording}
+          onClick={() => fileRef.current?.click()}
+          disabled={isUploading || isRecording}
           className={cn(
             "p-2 sm:p-3 rounded-lg",
-            uploading || isRecording
+            isUploading || isRecording
               ? "text-gray-400 cursor-not-allowed"
               : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
           )}
@@ -53,12 +55,12 @@ const ChatInputs = ({
 
         <div className="flex-1 relative">
           <input
-            value={inputMessage}
+            value={textMessage}
             onChange={handleTyping}
             onKeyDown={handleKeyPress}
             ref={msgSendInputRef}
             type="text"
-            placeholder="Type your message..."
+            placeholder={t("chat.type_message")}
             disabled={isRecording}
             className="w-full px-2 sm:px-4 py-1 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
           />
@@ -66,12 +68,12 @@ const ChatInputs = ({
 
         <button
           onClick={isRecording ? stopRecording : startRecording}
-          disabled={uploading}
+          disabled={isUploading}
           className={cn(
             "p-2 sm:p-3 rounded-lg transition-all duration-200",
             isRecording
               ? "bg-red-500 hover:bg-red-600 text-white"
-              : uploading
+              : isUploading
               ? "text-gray-400 cursor-not-allowed"
               : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
           )}

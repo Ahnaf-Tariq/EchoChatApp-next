@@ -1,14 +1,15 @@
 "use client";
-import Image from "next/image";
 import React from "react";
 import { BsExclamationCircle } from "react-icons/bs";
 import { IoArrowBack } from "react-icons/io5";
 import { formatDistanceToNow } from "date-fns";
 import { useChat } from "@/context/ChatContext";
+import { useCommonTranslations } from "@/hooks/useTranslations";
 
 const ChatHeader = () => {
-  const { selectedUser, setSelectedUser } = useChat();
-
+  const { selectedUser, setSelectedUser, getFirstLetterCapitalized } =
+    useChat();
+  const { t } = useCommonTranslations();
   return (
     selectedUser && (
       <div className="bg-white border-b border-gray-200 p-4">
@@ -22,7 +23,7 @@ const ChatHeader = () => {
             </button>
             <div className="hidden sm:block relative">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                {selectedUser.username.charAt(0).toUpperCase()}
+                {getFirstLetterCapitalized(selectedUser.username)}
               </div>
               {selectedUser.active && (
                 <span className="absolute bottom-0 right-0 block size-2 rounded-full bg-green-500 ring-2 ring-white"></span>
@@ -34,8 +35,8 @@ const ChatHeader = () => {
               </h1>
               <p className="text-xs sm:text-sm text-gray-500">
                 {selectedUser.active
-                  ? "Active Now"
-                  : `Last seen: ${formatDistanceToNow(
+                  ? t("chat.active_now")
+                  : `${t("chat.last_seen")}: ${formatDistanceToNow(
                       new Date(selectedUser.lastSeen),
                       {
                         addSuffix: true,
