@@ -15,7 +15,7 @@ import { useCommonTranslations } from "@/hooks/useTranslations";
 const Login = () => {
   const { t } = useCommonTranslations();
 
-  const { loginInputRef, currentState, setCurrentState } = useChat();
+  const { currentState, setCurrentState } = useChat();
   const {
     email,
     setEmail,
@@ -46,15 +46,15 @@ const Login = () => {
 
   return (
     <div className="flex justify-center mt-10 sm:mt-14 items-center px-2">
-      <div className="bg-white shadow-md p-4 sm:p-6 rounded-xl w-96 max-w-full sm:w-96">
+      <div className="bg-[#2f3136] shadow-lg p-4 sm:p-6 rounded-xl w-96 max-w-full sm:w-96 border border-[#4f545c]">
         <div className="flex justify-center">
-          <h1 className="font-bold text-xl sm:text-2xl">
+          <h1 className="font-bold text-xl sm:text-2xl text-white">
             {currentState === AuthState.SIGNIN
               ? t("auth.login_title")
               : t("auth.signup_title")}
           </h1>
         </div>
-        <hr className="text-gray-400 my-4" />
+        <hr className="text-[#4f545c] my-4" />
 
         <div className="flex flex-col gap-3">
           {currentState === AuthState.SIGNUP && (
@@ -77,7 +77,6 @@ const Login = () => {
             label={t("common.email")}
             type="email"
             id="email"
-            inputRef={loginInputRef}
           />
 
           <Input
@@ -92,7 +91,7 @@ const Login = () => {
 
           <button
             onClick={handleSignIn}
-            className="w-full font-semibold text-sm sm:text-base bg-blue-500 hover:bg-blue-600 hover:shadow-md text-white rounded-lg py-1 mt-2 cursor-pointer"
+            className="w-full font-semibold text-sm sm:text-base bg-[#5865f2] hover:bg-[#4752c4] hover:shadow-md text-white rounded-lg py-2 mt-2 cursor-pointer transition-colors"
           >
             {currentState === AuthState.SIGNIN
               ? t("common.login")
@@ -100,43 +99,44 @@ const Login = () => {
           </button>
 
           <div className="flex items-center my-1">
-            <hr className="flex-grow border-t border-gray-300" />
-            <span className="mx-2 text-gray-700">{t("common.or")}</span>
-            <hr className="flex-grow border-t border-gray-300" />
+            <hr className="flex-grow border-t border-[#4f545c]" />
+            <span className="mx-2 text-[#b9bbbe]">{t("common.or")}</span>
+            <hr className="flex-grow border-t border-[#4f545c]" />
           </div>
 
           <button
             onClick={googleLogin}
-            className="w-full flex justify-center items-center gap-2 border border-[#14b8a6] rounded-lg py-1 sm:py-2 hover:bg-gray-50 transition cursor-pointer"
+            className="w-full flex justify-center items-center gap-2 border border-[#4f545c] rounded-lg py-2 hover:bg-[#3c3f44] transition cursor-pointer"
           >
             <Image
               src={"/assests/google_img.jpeg"}
+              className="bg-[#4f545c] rounded-full"
               width={20}
               height={20}
               alt="google_logo"
             />
-            <span className="text-sm font-medium text-gray-700 hidden sm:block">
+            <span className="text-sm font-medium text-[#b9bbbe] hidden sm:block">
               {t("common.continue_google")}
             </span>
           </button>
         </div>
 
         {currentState === AuthState.SIGNIN ? (
-          <p className="mt-4 text-sm">
+          <p className="mt-4 text-sm text-[#b9bbbe]">
             {t("common.dont_have_account")}{" "}
             <span
               onClick={() => setCurrentState(AuthState.SIGNUP)}
-              className="text-blue-500 font-semibold hover:underline cursor-pointer"
+              className="text-[#5865f2] font-semibold hover:underline cursor-pointer"
             >
               {AuthState.SIGNUP}
             </span>
           </p>
         ) : (
-          <p className="mt-4 text-sm">
+          <p className="mt-4 text-sm text-[#b9bbbe]">
             {t("common.already_have_account")}{" "}
             <span
               onClick={() => setCurrentState(AuthState.SIGNIN)}
-              className="text-blue-500 hover:underline font-semibold cursor-pointer"
+              className="text-[#5865f2] hover:underline font-semibold cursor-pointer"
             >
               {AuthState.SIGNIN}
             </span>

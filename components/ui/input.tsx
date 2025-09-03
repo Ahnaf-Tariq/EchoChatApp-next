@@ -11,7 +11,6 @@ const Input = ({
   type,
   label,
   id,
-  inputRef,
 }: InputProps) => {
   return (
     // login page input
@@ -19,22 +18,25 @@ const Input = ({
       <input
         type={type}
         className={cn(
-          "px-2 py-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out",
-          isFocused ? "border-blue-500" : "border-gray-400"
+          "p-2 text-sm sm:text-base border rounded-md outline-none transition-all duration-200 ease-in-out bg-[#40444b] text-white placeholder-transparent",
+          isFocused
+            ? "border-[#5865f2] ring-1 ring-[#5865f2]"
+            : "border-[#4f545c]"
         )}
         value={val}
         onChange={(e) => setVal(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         id={id}
-        ref={inputRef}
+        placeholder={label}
       />
       <label
-        htmlFor="email"
+        htmlFor={id}
         className={cn(
-          "absolute left-3 transition-all duration-200 ease-in-out pointer-events-none",
-          isFocused || val ? "text-xs -top-2 px-1 bg-white" : "text-base top-2",
-          isFocused ? "text-blue-500" : "text-gray-400"
+          "absolute left-3 transition-all duration-200 pointer-events-none",
+          isFocused || val
+            ? "text-xs -top-2 px-1 bg-[#40444b] text-[#b9bbbe]"
+            : "text-sm top-3 text-[#72767d]"
         )}
       >
         {label}

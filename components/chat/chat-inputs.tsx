@@ -21,11 +21,13 @@ const ChatInputs = ({
 }: ChatInputsProps) => {
   const { t } = useCommonTranslations();
   return (
-    <div className="bg-white border-t border-gray-200 p-4">
+    <div className="bg-[#2f3136] border-t border-[#4f545c] p-4">
       {isRecording && (
-        <div className="flex items-center justify-center gap-2 mb-3 p-2 bg-red-50 rounded-lg">
-          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-          <span className="text-red-600 font-medium">Recording...</span>
+        <div className="flex items-center justify-center gap-2 mb-3 p-3 bg-[#ed4245] bg-opacity-10 rounded-lg border border-[#ed4245] border-opacity-30">
+          <div className="w-3 h-3 bg-[#ed4245] rounded-full animate-pulse"></div>
+          <span className="text-[#ed4245] font-medium text-sm">
+            Recording...
+          </span>
         </div>
       )}
 
@@ -43,10 +45,10 @@ const ChatInputs = ({
           onClick={() => fileRef.current?.click()}
           disabled={isUploading || isRecording}
           className={cn(
-            "p-2 sm:p-3 rounded-lg",
+            "p-2 rounded-lg transition-colors",
             isUploading || isRecording
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
+              ? "text-[#72767d] cursor-not-allowed"
+              : "text-[#b9bbbe] hover:text-white hover:bg-[#3c3f44] cursor-pointer"
           )}
           title="Upload Image"
         >
@@ -62,7 +64,7 @@ const ChatInputs = ({
             type="text"
             placeholder={t("chat.type_message")}
             disabled={isRecording}
-            className="w-full px-2 sm:px-4 py-1 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
+            className="w-full px-4 py-3 bg-[#40444b] border-0 rounded-lg text-white placeholder-[#72767d] focus:outline-none focus:ring-1 focus:ring-[#5865f2] transition-all duration-200 disabled:opacity-50 text-sm"
           />
         </div>
 
@@ -70,12 +72,12 @@ const ChatInputs = ({
           onClick={isRecording ? stopRecording : startRecording}
           disabled={isUploading}
           className={cn(
-            "p-2 sm:p-3 rounded-lg transition-all duration-200",
+            "p-2 rounded-lg transition-all duration-200",
             isRecording
-              ? "bg-red-500 hover:bg-red-600 text-white"
+              ? "bg-[#ed4245] hover:bg-[#c03e3f] text-white"
               : isUploading
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
+              ? "text-[#72767d] cursor-not-allowed"
+              : "text-[#b9bbbe] hover:text-white hover:bg-[#3c3f44] cursor-pointer"
           )}
           title={isRecording ? "Stop Recording" : "Start Voice Recording"}
         >
@@ -90,13 +92,13 @@ const ChatInputs = ({
           onClick={sendMessage}
           disabled={isRecording}
           className={cn(
-            "p-2 sm:p-3 rounded-lg sm:rounded-xl transition-colors text-white",
+            "p-2 rounded-lg transition-colors",
             isRecording
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-600 cursor-pointer"
+              ? "bg-[#72767d] cursor-not-allowed"
+              : "bg-[#5865f2] hover:bg-[#4752c4] cursor-pointer"
           )}
         >
-          <IoSend className="size-3 sm:size-5" />
+          <IoSend className="size-5 text-white" />
         </button>
       </div>
     </div>

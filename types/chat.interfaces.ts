@@ -1,4 +1,5 @@
-import { AuthState } from "./enums";
+import { ChangeEvent, KeyboardEvent, RefObject } from "react";
+import { AuthState, MessageType, TabType } from "./enums";
 import { Group } from "./group.interfaces";
 
 export interface User {
@@ -17,7 +18,7 @@ export interface Message {
   text?: string;
   imageUrl?: string;
   audioUrl?: string;
-  type: "text" | "image" | "audio";
+  type: MessageType;
   timestamp: number;
   reactions?: { [emoji: string]: string[] };
   hasUserSeen: boolean;
@@ -37,11 +38,11 @@ export interface ChatInputsProps {
   textMessage: string;
   isUploading: boolean;
   isRecording: boolean;
-  msgSendInputRef: React.RefObject<HTMLInputElement | null>;
-  fileRef: React.RefObject<HTMLInputElement | null>;
-  handleTyping: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  msgSendInputRef: RefObject<HTMLInputElement | null>;
+  fileRef: RefObject<HTMLInputElement | null>;
+  handleTyping: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleKeyPress: (e: KeyboardEvent<HTMLInputElement>) => void;
+  handleImageUpload: (e: ChangeEvent<HTMLInputElement>) => void;
   startRecording: () => void;
   stopRecording: () => void;
   sendMessage: () => void;
@@ -55,7 +56,6 @@ export interface InputProps {
   type: string;
   label: string;
   id: string;
-  inputRef?: React.Ref<HTMLInputElement>;
 }
 
 export interface EmojiModalProps {
@@ -85,6 +85,8 @@ export interface ChatContextType {
   setSelectedUser: (user: User | null) => void;
   selectedGroup: Group | null;
   setSelectedGroup: (group: Group | null) => void;
-  loginInputRef: React.RefObject<HTMLInputElement | null>;
+  loginInputRef: RefObject<HTMLInputElement | null>;
   getFirstLetterCapitalized: (name: string) => string;
+  activeTab: TabType;
+  setActiveTab: (tab: TabType) => void;
 }

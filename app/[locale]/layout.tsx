@@ -9,10 +9,16 @@ export default function LocaleLayout({
 }: PropsWithChildren<{
   params: { locale: string };
 }>) {
+  const dir = params.locale === "ur" ? "rtl" : "ltr";
+
   return (
-    <I18nProvider locale={params.locale}>
-      <ToastContainer />
-      <ChatProvider>{children}</ChatProvider>
-    </I18nProvider>
+    <html lang={params.locale} dir={dir}>
+      <body className="bg-[#36393f] text-white pt-4 sm:pt-8 scrollbar-hide">
+        <I18nProvider locale={params.locale}>
+          <ToastContainer />
+          <ChatProvider>{children}</ChatProvider>
+        </I18nProvider>
+      </body>
+    </html>
   );
 }

@@ -12,10 +12,10 @@ const Button = ({ isLoggedIn, onClick }: ButtonProps) => {
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm cursor-pointer",
+        "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover:shadow-sm cursor-pointer",
         isLoggedIn
-          ? "text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-200"
-          : "text-white bg-blue-500 hover:bg-blue-600"
+          ? "text-[#b9bbbe] bg-[#3c3f44] hover:bg-[#4f545c] hover:text-white border border-[#4f545c]"
+          : "text-white bg-[#5865f2] hover:bg-[#4752c4]"
       )}
     >
       {isLoggedIn ? <BiLogOut /> : <MdOutlineLogin />}

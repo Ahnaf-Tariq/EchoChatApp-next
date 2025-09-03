@@ -54,9 +54,9 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="shadow-sm bg-white">
-      <div className="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
-        <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-blue-500">
+    <nav className="bg-[#2f3136] border-b border-[#4f545c]">
+      <div className="flex justify-between items-center max-w-7xl mx-auto px-6 py-3">
+        <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-[#5865f2]">
           <IoChatboxEllipsesOutline className="size-4 sm:size-5" />
           {chatAppName}
         </h1>
@@ -65,15 +65,15 @@ const Navbar = () => {
           {user && (
             <div className="flex items-center gap-3">
               <div className="hidden sm:block">
-                <p className="text-xs text-gray-500">{user.email}</p>
+                <p className="text-xs text-[#b9bbbe]">{user.email}</p>
               </div>
 
               <Image
-                className="rounded-full border-2 border-gray-100 cursor-pointer"
+                className="rounded-full border-2 border-[#4f545c] cursor-pointer hover:border-[#5865f2] transition-colors"
                 src={"/assests/avatar.webp"}
                 alt="profile"
-                width={40}
-                height={40}
+                width={32}
+                height={32}
               />
             </div>
           )}

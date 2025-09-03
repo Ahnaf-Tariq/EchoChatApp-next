@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PropsWithChildren } from "react";
 import { ChatProvider } from "@/context/ChatContext";
-import Navbar from "@/components/navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +29,9 @@ export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#36393f] text-white pt-4 sm:pt-8 scrollbar-hide`}
       >
-        <ChatProvider>
-          <Navbar />
-          {children}
-        </ChatProvider>
+        <ChatProvider>{children}</ChatProvider>
       </body>
     </html>
   );

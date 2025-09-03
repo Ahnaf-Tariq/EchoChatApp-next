@@ -1,6 +1,6 @@
 "use client";
 import { auth, db } from "@/lib/firebase.config";
-import { AuthState } from "@/types/enums";
+import { AuthState, TabType } from "@/types/enums";
 import { ChatContextType, User } from "@/types/chat.interfaces";
 import { doc, updateDoc } from "firebase/firestore";
 import {
@@ -16,6 +16,7 @@ import { useCommonTranslations } from "@/hooks/useTranslations";
 export const ChatContext = createContext<ChatContextType | null>(null);
 
 export const ChatProvider = ({ children }: PropsWithChildren) => {
+  const [activeTab, setActiveTab] = useState<TabType>(TabType.USERS);
   const { t } = useCommonTranslations();
   const [currentState, setCurrentState] = useState<AuthState>(AuthState.SIGNIN);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -57,6 +58,8 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
     setSelectedGroup,
     loginInputRef,
     getFirstLetterCapitalized,
+    activeTab,
+    setActiveTab,
   };
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };

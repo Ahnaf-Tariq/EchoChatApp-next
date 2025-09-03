@@ -36,6 +36,8 @@
     "type_message": "Type a message...",
     "send": "Send",
     "active_now": "Active Now",
+    "online": "Online",
+    "offline": "Offline",
     "typing": "typing...",
     "last_seen": "Last seen",
     "welcome_to_chat": "Welcome to Echo Chat",

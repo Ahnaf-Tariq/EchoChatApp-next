@@ -24,6 +24,8 @@ import { RiGalleryLine } from "react-icons/ri";
 import Image from "next/image";
 import { Group, GroupMessage } from "@/types/group.interfaces";
 import { useCommonTranslations } from "@/hooks/useTranslations";
+import { User } from "@/types/chat.interfaces";
+import { MessageType, TabType } from "@/types/enums";
 
 interface GroupChatProps {
   group: Group;
@@ -53,8 +55,13 @@ export default function GroupChat({ group }: GroupChatProps) {
     groupMembers,
     setShowMentions,
   } = useGroupChat();
-  const { selectedGroup, setSelectedGroup, getFirstLetterCapitalized } =
-    useChat();
+  const {
+    setSelectedUser,
+    selectedGroup,
+    setSelectedGroup,
+    getFirstLetterCapitalized,
+    setActiveTab,
+  } = useChat();
   const { t } = useCommonTranslations();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [menuOption, setMenuOption] = useState<string | null>(null);
@@ -200,36 +207,39 @@ export default function GroupChat({ group }: GroupChatProps) {
   }
 
   return (
-    <div className="flex-1 h-[550px] flex flex-col bg-white">
+    <div className="flex-1 h-[550px] flex flex-col border-r border-gray-800">
       {/* Group Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+      <div className="flex items-center justify-between p-4 border-b border-[#4f545c] bg-[#2f3136]">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSelectedGroup(null)}
-            className="sm:hidden p-1 hover:bg-gray-100 rounded-full cursor-pointer"
+            className="sm:hidden p-1 hover:bg-[#3c3f44] rounded-full cursor-pointer transition-colors"
           >
-            <IoArrowBack className="size-5 text-gray-600" />
+            <IoArrowBack className="size-5 text-[#b9bbbe]" />
           </button>
           <div className="w-10 h-10 hidden bg-gradient-to-br from-blue-500 to-purple-600 rounded-full sm:flex items-center justify-center text-white font-semibold">
             {getFirstLetterCapitalized(group.name)}
           </div>
           <div>
-            <h2 className="font-semibold text-gray-900">{group.name}</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="font-semibold text-white">{group.name}</h2>
+            <p className="text-sm text-[#b9bbbe]">
               {group.members.length} {t("chat.members")}
             </p>
           </div>
         </div>
-        <button className="p-1 hover:bg-gray-100 rounded-full cursor-pointer">
-          <IoEllipsisVertical size={20} className="text-gray-500" />
+        <button className="p-1 hover:bg-[#3c3f44] rounded-full cursor-pointer transition-colors">
+          <IoEllipsisVertical
+            size={20}
+            className="text-[#b9bbbe] hover:text-white"
+          />
         </button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto scrollbar-hide p-3 space-y-1 bg-[#36393f]">
         {messages.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            <IoPeople size={48} className="mx-auto mb-4 text-gray-300" />
+          <div className="text-center text-[#72767d] py-8">
+            <IoPeople size={48} className="mx-auto mb-4 text-[#4f545c]" />
             <p>{t("chat.no_messages")}</p>
           </div>
         ) : (
@@ -241,20 +251,15 @@ export default function GroupChat({ group }: GroupChatProps) {
             return (
               <div
                 key={messageId}
-                className={cn(
-                  "flex",
-                  isOwnMessage ? "justify-end" : "justify-start"
-                )}
+                className="flex mb-1 px-2 py-1 hover:bg-[#32353b] group"
+                onMouseEnter={() => setMenuOption(messageId)}
+                onMouseLeave={() => {
+                  if (!showEmojiPicker) {
+                    setMenuOption(null);
+                  }
+                }}
               >
-                <div
-                  className="relative group max-w-xs lg:max-w-md"
-                  onMouseEnter={() => setMenuOption(messageId)}
-                  onMouseLeave={() => {
-                    if (!showEmojiPicker) {
-                      setMenuOption(null);
-                    }
-                  }}
-                >
+                <div className="relative max-w-[70%] -space-y-1">
                   {menuOption === messageId && (
                     <EmojiModal
                       isOwnMessage={isOwnMessage}
@@ -274,136 +279,118 @@ export default function GroupChat({ group }: GroupChatProps) {
 
                   <div
                     className={cn(
-                      "rounded-2xl",
-                      message.type === "image" && "bg-white p-2",
-                      message.type !== "image" &&
-                        (isOwnMessage
-                          ? "bg-blue-500 text-white rounded-br-sm p-3"
-                          : "bg-white text-gray-900 border border-gray-200 rounded-bl-sm p-3")
+                      "flex gap-3",
+                      message.type !== MessageType.IMAGE &&
+                        "border border-gray-600 p-2 rounded-xl"
                     )}
                   >
-                    {!isOwnMessage && (
-                      <div className="text-xs font-medium text-green-600 mb-1">
-                        {message.senderName || "Unknown User"}
+                    {!isOwnMessage && message.type !== MessageType.AUDIO && (
+                      <div className="w-6 h-6 bg-[#5865f2] rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
+                        {getFirstLetterCapitalized(message.senderName)}
                       </div>
                     )}
 
-                    {message.type === "text" && message.text && (
-                      <p className="text-sm break-words">
-                        {message.text.split(/(@\w+)/g).map((text, i) =>
-                          text.startsWith("@") ? (
-                            <span
-                              key={i}
-                              className={cn(
-                                "font-medium cursor-pointer hover:underline",
-                                isOwnMessage
-                                  ? "text-green-300"
-                                  : "text-green-400"
-                              )}
-                            >
-                              {text}
-                            </span>
-                          ) : (
-                            text
-                          )
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <span className="font-semibold text-[#5865f2] capitalize text-sm">
+                          {message.senderId !== auth.currentUser?.uid
+                            ? message.senderName
+                            : "You"}
+                        </span>
+                        {!isOwnMessage && (
+                          <span className="text-[#72767d] text-xs">
+                            {new Date(message.timestamp).toLocaleDateString()}
+                          </span>
                         )}
-                      </p>
-                    )}
+                      </div>
 
-                    {message.type === "image" && message.imageUrl && (
-                      <Image
-                        src={message.imageUrl}
-                        alt="group image"
-                        className="rounded-lg object-cover w-full max-w-[160px] sm:max-w-[180px] md:max-w-[220px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
-                        width={400}
-                        height={400}
-                      />
-                    )}
-
-                    {message.type === "audio" && message.audioUrl && (
-                      <div className="flex items-center gap-3 min-w-[150px]">
-                        <button
-                          onClick={() => toggleAudio(message.audioUrl!)}
-                          className={cn(
-                            "p-2 rounded-full cursor-pointer transition-colors",
-                            isOwnMessage
-                              ? "bg-blue-600 hover:bg-blue-700"
-                              : "bg-gray-200 hover:bg-gray-300"
-                          )}
-                        >
-                          {playingAudio === message.audioUrl && !isPaused ? (
-                            <MdPause
-                              className={cn(
-                                "size-4",
-                                isOwnMessage ? "text-white" : "text-gray-600"
-                              )}
-                            />
-                          ) : (
-                            <MdPlayArrow
-                              className={cn(
-                                "size-4",
-                                isOwnMessage ? "text-white" : "text-gray-600"
-                              )}
-                            />
-                          )}
-                        </button>
-                        <div className="flex-1">
-                          <div
-                            className={cn(
-                              "h-1 rounded-full",
-                              isOwnMessage ? "bg-blue-300" : "bg-gray-300"
+                      {/* Message Content */}
+                      <div className="relative">
+                        {message.type === "text" && message.text && (
+                          <p className="text-[#dcddde] text-sm break-words leading-relaxed">
+                            {message.text.split(/(@\w+)/g).map((text, i) =>
+                              text.startsWith("@") ? (
+                                <span
+                                  key={i}
+                                  onClick={() => {
+                                    setSelectedUser(
+                                      groupMembers.find(
+                                        (member) =>
+                                          member.id ===
+                                          message.taggedUsers?.[
+                                            message
+                                              .text!.split(/(@\w+)/g)
+                                              .filter((t) => t.startsWith("@"))
+                                              .indexOf(text)
+                                          ]
+                                      ) as User
+                                    );
+                                    setSelectedGroup(null);
+                                    setActiveTab(TabType.USERS);
+                                  }}
+                                  className="font-medium cursor-pointer hover:underline text-[#5865f2]"
+                                >
+                                  {text}
+                                </span>
+                              ) : (
+                                text
+                              )
                             )}
-                          >
-                            <div
-                              className={cn(
-                                "h-full w-2/3 rounded-full",
-                                isOwnMessage ? "bg-white" : "bg-blue-500"
-                              )}
-                            ></div>
-                          </div>
-                          <p
-                            className={cn(
-                              "text-xs mt-1",
-                              isOwnMessage ? "text-blue-100" : "text-gray-500"
-                            )}
-                          >
-                            Voice message
                           </p>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between gap-1 mt-1">
-                      <div
-                        className={cn(
-                          "text-xs",
-                          message.type === "image"
-                            ? "text-gray-400"
-                            : isOwnMessage
-                            ? "text-blue-100"
-                            : "text-gray-500"
                         )}
-                      >
-                        {new Date(message.timestamp).toLocaleTimeString()}
+
+                        {message.type === "image" && message.imageUrl && (
+                          <div className="mt-1">
+                            <Image
+                              src={message.imageUrl}
+                              alt="group image"
+                              className="rounded-lg object-cover max-w-[160px] sm:max-w-[180px] md:max-w-[220px] h-auto min-h-[120px] max-h-[200px] sm:max-h-[250px]"
+                              width={400}
+                              height={300}
+                            />
+                          </div>
+                        )}
+
+                        {message.type === "audio" && message.audioUrl && (
+                          <div className="flex items-center gap-3 min-w-[200px] mt-1">
+                            <button
+                              onClick={() => toggleAudio(message.audioUrl!)}
+                              className="p-2 bg-[#5865f2] hover:bg-[#4752c4] rounded-full cursor-pointer transition-colors"
+                            >
+                              {playingAudio === message.audioUrl &&
+                              !isPaused ? (
+                                <MdPause className="size-4 text-white" />
+                              ) : (
+                                <MdPlayArrow className="size-4 text-white" />
+                              )}
+                            </button>
+                            <div className="flex-1">
+                              <div className="h-1 bg-[#4f545c] rounded-full">
+                                <div className="h-full w-2/3 bg-[#5865f2] rounded-full"></div>
+                              </div>
+                              <p className="text-[#72767d] text-xs mt-1">
+                                Voice message
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {isOwnMessage && (
+                          <div className="flex items-center justify-end gap-1 mt-1">
+                            <span className="text-[#72767d] text-xs">
+                              {new Date(message.timestamp).toLocaleTimeString(
+                                [],
+                                { hour: "2-digit", minute: "2-digit" }
+                              )}
+                            </span>
+                            <MdDoneAll className="size-3 text-[#3ba55c]" />
+                          </div>
+                        )}
                       </div>
-                      {isOwnMessage && (
-                        <MdDoneAll
-                          className={cn(
-                            "size-4",
-                            isOwnMessage ? "text-green-300" : "text-gray-400"
-                          )}
-                        />
-                      )}
                     </div>
                   </div>
-
                   {reactionCounts.length > 0 && (
-                    <div
-                      className={cn(
-                        "flex flex-wrap gap-1 mt-1",
-                        isOwnMessage ? "justify-end" : "justify-start"
-                      )}
-                    >
+                    <div className="flex flex-wrap gap-1 mt-2">
                       {reactionCounts.map((reaction) => (
                         <div
                           key={reaction.emoji}
@@ -411,16 +398,14 @@ export default function GroupChat({ group }: GroupChatProps) {
                             deleteEmoji(message.timestamp, reaction.emoji)
                           }
                           className={cn(
-                            "flex items-center gap-1 px-2 py-1 rounded-full text-xs cursor-pointer border",
+                            "flex items-center gap-1 px-2 py-1 rounded-full text-xs cursor-pointer border transition-colors",
                             reaction.hasReacted
-                              ? "bg-blue-100 border-blue-300"
-                              : "bg-gray-100 border-gray-300"
+                              ? "bg-[#5865f2] border-[#5865f2] text-white"
+                              : "bg-[#2f3136] border-[#4f545c] text-[#b9bbbe] hover:border-[#5865f2]"
                           )}
                         >
                           <span>{reaction.emoji}</span>
-                          <span className="text-gray-600">
-                            {reaction.count}
-                          </span>
+                          <span>{reaction.count}</span>
                         </div>
                       ))}
                     </div>
@@ -434,11 +419,13 @@ export default function GroupChat({ group }: GroupChatProps) {
       </div>
 
       {/* Message Inputs */}
-      <div className="bg-white border-t border-gray-200 p-4">
+      <div className="bg-[#2f3136] border-t border-[#4f545c] p-4">
         {isRecording && (
-          <div className="flex items-center justify-center gap-2 mb-3 p-2 bg-red-50 rounded-lg">
-            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-            <span className="text-red-600 font-medium">Recording...</span>
+          <div className="flex items-center justify-center gap-2 mb-3 p-3 bg-[#ed4245] bg-opacity-10 rounded-lg border border-[#ed4245] border-opacity-30">
+            <div className="w-3 h-3 bg-[#ed4245] rounded-full animate-pulse"></div>
+            <span className="text-[#ed4245] font-medium text-sm">
+              Recording...
+            </span>
           </div>
         )}
 
@@ -456,10 +443,10 @@ export default function GroupChat({ group }: GroupChatProps) {
             onClick={() => fileRef.current?.click()}
             disabled={isUploading || isRecording}
             className={cn(
-              "p-2 sm:p-3 rounded-lg",
+              "p-2 rounded-lg transition-colors",
               isUploading || isRecording
-                ? "text-gray-400 cursor-not-allowed"
-                : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
+                ? "text-[#72767d] cursor-not-allowed"
+                : "text-[#b9bbbe] hover:text-white hover:bg-[#3c3f44] cursor-pointer"
             )}
             title="Upload Image"
           >
@@ -474,10 +461,10 @@ export default function GroupChat({ group }: GroupChatProps) {
               type="text"
               placeholder={t("chat.type_message")}
               disabled={isRecording}
-              className="w-full px-2 sm:px-4 py-1 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
+              className="w-full px-4 py-3 bg-[#40444b] border-0 rounded-lg text-white placeholder-[#72767d] focus:outline-none focus:ring-1 focus:ring-[#5865f2] transition-all duration-200 disabled:opacity-50 text-sm"
             />
             {showMentions && (
-              <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto scrollbar-hide z-50">
+              <div className="absolute bottom-full left-0 right-0 mb-2 bg-[#2f3136] border border-[#4f545c] rounded-lg shadow-lg max-h-40 overflow-y-auto discord-scrollbar z-50">
                 {group.members
                   .map((memberId) =>
                     groupMembers.find((member) => member.id === memberId)
@@ -505,7 +492,7 @@ export default function GroupChat({ group }: GroupChatProps) {
 
                         setShowMentions(false);
                       }}
-                      className="p-3 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-gray-50 flex items-center gap-3"
+                      className="p-3 cursor-pointer border-b border-[#4f545c] last:border-b-0 hover:bg-[#3c3f44] flex items-center gap-3 text-white"
                     >
                       @{member!.username}
                     </div>
@@ -520,12 +507,12 @@ export default function GroupChat({ group }: GroupChatProps) {
             }
             disabled={isUploading}
             className={cn(
-              "p-2 sm:p-3 rounded-lg transition-all duration-200",
+              "p-2 rounded-lg transition-all duration-200",
               isRecording
-                ? "bg-red-500 hover:bg-red-600 text-white"
+                ? "bg-[#ed4245] hover:bg-[#c03e3f] text-white"
                 : isUploading
-                ? "text-gray-400 cursor-not-allowed"
-                : "text-gray-600 hover:text-blue-500 hover:bg-gray-100 cursor-pointer"
+                ? "text-[#72767d] cursor-not-allowed"
+                : "text-[#b9bbbe] hover:text-white hover:bg-[#3c3f44] cursor-pointer"
             )}
             title={isRecording ? "Stop Recording" : "Start Voice Recording"}
           >
@@ -540,13 +527,13 @@ export default function GroupChat({ group }: GroupChatProps) {
             onClick={handleSendMessage}
             disabled={isRecording}
             className={cn(
-              "p-2 sm:p-3 rounded-lg sm:rounded-xl transition-colors text-white",
+              "p-2 rounded-lg transition-colors",
               isRecording
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                ? "bg-[#72767d] cursor-not-allowed"
+                : "bg-[#5865f2] hover:bg-[#4752c4] cursor-pointer"
             )}
           >
-            <IoSend className="size-3 sm:size-5" />
+            <IoSend className="size-5 text-white" />
           </button>
         </div>
       </div>

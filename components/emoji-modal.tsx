@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { cn } from "@/lib/utils";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdDelete, MdOutlineEmojiEmotions } from "react-icons/md";
 import { EmojiModalProps } from "@/types/chat.interfaces";
@@ -34,7 +33,7 @@ const EmojiModal = ({
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [menuOption]);
+  }, [menuOption, showEmojiPicker]);
 
   const handleEmojiClick = (emoji: string) => {
     if (reactions && reactions[emoji]) {
@@ -56,50 +55,35 @@ const EmojiModal = ({
   return (
     <div
       ref={menuRef}
-      className={cn(
-        "absolute top-1/2 -translate-y-1/2 z-50",
-        isOwnMessage ? "left-0 -translate-x-full" : "right-0 translate-x-full"
-      )}
+      className="absolute top-1/2 -translate-y-1/2 z-50 right-0 translate-x-full"
     >
       <div className="relative">
         <button
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 cursor-pointer"
+          className="p-2 rounded-full cursor-pointer"
         >
-          <BsThreeDotsVertical className="size-4 text-gray-600" />
+          <BsThreeDotsVertical className="size-4 text-gray-500" />
         </button>
 
         {showEmojiPicker && (
-          <div
-            className={cn(
-              "absolute top-8 bg-white rounded-lg shadow-md border border-gray-400 p-1 z-20",
-              isOwnMessage ? "right-0" : "left-0"
-            )}
-          >
+          <div className="absolute top-8 bg-[#36393f] rounded-lg shadow-md border border-gray-400 p-1 z-20 left-0">
             <div className="flex flex-col gap-1">
               <div className="relative">
                 <button
                   onClick={() => setReactEmoji(!reactEmoji)}
-                  className="flex items-center gap-2 px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-md w-full text-left cursor-pointer"
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-white hover:bg-[#2f3136] rounded-md w-full text-left cursor-pointer"
                 >
                   <MdOutlineEmojiEmotions className="size-4" />
                   React
                 </button>
 
                 {reactEmoji && (
-                  <div
-                    className={cn(
-                      "absolute bottom-[34px] bg-white rounded-lg shadow-lg border border-gray-400 p-1 flex gap-1",
-                      isOwnMessage
-                        ? "right-[-120px] sm:right-0"
-                        : "left-[-105px] sm:left-0"
-                    )}
-                  >
+                  <div className="absolute bottom-[34px] bg-[#36393f] rounded-lg shadow-lg border border-gray-400 p-1 flex gap-1 left-[-105px] sm:left-0">
                     {EMOJIS.map((emoji) => (
                       <button
                         key={emoji}
                         onClick={() => handleEmojiClick(emoji)}
-                        className="text-lg hover:bg-gray-100 rounded p-1 cursor-pointer transition-colors"
+                        className="text-lg hover:bg-[#2f3136] rounded p-1 cursor-pointer"
                       >
                         {emoji}
                       </button>
@@ -111,7 +95,7 @@ const EmojiModal = ({
               {isOwnMessage && (
                 <button
                   onClick={handleDeleteClick}
-                  className="flex items-center gap-2 px-2 py-1 text-sm text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-red-600 hover:bg-[#2f3136] rounded-md cursor-pointer"
                 >
                   <MdDelete className="size-4" />
                   Delete

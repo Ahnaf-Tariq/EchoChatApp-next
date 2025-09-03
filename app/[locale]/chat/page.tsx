@@ -28,8 +28,8 @@ const Chat = () => {
   }, [router]);
 
   return (
-    <div className="bg-gray-50">
-      <div className="max-w-6xl mx-auto my-3 sm:my-6 grid grid-cols-1 sm:grid-cols-[1fr_2fr] shadow-md">
+    <div className="bg-[#36393f] min-h-screen">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-[300px_1fr]">
         {/* Sidebar Display */}
         <div
           className={cn(

@@ -37,12 +37,12 @@ const Chats = () => {
   };
 
   return (
-    <div className="h-[550px] bg-gray-50 flex flex-col">
+    <div className="h-[550px] bg-[#36393f] flex flex-col border-r border-gray-800">
       {selectedUser && (
         <>
           <ChatHeader />
 
-          <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-2">
+          <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-1">
             {messages.map((message, ind) => (
               <ChatMessages
                 key={ind}
